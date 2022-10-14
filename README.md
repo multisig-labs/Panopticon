@@ -1,4 +1,5 @@
-# Notes
+# 👁 Panopticon 👁
 
-- Orc serves minipool db. Can be polled easily. No transforms, just raw JSON data.
-- Front end uses websocket conn to get contract data, do all transforms on client.
+Read-only web ui for keeping tabs on the GoGoPool Protocol
+
+![](docs/Panopticon.jpg)

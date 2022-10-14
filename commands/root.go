@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"io/fs"
 
-	"github.com/multisig-labs/panopticon/pkg/version"
 	"github.com/spf13/cobra"
 )
 
 const rootCmdName = "panopticon"
 
 const asciiArt = `
-▁ ▂ ▄ ▅ ▆ ▇ █ Panopticon █ ▇ ▆ ▅ ▄ ▂ ▁
+👁 Panopticon 👁
 
 `
 
@@ -26,7 +25,6 @@ func NewRootCommand() *cobra.Command {
 		PersistentPreRun: func(cmd *cobra.Command, args []string) {
 			cmd.SilenceUsage = true // So cobra doesn't print usage when a command fails.
 			fmt.Print(asciiArt)
-			fmt.Printf("Panopticon Version: %s\n\n", version.Version)
 		},
 	}
 

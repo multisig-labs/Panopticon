@@ -12,7 +12,7 @@ import (
 func versionCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
-		Short: "Print the version number of rialto",
+		Short: "Print the version number and list of embedded files",
 		Run: func(c *cobra.Command, args []string) {
 			fmt.Println("Build Date:", version.BuildDate)
 			fmt.Println("Git Commit:", version.GitCommit)

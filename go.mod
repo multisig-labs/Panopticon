@@ -3,6 +3,7 @@ module github.com/multisig-labs/panopticon
 go 1.19
 
 require (
+	github.com/AbsaOSS/env-binder v1.0.1
 	github.com/ava-labs/avalanchego v1.8.5
 	github.com/ava-labs/coreth v0.10.1
 	github.com/davecgh/go-spew v1.1.1

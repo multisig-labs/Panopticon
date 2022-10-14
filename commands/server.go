@@ -14,7 +14,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
-	"github.com/multisig-labs/panopticon/pkg/contracts"
 	"github.com/pkg/browser"
 	"github.com/spf13/cobra"
 )
@@ -25,15 +24,6 @@ var contentSub fs.FS
 // TemplateRenderer is a custom html/template renderer for Echo framework
 type TemplateRenderer struct {
 	templates *template.Template
-}
-
-type reqParams struct {
-	Status       uint   `query:"status"`
-	NodeID       string `query:"nodeid"`
-	Index        uint64 `query:"index"`
-	Limit        uint64 `query:"limit"`
-	Offset       uint64 `query:"offset"`
-	TemplateName string `query:"templateName"`
 }
 
 // Render renders a template document
@@ -56,34 +46,23 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 func serverCommand() *cobra.Command {
 	var host string
 	var port int
-	var authtoken string
-	var verbose bool
 
 	cmd := &cobra.Command{
 		Use:   "server",
-		Short: "Start the Panopticon server process",
+		Short: "Start the Panopticon web server",
 		Run: func(c *cobra.Command, args []string) {
 
-			// PANOPTICON_AUTHTOKEN env will override cli flag
-			atFromEnv, ok := os.LookupEnv("PANOPTICON_AUTHTOKEN")
-			if ok {
-				log.Info("Using PANOPTICON_AUTHTOKEN from env")
-				authtoken = atFromEnv
-			}
-
 			log.SetLevel(0)
-			startServer(authtoken, host, port, verbose)
+			startServer(host, port, AppConfig.AuthToken, AppConfig.Verbose, AppConfig.OpenBrowser)
 		},
 	}
 
 	cmd.Flags().StringVar(&host, "host", "0.0.0.0", "IP addr the server should listen on")
 	cmd.Flags().IntVar(&port, "port", 8000, "TCP port the server should listen on")
-	cmd.Flags().StringVar(&authtoken, "authtoken", "", "HTTP BasicAuth admin:<authtoken>")
-	cmd.Flags().BoolVar(&verbose, "v", false, "Verbose logging")
 	return cmd
 }
 
-func startServer(authtoken string, host string, port int, verbose bool) {
+func startServer(host string, port int, authtoken string, verbose bool, openBrowser bool) {
 	var err error
 
 	e := echo.New()
@@ -92,6 +71,7 @@ func startServer(authtoken string, host string, port int, verbose bool) {
 	e.Use(middleware.CORS())
 
 	if authtoken != "" {
+		fmt.Println("Basic Auth enabled with admin:$AUTH_TOKEN")
 		e.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
 			if subtle.ConstantTimeCompare([]byte(username), []byte("admin")) == 1 &&
 				subtle.ConstantTimeCompare([]byte(password), []byte(authtoken)) == 1 {
@@ -117,7 +97,7 @@ func startServer(authtoken string, host string, port int, verbose bool) {
 		fmt.Println("Ignoring embedded content, serving from /public")
 		contentSub = os.DirFS("./public")
 	} else {
-		// Basically "cd" into the /public folder
+		// Basically "cd" into the /public folder of the embedded content
 		contentSub, err = fs.Sub(content, "public")
 		if err != nil {
 			panic(err)
@@ -131,26 +111,6 @@ func startServer(authtoken string, host string, port int, verbose bool) {
 
 	// ROUTES
 
-	contr, err := contracts.NewContracts("https://anr.fly.dev", "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c")
-	if err != nil {
-		panic(err)
-	}
-
-	e.GET("/contracts/MinipoolManager/FetchMinipool", func(c echo.Context) error {
-		p := new(reqParams)
-		if err := c.Bind(p); err != nil {
-			return err
-		}
-
-		// var result []interface{}
-		// err := contr.MinipoolManagerRaw.Call(nil, &result, method, p)
-		result, err := contr.FetchMinipool(p.NodeID)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusUnprocessableEntity, err.Error())
-		}
-		return c.JSON(http.StatusOK, result)
-	})
-
 	// Autocreate routes for any .html files in /public that do not start with "_"
 	fs.WalkDir(contentSub, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -163,10 +123,9 @@ func startServer(authtoken string, host string, port int, verbose bool) {
 			}
 			e.GET(PathFromFilenameWithoutExtension(fname), func(c echo.Context) error {
 				return c.Render(http.StatusOK, fname, map[string]interface{}{
-					"Title": fmt.Sprintf("Panopticon - %s", TitleFromFilename(fname)),
+					"Title": fmt.Sprintf("👁 Panopticon - %s", TitleFromFilename(fname)),
 				})
 			})
-
 		}
 		return nil
 	})
@@ -180,7 +139,9 @@ func startServer(authtoken string, host string, port int, verbose bool) {
 
 	listenAddr := fmt.Sprintf("%s:%v", host, port)
 
-	browser.OpenURL(fmt.Sprintf("http://localhost:%d", port))
+	if openBrowser {
+		browser.OpenURL(fmt.Sprintf("http://localhost:%d", port))
+	}
 
 	if err := e.Start(listenAddr); err != http.ErrServerClosed {
 		e.Logger.Fatal(err)

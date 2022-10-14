@@ -4,9 +4,26 @@ import (
 	"embed"
 	"fmt"
 	"io/fs"
+	"log"
 
+	"github.com/AbsaOSS/env-binder/env"
 	"github.com/spf13/cobra"
 )
+
+type Config struct {
+	OpenBrowser bool   `env:"OPEN_BROWSER,default=true"`
+	Verbose     bool   `env:"VERBOSE,default=false"`
+	AuthToken   string `env:"AUTH_TOKEN"`
+}
+
+var AppConfig *Config
+
+func init() {
+	AppConfig = &Config{}
+	if err := env.Bind(AppConfig); err != nil {
+		log.Fatalf("error binding config to env: %v", err)
+	}
+}
 
 const rootCmdName = "panopticon"
 

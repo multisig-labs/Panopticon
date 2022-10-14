@@ -1,3 +1,5 @@
+github.com/AbsaOSS/env-binder v1.0.1 h1:tjpJr8O1ydxAMLvjM5wShphPeOd6RbRApa+FTnZoHh4=
+github.com/AbsaOSS/env-binder v1.0.1/go.mod h1:Gpxv0OsTOIrD00Zhj5Bu6zoXnkVdthQZOiCxzlzmwH8=
 github.com/VictoriaMetrics/fastcache v1.10.0 h1:5hDJnLsKLpnUEToub7ETuRu8RCkb40woBZAUiKonXzY=
 github.com/ava-labs/avalanchego v1.8.5 h1:HhNJUsvwk+DxxncutN/4rlnUmnQvtF/73qNbpW3BFJc=
 github.com/ava-labs/avalanchego v1.8.5/go.mod h1:GAo3tDCj5Ulx9xIY78ad5SmGFqtdmFRjJGQ2gJk//Vk=

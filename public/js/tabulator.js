@@ -4,16 +4,13 @@ const dashboardDef = {
   data: [], //assign data to table
   index: "title",
   // reactiveData: true,
-  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
   groupBy: "contract",
   groupHeader: function (value, count, data, group) {
-    return `${value} ${data[0].address.substring(
-      0,
-      6
-    )} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
+    return `${value} ${data[0].address.substring(0, 6)} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
   },
   selectable: true,
   clipboard: "copy",

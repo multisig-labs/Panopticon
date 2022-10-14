@@ -45,59 +45,27 @@ const deployment = {
         },
       ],
     },
-    { contract: "MinipoolManager", metrics: [] },
     {
-      contract: "ProtocolDAO",
+      contract: "Storage",
       metrics: [
         {
-          fn: "getGGPRewardCycleLength",
-          desc: "",
+          fn: "getGuardian",
+          title: "Guardian",
+          desc: "Address of current Guardian",
         },
-        {
-          fn: "getTotalGGPCirculatingSupply",
-          desc: "",
-          formatter: "formatEther",
-        },
-        { fn: "getInflationIntervalRate", desc: "" },
-        {
-          fn: "getInflationIntervalStartTime",
-          desc: "",
-          formatter: "unixToISO",
-        },
-        { fn: "getInflationInterval", desc: "" },
       ],
     },
+    { contract: "MinipoolManager", metrics: [] },
     {
       contract: "TokenggAVAX",
       metrics: [
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
-        { fn: "lastSync", desc: null, formatter: "unixToISO" },
-        { fn: "rewardsCycleEnd", desc: null, formatter: "unixToISO" },
-        { fn: "lastRewardAmount", desc: null, formatter: "formatEther" },
-        { fn: "totalReleasedAssets", desc: null, formatter: "formatEther" },
-        { fn: "stakingTotalAssets", desc: null, formatter: "formatEther" },
-        {
-          fn: "amountAvailableForStaking",
-          desc: null,
-          formatter: "formatEther",
-        },
-      ],
-    },
-    {
-      contract: "Staking",
-      metrics: [
-        {
-          fn: "getTotalGGPStake",
-          title: "Total GGP Stake",
-          desc: "Total GGP in vault assigned to the Staking contract",
-          formatter: "formatEther",
-        },
-        {
-          fn: "getStakerCount",
-          title: "Staker Count",
-          desc: "",
-          formatter: "bigToNumber",
-        },
+        { fn: "lastSync", formatter: "unixToISO" },
+        { fn: "rewardsCycleEnd", formatter: "unixToISO" },
+        { fn: "lastRewardAmount", formatter: "formatEther" },
+        { fn: "totalReleasedAssets", formatter: "formatEther" },
+        { fn: "stakingTotalAssets", formatter: "formatEther" },
+        { fn: "amountAvailableForStaking", formatter: "formatEther" },
       ],
     },
   ],
@@ -106,21 +74,12 @@ const deployment = {
 export default deployment;
 
 // HACK Since only Chrome has the above "assert" syntax
-const contracts = [
-  "Storage",
-  "MinipoolManager",
-  "TokenggAVAX",
-  "Oracle",
-  "Staking",
-  "ProtocolDAO",
-];
-
+const contracts = deployment.dashboard.map((v) => v.contract);
+console.log(contracts);
 export async function deploymentFn() {
   async function fetchABIs(names) {
     const abis = {};
-    const promises = names.map((name) =>
-      fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json())
-    );
+    const promises = names.map((name) => fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json()));
     const responses = await Promise.all(promises);
     for (let i = 0; i < contracts.length; i++) {
       abis[contracts[i]] = responses[i];

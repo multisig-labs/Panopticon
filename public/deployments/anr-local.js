@@ -111,13 +111,23 @@ const deployment = {
         },
       ],
     },
+    {
+      contract: "Storage",
+      metrics: [
+        {
+          fn: "getGuardian",
+          title: "Guardian",
+          desc: "Address of current Guardian",
+        },
+      ],
+    },
   ],
 };
 
 export default deployment;
 
 // HACK Since only Chrome has the above "assert" syntax
-const contracts = ["Storage", "MinipoolManager", "TokenggAVAX", "Oracle", "Staking", "ProtocolDAO"];
+const contracts = deployment.dashboard.map((v) => v.contract);
 
 export async function deploymentFn() {
   async function fetchABIs(names) {

@@ -250,7 +250,7 @@ class Blockchain {
       // console.log("Polling for blockchain data");
       await this.fetchData();
       fn();
-      setTimeout(poll, 30000);
+      setTimeout(poll, 10000);
     };
     poll();
   }
@@ -311,6 +311,7 @@ class GoGoPool {
 
     // Get Storage contract, where we can look up other addresses
     this.contracts.Storage = await new Contract(this.addresses.Storage, this.abis.Storage.abi, this.provider);
+    this.mccontracts.Storage = await new MCContract(this.addresses.Storage, this.abis.Storage.abi);
 
     // Loop through all other contract names we have abis for
     for (const name of Object.keys(this.abis)) {
@@ -351,7 +352,7 @@ class GoGoPool {
     try {
       results = await this.multicallProvider.all(calls);
     } catch (err) {
-      console.log("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
+      console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
     }
     if (!results) return [];
     // console.log("Multicall Results", results);

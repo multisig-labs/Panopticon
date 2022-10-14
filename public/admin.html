@@ -1,0 +1,162 @@
+{{template "layout" .}} {{define "content"}}
+<div class="container w-50 my-5 p-3 border border-5 rounded">
+  <h1 class="text-center">
+    Admin
+    <img class="spinner htmx-indicator" src="/img/rings.svg" />
+  </h1>
+  <div class="container">
+    <button
+      class="btn btn-success off"
+      hx-post="/v1/control/start"
+      hx-ext="json-enc"
+      hx-vals='{"execPath":"/usr/local/bin/avalanchego", "globalNodeConfig": "{\"min-stake-duration\": \"1m\"}"}'
+      hx-swap="none"
+      hx-indicator=".spinner"
+      z_="on load fetch `/ext/bc/P` if it then add .networkRunning to document.body end
+            on click add @disabled to me end
+            on htmx:afterRequest 
+            show #waiter then repeat forever 
+              fetch `/ext/bc/P` 
+              if it 
+                then hide #waiter then add .networkRunning to document.body then remove @disabled from me then break 
+              else wait 5s
+            end"
+    >
+      Start Network
+    </button>
+    <div id="waiter" style="display: none">
+      Waiting 30sec for network to start...
+    </div>
+
+    <button
+      class="btn btn-danger on"
+      hx-post="/v1/control/stop"
+      hx-ext="json-enc"
+      hx-swap="none"
+      hx-indicator=".spinner"
+      z_="on htmx:afterRequest if detail.successful then 
+               remove .networkRunning from document.body"
+    >
+      Stop Network
+    </button>
+
+    <form>
+      <button
+        class="btn btn-info on"
+        hx-post="/v1/control/addnode"
+        hx-ext="json-enc"
+        hx-indicator=".spinner"
+        hx-swap="none"
+        _="on htmx.afterRequest wait 3s then send click to #node-list-refresher"
+      >
+        Spin Up Node
+      </button>
+      <input id="nodeName" name="name" style="visibility: hidden" />
+    </form>
+
+    <div class="container">
+      <hr />
+      <h3 class="text-center">Snapshots</h3>
+      <div>
+        Snapshots are wonky. When you save a snapshot, it stops the network. To
+        reload a snapshot, you have to start the network, THEN reload a
+        snapshot.
+      </div>
+      <table id="snapshots">
+        <thead>
+          <tr>
+            <th>Snapshot Name</th>
+            <th>
+              <span
+                class="icon"
+                hx-post="/v1/control/getsnapshotnames"
+                hx-ext="json-enc"
+                hx-target="#snapshots>tbody"
+                hx-trigger="click,load"
+                nunjucks-template="snapshots-list.njk"
+                ><i class="bi-arrow-clockwise"></i
+              ></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">
+              <form>
+                <input name="snapshot_name" placeholder="Name" />
+                <button
+                  hx-post="/v1/control/savesnapshot"
+                  hx-ext="json-enc"
+                  hx-swap="none"
+                >
+                  Create
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="container mt-5">
+    <div class="off badge bg-danger">Network not running.</div>
+    <h1 class="on">All Running Nodes</h1>
+    <table id="node-list" class="on table table-sm">
+      <thead>
+        <th>Node</th>
+        <th>
+          <span
+            id="node-list-refresher"
+            class="icon"
+            hx-post="/v1/control/health"
+            hx-ext="json-enc"
+            hx-target="#node-list>tbody"
+            hx-trigger="click,load"
+            hx-indicator=".spinner"
+            nunjucks-template="node-list.njk"
+            z_="on htmx:afterRequest 
+                     if detail.successful 
+                     then call getNextNodeName(JSON.parse(detail.xhr.response).clusterInfo.nodeNames)
+                     then set #nodeName.value to result
+                     "
+          >
+            <i class="bi-arrow-clockwise"></i>
+          </span>
+        </th>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="2"></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="container w-75 text-center border border-5 rounded mt-4">
+  <h3 class="text-center">
+    Contract Addresses
+    <span
+      class="icon"
+      z_="on load or click fetch 'https://opensheet.elk.sh/1VFPt_0FMzDvwHUogSqqIZ_S1QpQcNGqgT9FuAgEbGeM/Sheet1' with method:'GET'
+            then set ctx to {contracts: JSON.parse(result)}
+            then call nunjucks.render('contract-addresses.njk', ctx) 
+            then put result into <#contract-addresses>tbody/>"
+    >
+      <i class="bi-arrow-clockwise"></i>
+    </span>
+  </h3>
+  <table id="contract-addresses">
+    <tbody></tbody>
+  </table>
+  <div class="text-end fs-6 fw-light fst-italic">
+    (Update addresses
+    <a
+      href="https://docs.google.com/spreadsheets/d/1VFPt_0FMzDvwHUogSqqIZ_S1QpQcNGqgT9FuAgEbGeM/edit#gid=0"
+      target="_blank"
+      >here</a
+    >
+  </div>
+</div>
+{{end}}

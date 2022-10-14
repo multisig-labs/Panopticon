@@ -1,0 +1,36 @@
+app = "panopticon"
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+
+# [experimental]
+# allowed_public_ports = []
+# cmd = []
+
+[[services]]
+protocol = "tcp"
+internal_port = 8500
+
+[[services.ports]]
+handlers = ["http"]
+port = "80"
+force_https = true
+
+[[services.ports]]
+handlers = ["http", "tls"]
+port = "443"
+
+[services.concurrency]
+hard_limit = 25
+soft_limit = 20
+type = "connections"
+
+[[services.tcp_checks]]
+grace_period = "30s"
+interval = "30s"
+restart_limit = 0
+timeout = "5s"
+

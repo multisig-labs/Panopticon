@@ -1,0 +1,50 @@
+{{define "_nav"}}
+<nav
+  class="navbar navbar-expand-lg"
+  style="background-color: #ff6161"
+  zhx-boost="true"
+>
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+      <img src="/img/ggp-logo-full-color.svg" width="125" />
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+    >
+      <span class="navbar-toggler-icon">🍔</span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="/home">Home</a>
+        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link active" href="/status">Status</a>
+        </li> -->
+      </ul>
+      <div class="row mb-2 mx-2">
+        <div class="col-12">
+          <select
+            id="deployment"
+            name="deployment"
+            class="form-control form-control form-select"
+            _="on load 
+             js return localStorage.getItem('deployment') end
+             then put it into my value
+             on change 
+             call localStorage.setItem('deployment', my value)
+             then call window.location.reload()
+          "
+          >
+            <option value="anr-fly" selected>ANR (fly)</option>
+            <option value="anr-local">ANR (local)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+{{end}}

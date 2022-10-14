@@ -1,0 +1,43 @@
+{{template "layout" .}} {{define "content"}}
+<div class="masthead mb-3">
+  <div class="container-xxl bd-gutter">
+    <div class="col-md-8 mx-auto text-center mt-5">
+      <h1 class="mb-3 fw-semibold">👁Panopticon👁</h1>
+    </div>
+  </div>
+</div>
+
+<div class="container w-95 text-left">
+  <div id="blockchain-metrics"></div>
+</div>
+
+<div class="container w-95 text-center border border-5 rounded">
+  <h3 class="text-center">Protocol Dashboard</h3>
+  <div id="dashboard"></div>
+</div>
+<div class="container w-95 text-center border border-5 rounded mt-4">
+  <h3 class="text-center">Minipools</h3>
+  <div id="minipools"></div>
+</div>
+
+<script type="module">
+  import { dashboardDef, minipoolsDef } from "/js/tabulator.js";
+
+  document.addEventListener("ggp:loaded", (evt) => {
+    console.log("home.html ggp:loaded", evt);
+
+    window.BC.refreshDataLoop(
+      () =>
+        (document.getElementById("blockchain-metrics").innerHTML =
+          window.BC.statusLine())
+    );
+
+    const tableDashboard = new Tabulator("#dashboard", dashboardDef);
+    const tableMinipools = new Tabulator("#minipools", minipoolsDef);
+    window.GGP.refreshDataLoop(() => {
+      tableDashboard.updateOrAddData(window.GGP.dashboardAsTabulatorData());
+      tableMinipools.updateOrAddData(window.GGP.minipoolsAsTabulatorData());
+    });
+  });
+</script>
+{{ end }}

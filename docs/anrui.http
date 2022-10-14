@@ -1,0 +1,15 @@
+# Install https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+@url = {{$dotenv PANOPTICON_URL}}
+@auth = admin:{{$dotenv PANOPTICON_AUTH_TOKEN}}
+
+GET {{url}}
+Authorization: Basic {{auth}}
+
+###
+GET {{url}}/contracts/MinipoolManager?nodeid=NodeID-BpmNCATNrmErQRkZgdAqJt815nys9Th58
+Authorization: Basic {{auth}}
+
+###
+GET {{url}}/contracts/MinipoolManager/getMinipool?index=0
+Authorization: Basic {{auth}}
+

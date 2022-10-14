@@ -1,0 +1,32 @@
+{% for n in snapshotNames %}
+<tr>
+  <td class="text-start">
+    <form>
+      {{ n }}
+      <input style="visibility: hidden" name="snapshot_name" value="{{ n }}" />
+      <button
+        hx-post="/v1/control/loadsnapshot"
+        hx-ext="json-enc"
+        hx-swap="none"
+        hx-confirm="Load snapshot {{ n }}?"
+      >
+        <i class="bi-cloud-arrow-up"></i>
+      </button>
+    </form>
+  </td>
+  <td>
+    <form>
+      <input style="visibility: hidden" name="snapshot_name" value="{{ n }}" />
+      <button
+        _="on htmx:afterRequest if detail.successful transition opacity to 0 then remove closest <tr/>"
+        hx-post="/v1/control/removesnapshot"
+        hx-ext="json-enc"
+        hx-swap="none"
+        hx-confirm="Delete snapshot {{ n }}?"
+      >
+        <i class="bi-trash"></i>
+      </button>
+    </form>
+  </td>
+</tr>
+{% endfor %}

@@ -1,0 +1,140 @@
+{{template "layout" .}} {{define "content"}}
+
+<div class="container-fluid p-5">
+  <div id="minipools"></div>
+</div>
+
+<script>
+  var table = new Tabulator("#minipools", {
+    // data: data, //assign data to table
+    ajaxURL: `${localStorage.getItem("rialto_url")}/all_minipools`,
+    // ajaxURL: `/orc.json`,
+    ajaxConfig: {
+      headers: {
+        Authorization: "Basic YWRtaW46c2VrcmV0",
+      },
+    },
+    ajaxResponse: function (url, params, response) {
+      const data = response.Minipools;
+      return data;
+    },
+    height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+    layout: "fitColumns", //fit columns to width of table (optional)
+    responsiveLayout: "collapse",
+    responsiveLayoutCollapseStartOpen: false,
+    groupBy: "State",
+    groupHeader: function (value, count, data, group) {
+      return `${STATEMAP[value]}<span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
+    },
+    selectable: true,
+    clipboard: "copy",
+    clipboardCopyRowRange: "selected",
+    columns: [
+      //Define Table Columns
+      { width: 20, formatter: "responsiveCollapse", headerSort: false },
+      { title: "ID", field: "ID", width: 5 },
+      { title: "NodeID", field: "NodeID" },
+      { title: "State", field: "State", width: 90, formatter: stateFormatter },
+      { title: "Status", field: "Status", width: 70 },
+      { title: "Dur", field: "Duration", width: 60 },
+      {
+        title: "Created",
+        field: "CreatedAt",
+        width: 90,
+        formatter: "datetime",
+        sorter: "date",
+        formatterParams: {
+          inputFormat: "iso",
+          outputFormat: "MM/dd/yy",
+          invalidPlaceholder: "(invalid date)",
+          timezone: "America/Los_Angeles",
+        },
+      },
+      { title: "Owner", field: "Owner", width: 120 },
+      { title: "AvaxNodeOp", field: "AvaxNodeOpAmt", formatter: amtFormatter },
+      { title: "AvaxUser", field: "AvaxUserAmt", formatter: amtFormatter },
+      { title: "GGPSlash", field: "GgpSlashAmt", formatter: amtFormatter },
+      { title: "Error", field: "MinipoolError" },
+      {
+        title: "NodeAddr",
+        field: "NodeAddr",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "MultisigAddr",
+        field: "MultisigAddr",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ClaimMinipoolTxID",
+        field: "ClaimMinipoolTxID",
+        formatter: txFormatter,
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ExportC2PTxID",
+        field: "ExportC2PTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ImportC2PTxID",
+        field: "ImportC2PTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ExportC2PTxID",
+        field: "ExportC2PTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "StakeMinipoolTxID",
+        field: "StakeMinipoolTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "RecordStakingStartTxID",
+        field: "RecordStakingStartTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "RecordStakingEndTxID",
+        field: "RecordStakingEndTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ExportP2CTxID",
+        field: "ExportP2CTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "ImportP2CTxID",
+        field: "ImportP2CTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "RecordStakingErrorTxID",
+        field: "RecordStakingErrorTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+      {
+        title: "CancelMinipoolTxID",
+        field: "CancelMinipoolTxID",
+        minWidth: 5000,
+        responsive: 9,
+      },
+    ],
+  });
+</script>
+{{end}}

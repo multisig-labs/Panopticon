@@ -1,0 +1,110 @@
+{{template "layout" .}} {{define "content"}}
+<div class="container-xxl bd-gutter my-5">
+  <div class="container">
+    <h1>
+      Validators
+      <span
+        class="icon"
+        hx-post="/ext/bc/P"
+        hx-vals='{"jsonrpc":"2.0","id":"1","method":"platform.getCurrentValidators"}'
+        hx-ext="json-enc"
+        hx-target="#validators>tbody"
+        hx-trigger="click,load"
+        nunjucks-template="validators-list.njk"
+        _="on htmx:afterRequest if detail.successful then 
+                     add .networkRunning to document.body 
+                     else remove .networkRunning from document.body"
+      >
+        <i class="bi-arrow-clockwise"></i>
+      </span>
+    </h1>
+    <table id="validators" class="table table-sm">
+      <thead>
+        <th>Validator NodeID</th>
+        <th>Staked</th>
+        <th>Reward</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Fee</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="6">
+            Network Not Running. Must be logged in to start the network.
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td colspan="3" style="text-align: right">
+            <i>Current Time: <span id="currTime"></span></i>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="container mt-5">
+    <h1>
+      Pending Validators
+      <span
+        class="icon"
+        hx-post="/ext/bc/P"
+        hx-vals='{"jsonrpc":"2.0","id":"1","method":"platform.getPendingValidators"}'
+        hx-ext="json-enc"
+        hx-target="#pending-validators>tbody"
+        hx-trigger="click,load"
+        nunjucks-template="pending-validators-list.njk"
+      >
+        <i class="bi-arrow-clockwise"></i>
+      </span>
+    </h1>
+    <table id="pending-validators" class="table table-sm">
+      <thead>
+        <th>Validator NodeID</th>
+        <th>Staked</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Fee</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="5">
+            Network Not Running. Must be logged in to start the network.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="container mt-5">
+    <h1>
+      Available Nodes
+      <span
+        id="node-list-refresher"
+        class="icon"
+        hx-get="/cgi-bin/nodes"
+        hx-ext="json-enc"
+        hx-target="#node-list>tbody"
+        hx-trigger="click,load"
+        hx-indicator=".spinner"
+        nunjucks-template="available-nodes.njk"
+      >
+        <i class="bi-arrow-clockwise"></i>
+      </span>
+    </h1>
+    <table id="node-list" class="on table table-sm">
+      <thead>
+        <th>NodeID</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{{end}}

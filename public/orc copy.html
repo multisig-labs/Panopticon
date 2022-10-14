@@ -1,0 +1,142 @@
+{{template "layout" .}} {{define "content"}}
+
+<div id="minipools"></div>
+
+<script>
+  const addClassWhenNeeded = (td, cellProperties) => {
+    const className = cellProperties.className;
+
+    if (className !== void 0) {
+      Handsontable.dom.addClass(td, className);
+    }
+  };
+  function progressBarRenderer(
+    instance,
+    td,
+    row,
+    column,
+    prop,
+    value,
+    cellProperties
+  ) {
+    const div = document.createElement("div");
+
+    div.style.width = `${value * 10}px`;
+
+    addClassWhenNeeded(td, cellProperties);
+    Handsontable.dom.addClass(div, "progressBar");
+    Handsontable.dom.empty(td);
+
+    td.appendChild(div);
+  }
+
+  const table = document.getElementById("minipools");
+  let data = [
+    {
+      AvaxNodeOpAmt: 1000000000000,
+      AvaxNodeOpRewardAmt: 0,
+      AvaxTotalRewardAmt: 0,
+      AvaxUserAmt: 1000000000000,
+      AvaxUserRewardAmt: 0,
+      CancelMinipoolTxID: "",
+      ClaimMinipoolTxID:
+        "0x523a44e0f9396974861c417eb8b9d6726dba2b71d0893442849970ae4a46d0fb",
+      CreatedAt: "2022-09-22T01:06:20.290647936Z",
+      DelegationFee: 0,
+      DeletedAt: 1663809061,
+      Duration: 120,
+      EndTime: 0,
+      ExportC2PTxID: "2fNLaMtfKX7h4va79BAvHHfctLQ6jZ3A9efKn3Yb47JQ2W3RY8",
+      ExportP2CTxID: "2nLsnkorJcu5mPtekHWn2vGTxZsu3WiZvhzFpCLmGMoAm4JJ2m",
+      GgpSlashAmt: 0,
+      ID: 1,
+      ImportC2PTxID: "2odYWLjLWviYykaSKbeMKvtWA57rqsBgwJPc1vpQTNqoFzDPde",
+      ImportP2CTxID: "VdJePbgN69PNKmqFW6Y9diS5ANUE8CwB6cMBHYurPt26YJPgt",
+      MinipoolError: "",
+      MultisigAddr: "0xB654A60A22b9c307B4a0B8C200CdB75A78c4187c",
+      NodeAddr: "0x6977C4Ae53FD6849bE9d9AcD47e3b7dcdD55b92B",
+      NodeID: "NodeID-AcfRnjbzyGhmYytzk7eCSfPnkchqRZwN3",
+      Owner: "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee",
+      RecordStakingEndTxID:
+        "0x5b96d554e63167bff4b2d36d3d5fe61a47cb6734314499c2daceef1fef466f23",
+      RecordStakingErrorTxID: "",
+      RecordStakingStartTxID:
+        "0x61855edaab08f9d8b1335570a101b1260c0cbe9ad07c9dc021dc4fde32adc4fe",
+      StakeMinipoolTxID: "22eHzTyX8PuZqPGTvUs6BANEt9tioaKmCotzvto83UqpteRLSu",
+      StartTime: 0,
+      State: 19,
+      Status: 0,
+      UpdatedAt: "2022-09-22T01:11:01.12146148Z",
+    },
+  ];
+
+  function pick(o, ...props) {
+    return Object.assign({}, ...props.map((prop) => ({ [prop]: o[prop] })));
+  }
+
+  function safeHtmlRenderer(
+    instance,
+    td,
+    row,
+    col,
+    prop,
+    value,
+    cellProperties
+  ) {
+    // be sure you only allow certain HTML tags to avoid XSS threats
+    // (you should also remove unwanted HTML attributes)
+    td.innerHTML = Handsontable.helper.sanitize(value, {
+      ALLOWED_TAGS: ["em", "b", "strong", "a", "big"],
+    });
+  }
+
+  const cols = ["ID", "State", "Status", "NodeID", "TXs"];
+  data = data.map((r) => pick(r, ...cols));
+  data[0].TXs = "TXID: 0x123<br>TXID:0x345";
+  console.log(data);
+
+  new Handsontable(table, {
+    data,
+    height: "auto",
+    width: "auto",
+    colHeaders: cols,
+    columns: [
+      { data: "ID", renderer: "html" },
+      { data: "State", renderer: "html" },
+      { data: "Status", renderer: "html" },
+      { data: "NodeID", renderer: "html" },
+      { data: "TXs", renderer: "html" },
+      //   { data: 2, type: "text" },
+      //   { data: 3, type: "text" },
+      //   {
+      //     data: 4,
+      //     type: "date",
+      //     allowInvalid: false,
+      //   },
+      //   { data: 5, type: "text" },
+      //   {
+      //     data: 6,
+      //     type: "checkbox",
+      //     className: "htCenter",
+      //   },
+      //   {
+      //     data: 7,
+      //     type: "numeric",
+      //   },
+    ],
+    dropdownMenu: true,
+    hiddenColumns: {
+      indicators: true,
+    },
+    contextMenu: true,
+    multiColumnSorting: true,
+    filters: true,
+    rowHeaders: true,
+    // manualRowMove: true,
+    // afterGetColHeader: alignHeaders,
+    // afterOnCellMouseDown: changeCheckboxCell,
+    // beforeRenderer: addClassesToRows,
+    licenseKey: "non-commercial-and-evaluation",
+  });
+</script>
+{{end}}

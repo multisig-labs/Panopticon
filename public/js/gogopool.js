@@ -2,10 +2,7 @@
 
 import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { utils, providers, Contract } from "https://cdn.skypack.dev/ethers";
-import {
-  Contract as MCContract,
-  Provider as MCProvider,
-} from "https://cdn.skypack.dev/ethcall";
+import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
 
 const STATUSMAP = {
   0: "Prelaunch",
@@ -37,12 +34,7 @@ async function cb58Decode(message) {
   const checksum = buffer.slice(-4);
   const newChecksum = (await sha256(payload)).slice(-4);
 
-  if (
-    (checksum[0] ^ newChecksum[0]) |
-    (checksum[1] ^ newChecksum[1]) |
-    (checksum[2] ^ newChecksum[2]) |
-    (checksum[3] ^ newChecksum[3])
-  )
+  if ((checksum[0] ^ newChecksum[0]) | (checksum[1] ^ newChecksum[1]) | (checksum[2] ^ newChecksum[2]) | (checksum[3] ^ newChecksum[3]))
     throw new Error("Invalid checksum");
   return payload;
 }
@@ -144,13 +136,27 @@ async function transformMinipools(mps, labels = {}) {
   return xmps;
 }
 
-// TODO Maybe just merge these with the Tabular ones, only format for the table?
+// TODO Maybe just merge these with the Tabulator ones, only format for the table?
 const defaultFormatters = {
-  formatEther: (v) => utils.formatEther(v),
+  formatEther: (v) =>
+    parseFloat(utils.formatEther(v)).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+  formatEtherPct: (v) => {
+    const p = parseFloat(utils.formatEther(v)) * 100;
+    return (
+      p.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      }) + "%"
+    );
+  },
   formatEtherAtTime: (v) => `${utils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),
-  unixToISO: (v) =>
-    DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT),
+  unixToISO: (v) => {
+    if (v.toNumber) v = v.toNumber();
+    return DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT);
+  },
 };
 
 class Blockchain {
@@ -204,8 +210,7 @@ class Blockchain {
         name: "timestampP",
         url: "/ext/bc/P",
         method: "platform.getTimestamp",
-        resultFn: (v) =>
-          DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
+        resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
       },
       {
         name: "blockNumberC",
@@ -218,23 +223,16 @@ class Blockchain {
         name: "timestampC",
         url: "/ext/index/C/block",
         method: "index.getLastAccepted",
-        resultFn: (v) =>
-          DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
+        resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
       },
     ];
-    const promises = metrics.map((m) =>
-      fetch(`${this.host}${m.url}`, this.makeRpc(m.method, m.params)).then(
-        (res) => res.json()
-      )
-    );
+    const promises = metrics.map((m) => fetch(`${this.host}${m.url}`, this.makeRpc(m.method, m.params)).then((res) => res.json()));
     let results = await Promise.all(promises);
 
     this.data = {};
 
     for (let i = 0; i < metrics.length; i++) {
-      const value = metrics[i].resultFn
-        ? metrics[i].resultFn.call(this, results[i].result)
-        : results[i].result;
+      const value = metrics[i].resultFn ? metrics[i].resultFn.call(this, results[i].result) : results[i].result;
       this.data[metrics[i].name] = value;
     }
 
@@ -312,37 +310,21 @@ class GoGoPool {
     await this.multicallProvider.init(this.provider);
 
     // Get Storage contract, where we can look up other addresses
-    this.contracts.Storage = await new Contract(
-      this.addresses.Storage,
-      this.abis.Storage.abi,
-      this.provider
-    );
+    this.contracts.Storage = await new Contract(this.addresses.Storage, this.abis.Storage.abi, this.provider);
 
     // Loop through all other contract names we have abis for
     for (const name of Object.keys(this.abis)) {
       if (name === "Storage") continue;
       try {
-        const address = await this.contracts.Storage.getAddress(
-          utils.solidityKeccak256(
-            ["string", "string"],
-            ["contract.address", name]
-          )
-        );
+        const address = await this.contracts.Storage.getAddress(utils.solidityKeccak256(["string", "string"], ["contract.address", name]));
         this.addresses[name] = address;
 
         // Make a standard ethers contract
-        const contract = await new Contract(
-          this.addresses[name],
-          this.abis[name].abi,
-          this.provider
-        );
+        const contract = await new Contract(this.addresses[name], this.abis[name].abi, this.provider);
         this.contracts[name] = contract;
 
         // Also make a MultiCall contract for use with 'ethcall'
-        const mccontract = await new MCContract(
-          this.addresses[name],
-          this.abis[name].abi
-        );
+        const mccontract = await new MCContract(this.addresses[name], this.abis[name].abi);
         this.mccontracts[name] = mccontract;
       } catch (e) {
         console.log(`error [${name}]`, e);
@@ -365,7 +347,13 @@ class GoGoPool {
       }
     }
 
-    const results = await this.multicallProvider.all(calls);
+    let results;
+    try {
+      results = await this.multicallProvider.all(calls);
+    } catch (err) {
+      console.log("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
+    }
+    if (!results) return [];
     // console.log("Multicall Results", results);
 
     let i = 0;
@@ -374,10 +362,7 @@ class GoGoPool {
         metric.rawValue = results[i];
         switch (typeof metric.formatter) {
           case "string":
-            metric.value = this.formatters[metric.formatter].call(
-              this,
-              results[i]
-            );
+            metric.value = this.formatters[metric.formatter].call(this, results[i]);
             break;
           case "function":
             metric.value = metric.formatter.call(this, results[i]);
@@ -414,14 +399,9 @@ class GoGoPool {
   async fetchMinipools({ status } = { status: Object.keys(STATUSMAP) }) {
     await this.until((_) => this.isLoaded);
 
-    const promises = status.map((s) =>
-      this.contracts.MinipoolManager.getMinipools(s, 0, 0)
-    );
+    const promises = status.map((s) => this.contracts.MinipoolManager.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
-    this.minipools = await transformMinipools(
-      results.flat(),
-      this.addressLabels
-    );
+    this.minipools = await transformMinipools(results.flat(), this.addressLabels);
     return this.minipools;
   }
 

@@ -1,14 +1,4 @@
 // Scripts that need to load before everything
-document.addEventListener("alpine:init", () => {
-  Alpine.store("GGP", {
-    on: false,
-
-    toggle() {
-      this.on = !this.on;
-    },
-  });
-});
-
 document.addEventListener("ggp:loaded", (e) => {
   console.log("ggp:loaded");
 });
@@ -17,7 +7,7 @@ document.addEventListener("DOMContentLoaded", (e) => {
   // To Debug HTMX uncomment this line
   // htmx.logAll();
 
-  console.log("addEventListener DOMContentLoaded");
+  console.log("DOMContentLoaded");
 
   document.body.addEventListener("htmx:load", function (evt) {
     console.log("htmx:load", evt);

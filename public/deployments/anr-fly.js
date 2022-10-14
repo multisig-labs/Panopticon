@@ -47,6 +47,27 @@ const deployment = {
     },
     { contract: "MinipoolManager", metrics: [] },
     {
+      contract: "ProtocolDAO",
+      metrics: [
+        {
+          fn: "getGGPRewardCycleLength",
+          desc: "",
+        },
+        {
+          fn: "getTotalGGPCirculatingSupply",
+          desc: "",
+          formatter: "formatEther",
+        },
+        { fn: "getInflationIntervalRate", desc: "" },
+        {
+          fn: "getInflationIntervalStartTime",
+          desc: "",
+          formatter: "unixToISO",
+        },
+        { fn: "getInflationInterval", desc: "" },
+      ],
+    },
+    {
       contract: "TokenggAVAX",
       metrics: [
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
@@ -91,6 +112,7 @@ const contracts = [
   "TokenggAVAX",
   "Oracle",
   "Staking",
+  "ProtocolDAO",
 ];
 
 export async function deploymentFn() {

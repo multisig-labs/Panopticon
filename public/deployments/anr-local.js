@@ -47,6 +47,38 @@ const deployment = {
     },
     { contract: "MinipoolManager", metrics: [] },
     {
+      contract: "ProtocolDAO",
+      metrics: [
+        { fn: "getGGPRewardsEligibilityMinLength", desc: "" },
+        {
+          fn: "getGGPRewardCycleLength",
+          desc: "Seconds",
+        },
+        {
+          fn: "getTotalGGPCirculatingSupply",
+          desc: "",
+          formatter: "formatEther",
+        },
+        // Needs an arg, wat do?
+        // { fn: "getClaimingContractPerc" },
+        { fn: "getInflationIntervalRate", desc: "" },
+        {
+          fn: "getInflationIntervalStartTime",
+          formatter: "unixToISO",
+        },
+        { fn: "getInflationInterval", desc: "Seconds" },
+        { fn: "getMinipoolMinStakingAmount", formatter: "formatEther" },
+        { fn: "getMinipoolNodeCommissionFeePercentage", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinipoolAvaxAssignmentMax", formatter: "formatEther" },
+        { fn: "getMinipoolAvaxAssignmentMin", formatter: "formatEther" },
+        { fn: "getExpectedRewardRate", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMaxCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
+        { fn: "getDelegationDurationLimit", desc: "Seconds" },
+        { fn: "getTargetGGAVAXReserveRate", desc: "", formatter: "formatEtherPct" },
+      ],
+    },
+    {
       contract: "TokenggAVAX",
       metrics: [
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
@@ -85,20 +117,12 @@ const deployment = {
 export default deployment;
 
 // HACK Since only Chrome has the above "assert" syntax
-const contracts = [
-  "Storage",
-  "MinipoolManager",
-  "TokenggAVAX",
-  "Oracle",
-  "Staking",
-];
+const contracts = ["Storage", "MinipoolManager", "TokenggAVAX", "Oracle", "Staking", "ProtocolDAO"];
 
 export async function deploymentFn() {
   async function fetchABIs(names) {
     const abis = {};
-    const promises = names.map((name) =>
-      fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json())
-    );
+    const promises = names.map((name) => fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json()));
     const responses = await Promise.all(promises);
     for (let i = 0; i < contracts.length; i++) {
       abis[contracts[i]] = responses[i];

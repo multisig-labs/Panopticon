@@ -33,6 +33,7 @@ dev: compile
 copy-contracts:
 	cp -r ../gogopool-contracts/artifacts/contracts/contract/MinipoolManager.sol ./public/contracts
 	cp -r ../gogopool-contracts/artifacts/contracts/contract/Oracle.sol ./public/contracts
+	cp -r ../gogopool-contracts/artifacts/contracts/contract/dao/ProtocolDAO.sol ./public/contracts
 	cp -r ../gogopool-contracts/artifacts/contracts/contract/rewards/RewardsPool.sol ./public/contracts
 	cp -r ../gogopool-contracts/artifacts/contracts/contract/Staking.sol ./public/contracts
 	cp -r ../gogopool-contracts/artifacts/contracts/contract/Storage.sol ./public/contracts

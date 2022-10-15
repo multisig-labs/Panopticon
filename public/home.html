@@ -3,8 +3,7 @@
   <div class="container-xxl bd-gutter">
     <div class="col-md-8 mx-auto text-center mt-5">
       <h1 class="mb-3 fw-semibold">
-        Panopticon
-        <span class="d-inline-block blinking" data-hover="👁">👁</span>
+        <span class="d-inline-block blinking">👁</span> Panopticon <span class="d-inline-block blinking">👁</span>
       </h1>
     </div>
   </div>
@@ -24,19 +23,34 @@
 </div>
 
 <script type="module">
+  import { DEPLOYMENT } from "/deployments/selected.js";
+  import { GoGoPool, Blockchain } from "/js/gogopool.js";
   import { dashboardDef, minipoolsDef } from "/js/tabulator.js";
+  let GGP, BC;
 
-  document.addEventListener("ggp:loaded", (evt) => {
-    console.log("home.html ggp:loaded", evt);
+  async function initData() {
+    GGP = new GoGoPool(DEPLOYMENT);
+    BC = new Blockchain(DEPLOYMENT);
 
-    window.BC.refreshDataLoop(() => (document.getElementById("blockchain-metrics").innerHTML = window.BC.statusLine()));
+    await Promise.all([
+      BC.fetchData(),
+      GGP.fetchContracts(),
+      GGP.fetchDashboardData(),
+      // GGP.fetchMinipools({ status: [1, 2, 3] }),
+      GGP.fetchMinipools(),
+    ]);
+    console.log("GGP Loaded", GGP);
+  }
 
-    const tableDashboard = new Tabulator("#dashboard", dashboardDef);
-    const tableMinipools = new Tabulator("#minipools", minipoolsDef);
-    window.GGP.refreshDataLoop(() => {
-      tableDashboard.updateOrAddData(window.GGP.dashboardAsTabulatorData());
-      tableMinipools.updateOrAddData(window.GGP.minipoolsAsTabulatorData());
-    });
+  await initData();
+
+  BC.refreshDataLoop(() => (document.getElementById("blockchain-metrics").innerHTML = BC.statusLine()));
+
+  const tableDashboard = new Tabulator("#dashboard", dashboardDef);
+  const tableMinipools = new Tabulator("#minipools", minipoolsDef);
+  GGP.refreshDataLoop(() => {
+    tableDashboard.updateOrAddData(GGP.dashboardAsTabulatorData());
+    tableMinipools.updateOrAddData(GGP.minipoolsAsTabulatorData());
   });
 </script>
 {{ end }}

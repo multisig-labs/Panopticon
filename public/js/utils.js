@@ -1,4 +1,7 @@
-const STATEMAP = {
+import { utils as ethersUtils } from "https://cdn.skypack.dev/ethers";
+import { DateTime } from "https://cdn.skypack.dev/luxon";
+
+const ORC_STATE_MAP = {
   0: "Prelaunch",
   1: "ClaimMPStrt",
   2: "ClaimMPFin",
@@ -24,24 +27,15 @@ const STATEMAP = {
   22: "MPError",
 };
 
-function addrFormatter(cell, formatterParams, onRendered) {
-  const addr = cell.getValue();
-  return addr.substring(0, 6) + ".." + addr.substring(addr.length - 4);
-}
-
-function txFormatter(cell, formatterParams, onRendered) {
-  const tx = cell.getValue();
-  if (tx.substring(0, 2) === "0x") {
-    return `<a href="https://anr.fly.dev/cgi-bin/txc/${tx}" target="_blank">${tx}</a>`;
-  } else {
-    return `<a href="https://anr.fly.dev/cgi-bin/txp/${tx}" target="_blank">${tx}</a>`;
-  }
-}
-
-function stateFormatter(cell, formatterParams, onRendered) {
-  console.log(cell.getValue());
-  return STATEMAP[cell.getValue()];
-}
+const MINIPOOL_STATUS_MAP = {
+  0: "Prelaunch",
+  1: "Launched",
+  2: "Staking",
+  3: "Withdrawable",
+  4: "Finished",
+  5: "Canceled",
+  6: "Error",
+};
 
 function pick(o, ...props) {
   return Object.assign({}, ...props.map((prop) => ({ [prop]: o[prop] })));
@@ -62,3 +56,70 @@ function checkNetworkStatus(eth_rpc_url) {
     },
   });
 }
+
+function makeRpc(method, params = {}) {
+  const rpc = {
+    id: 1,
+    jsonrpc: "2.0",
+    method,
+    params,
+  };
+
+  return {
+    method: "POST",
+    body: JSON.stringify(rpc),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  };
+}
+
+async function sha256(message) {
+  const buffer = await window.crypto.subtle.digest("SHA-256", message.buffer);
+  return new Uint8Array(buffer);
+}
+
+async function cb58Encode(message) {
+  const payload = ethersUtils.arrayify(message);
+  const checksum = await sha256(payload);
+  const buffer = new Uint8Array(payload.length + 4);
+  buffer.set(payload);
+  buffer.set(checksum.slice(-4), payload.length);
+  return ethersUtils.base58.encode(new Uint8Array(buffer));
+}
+
+async function cb58Decode(message) {
+  const buffer = ethersUtils.base58.decode(message);
+  const payload = buffer.slice(0, -4);
+  const checksum = buffer.slice(-4);
+  const newChecksum = (await sha256(payload)).slice(-4);
+
+  if ((checksum[0] ^ newChecksum[0]) | (checksum[1] ^ newChecksum[1]) | (checksum[2] ^ newChecksum[2]) | (checksum[3] ^ newChecksum[3]))
+    throw new Error("Invalid checksum");
+  return payload;
+}
+
+// Generic formatters
+const formatters = {
+  formatEther: (v) =>
+    parseFloat(ethersUtils.formatEther(v)).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
+  formatEtherPct: (v) => {
+    const p = parseFloat(ethersUtils.formatEther(v)) * 100;
+    return (
+      p.toLocaleString(undefined, {
+        maximumFractionDigits: 2,
+      }) + "%"
+    );
+  },
+  formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,
+  bigToNumber: (v) => v.toNumber(),
+  unixToISO: (v) => {
+    if (v.toNumber) v = v.toNumber();
+    return DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT);
+  },
+};
+
+export { MINIPOOL_STATUS_MAP, ORC_STATE_MAP, formatters, sha256, cb58Encode, cb58Decode, makeRpc };

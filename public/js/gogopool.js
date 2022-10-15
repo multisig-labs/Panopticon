@@ -1,43 +1,9 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
 import { DateTime } from "https://cdn.skypack.dev/luxon";
-import { utils, providers, Contract } from "https://cdn.skypack.dev/ethers";
+import { utils as ethersUtils, providers, Contract } from "https://cdn.skypack.dev/ethers";
 import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
-
-const STATUSMAP = {
-  0: "Prelaunch",
-  1: "Launched",
-  2: "Staking",
-  3: "Withdrawable",
-  4: "Finished",
-  5: "Canceled",
-  6: "Error",
-};
-
-async function sha256(message) {
-  const buffer = await window.crypto.subtle.digest("SHA-256", message.buffer);
-  return new Uint8Array(buffer);
-}
-
-async function cb58Encode(message) {
-  const payload = utils.arrayify(message);
-  const checksum = await sha256(payload);
-  const buffer = new Uint8Array(payload.length + 4);
-  buffer.set(payload);
-  buffer.set(checksum.slice(-4), payload.length);
-  return utils.base58.encode(new Uint8Array(buffer));
-}
-
-async function cb58Decode(message) {
-  const buffer = utils.base58.decode(message);
-  const payload = buffer.slice(0, -4);
-  const checksum = buffer.slice(-4);
-  const newChecksum = (await sha256(payload)).slice(-4);
-
-  if ((checksum[0] ^ newChecksum[0]) | (checksum[1] ^ newChecksum[1]) | (checksum[2] ^ newChecksum[2]) | (checksum[3] ^ newChecksum[3]))
-    throw new Error("Invalid checksum");
-  return payload;
-}
+import { MINIPOOL_STATUS_MAP, formatters, cb58Encode, makeRpc } from "/js/utils.js";
 
 async function transformMinipools(mps, labels = {}) {
   // etherjs sends an obj with unnecessary data
@@ -65,7 +31,7 @@ async function transformMinipools(mps, labels = {}) {
     const newObj = Object.assign({}, obj);
     for (const k of Object.keys(newObj)) {
       if (k.match("Amt$")) {
-        newObj[k] = utils.formatEther(newObj[k]);
+        newObj[k] = ethersUtils.formatEther(newObj[k]);
       }
     }
     return newObj;
@@ -93,20 +59,20 @@ async function transformMinipools(mps, labels = {}) {
 
   function addStatusName(obj) {
     const newObj = Object.assign({}, obj);
-    newObj.statusName = STATUSMAP[newObj.status];
+    newObj.statusName = MINIPOOL_STATUS_MAP[newObj.status];
     return newObj;
   }
 
   function decodeErrorMsg(obj) {
     const newObj = Object.assign({}, obj);
-    newObj.errorMsg = utils.toUtf8String(utils.stripZeros(newObj.errorCode));
+    newObj.errorMsg = ethersUtils.toUtf8String(ethersUtils.stripZeros(newObj.errorCode));
     return newObj;
   }
 
   async function encodeNodeID(obj) {
     const newObj = Object.assign({}, obj);
     newObj.nodeAddr = obj.nodeID;
-    const b = utils.arrayify(utils.getAddress(newObj.nodeAddr));
+    const b = ethersUtils.arrayify(ethersUtils.getAddress(newObj.nodeAddr));
     const bec = await cb58Encode(b);
     newObj.nodeID = `NodeID-${bec}`;
     return newObj;
@@ -115,7 +81,7 @@ async function transformMinipools(mps, labels = {}) {
   // Stored as 0x123 but its a P-chain tx so we need CB58
   async function encodeTxID(obj) {
     const newObj = Object.assign({}, obj);
-    const b = utils.arrayify(newObj.txID);
+    const b = ethersUtils.arrayify(newObj.txID);
     const bec = await cb58Encode(b);
     newObj.txID = bec;
     return newObj;
@@ -136,54 +102,14 @@ async function transformMinipools(mps, labels = {}) {
   return xmps;
 }
 
-// TODO Maybe just merge these with the Tabulator ones, only format for the table?
-const defaultFormatters = {
-  formatEther: (v) =>
-    parseFloat(utils.formatEther(v)).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }),
-  formatEtherPct: (v) => {
-    const p = parseFloat(utils.formatEther(v)) * 100;
-    return (
-      p.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
-      }) + "%"
-    );
-  },
-  formatEtherAtTime: (v) => `${utils.formatEther(v[0])}@${v[1]}`,
-  bigToNumber: (v) => v.toNumber(),
-  unixToISO: (v) => {
-    if (v.toNumber) v = v.toNumber();
-    return DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT);
-  },
-};
-
 class Blockchain {
   host;
   data;
 
-  constructor({ host = "http://localhost:8545" }) {
+  constructor({ host = this.required() }) {
     Object.assign(this, {
       host,
     });
-  }
-
-  makeRpc(method, params = {}) {
-    const rpc = {
-      id: 1,
-      jsonrpc: "2.0",
-      method,
-      params,
-    };
-
-    return {
-      method: "POST",
-      body: JSON.stringify(rpc),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
   }
 
   async fetchData() {
@@ -226,7 +152,9 @@ class Blockchain {
         resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
       },
     ];
-    const promises = metrics.map((m) => fetch(`${this.host}${m.url}`, this.makeRpc(m.method, m.params)).then((res) => res.json()));
+    const promises = metrics.map((m) =>
+      fetch(`${this.host}${m.url}`, makeRpc(m.method, m.params)).then((res) => res.json())
+    );
     let results = await Promise.all(promises);
 
     this.data = {};
@@ -254,6 +182,10 @@ class Blockchain {
     };
     poll();
   }
+
+  required() {
+    throw new Error("Missing argument.");
+  }
 }
 
 class GoGoPool {
@@ -265,23 +197,21 @@ class GoGoPool {
   rpc;
   addressLabels;
   dashboard;
-  formatters;
   // Internal data
   contracts;
   mccontracts;
   provider;
   multicallProvider;
-  minipools;
   minipoolsData;
   dashboardData;
   isLoaded;
 
+  // Deconstruct parms from a DEPLOYMENT descriptor
   constructor({
     addresses = this.required(),
     abis = this.required(),
-    chain = { name: "ANR", chainId: 43112 },
-    rpc = "http://localhost:8545/ext/bc/C/rpc",
-    formatters = defaultFormatters,
+    chain = this.required(),
+    rpc = this.required(),
     dashboard = [],
     addressLabels = {},
   }) {
@@ -290,13 +220,11 @@ class GoGoPool {
       abis,
       chain,
       rpc,
-      formatters,
       dashboard,
       addressLabels,
     });
     this.contracts = {};
     this.mccontracts = {};
-    this.minipools = [];
     this.minipoolsData = [];
     this.dashboardData = [];
     this.isLoaded = false;
@@ -317,7 +245,9 @@ class GoGoPool {
     for (const name of Object.keys(this.abis)) {
       if (name === "Storage") continue;
       try {
-        const address = await this.contracts.Storage.getAddress(utils.solidityKeccak256(["string", "string"], ["contract.address", name]));
+        const address = await this.contracts.Storage.getAddress(
+          ethersUtils.solidityKeccak256(["string", "string"], ["contract.address", name])
+        );
         this.addresses[name] = address;
 
         // Make a standard ethers contract
@@ -350,12 +280,13 @@ class GoGoPool {
 
     let results;
     try {
+      console.log("foo");
       results = await this.multicallProvider.all(calls);
     } catch (err) {
       console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
     }
+    console.log("Multicall Results", results);
     if (!results) return [];
-    // console.log("Multicall Results", results);
 
     let i = 0;
     for (const obj of this.dashboard) {
@@ -363,7 +294,7 @@ class GoGoPool {
         metric.rawValue = results[i];
         switch (typeof metric.formatter) {
           case "string":
-            metric.value = this.formatters[metric.formatter].call(this, results[i]);
+            metric.value = formatters[metric.formatter].call(this, results[i]);
             break;
           case "function":
             metric.value = metric.formatter.call(this, results[i]);
@@ -397,24 +328,18 @@ class GoGoPool {
     return this.dashboardData;
   }
 
-  async fetchMinipools({ status } = { status: Object.keys(STATUSMAP) }) {
+  async fetchMinipools({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
     await this.until((_) => this.isLoaded);
 
     const promises = status.map((s) => this.contracts.MinipoolManager.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
-    this.minipools = await transformMinipools(results.flat(), this.addressLabels);
-    return this.minipools;
+    this.minipoolsData = await transformMinipools(results.flat(), this.addressLabels);
+    console.log("Minipools", this.minipoolsData);
+    return this.minipoolsData;
   }
 
   minipoolsAsTabulatorData() {
-    return this.minipools;
-    // while (this.minipoolsData.length > 0) {
-    //   this.minipoolsData.pop();
-    // }
-    // for (const mp of this.minipools) {
-    //   this.minipoolsData.push(mp);
-    // }
-    // return this.minipoolsData;
+    return this.minipoolsData;
   }
 
   // Helpers

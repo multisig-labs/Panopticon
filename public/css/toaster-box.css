@@ -1,4 +1,8 @@
 /* The toaster - position it at the bottom and in the middle of the screen */
+.toastError {
+  background-color: red;
+}
+
 .inverted {
   -webkit-filter: invert(1);
   filter: invert(1);

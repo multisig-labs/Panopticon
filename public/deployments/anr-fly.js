@@ -16,6 +16,7 @@
 const deployment = {
   host: "https://anr.fly.dev",
   rpc: "https://anr.fly.dev/ext/bc/C/rpc",
+  orc: "https://orchestrator.fly.dev",
   chain: {
     name: "custom",
     chainId: 43112,

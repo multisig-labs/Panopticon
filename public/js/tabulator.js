@@ -1,14 +1,30 @@
+import { ORC_STATE_MAP, formatters } from "/js/utils.js";
+import { DEPLOYMENT } from "/deployments/selected.js";
+
+// Formatters specific for use in Tabulator cells
+function formatEther(cell, formatterParams, onRendered) {
+  return formatters.formatEther(cell.getValue());
+}
+
+function formatTxID(cell, formatterParams, onRendered) {
+  const tx = cell.getValue();
+  if (tx.substring(0, 2) === "0x") {
+    return `<a href="https://anr.fly.dev/cgi-bin/txc/${tx}" target="_blank">${tx}</a>`;
+  } else {
+    return `<a href="https://anr.fly.dev/cgi-bin/txp/${tx}" target="_blank">${tx}</a>`;
+  }
+}
+
 // Definitions for Tabulator tables
 
 const dashboardDef = {
-  data: [], //assign data to table
+  data: [], // Filled in later by JS
   index: "title",
-  // reactiveData: true,
   height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
-  groupBy: "contract",
+  groupBy: "contract", // contract name
   groupHeader: function (value, count, data, group) {
     return `${value} ${data[0].address.substring(0, 6)} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
   },
@@ -24,9 +40,8 @@ const dashboardDef = {
 };
 
 const minipoolsDef = {
-  data: [], //assign data to table
+  data: [], // Filled in later by JS
   index: "index",
-  // reactiveData: true,
   height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
@@ -45,7 +60,6 @@ const minipoolsDef = {
     }
   },
   columns: [
-    //Define Table Columns
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
     { title: "idx", field: "index", width: 5 },
     { title: "NodeID", field: "nodeID" },
@@ -122,11 +136,151 @@ const minipoolsDef = {
     {
       title: "txID",
       field: "txID",
-      formatter: txFormatter,
+      formatter: formatTxID,
       minWidth: 5000,
       responsive: 9,
     },
   ],
 };
 
-export { minipoolsDef, dashboardDef };
+const orcDef = {
+  ajaxURL: `${DEPLOYMENT.orc}/all_minipools`,
+  ajaxConfig: {
+    headers: {
+      Authorization: `Basic ${btoa(`admin:${ORC_AUTH_TOKEN}`)}`,
+    },
+  },
+  ajaxResponse: function (url, params, response) {
+    const data = response.Minipools;
+    return data;
+  },
+  index: "ID",
+  height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  groupBy: "State",
+  groupHeader: function (value, count, data, group) {
+    return `${ORC_STATE_MAP[value]}<span style="color:#00d; margin-left:10px;">(${count} items)</span>`;
+  },
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "ID", field: "ID", width: 5 },
+    { title: "NodeID", field: "NodeID" },
+    { title: "State", field: "State", width: 90 },
+    { title: "Status", field: "Status", width: 70 },
+    { title: "Dur", field: "Duration", width: 60 },
+    {
+      title: "Created",
+      field: "CreatedAt",
+      width: 90,
+      formatter: "datetime",
+      sorter: "date",
+      formatterParams: {
+        inputFormat: "iso",
+        outputFormat: "MM/dd/yy",
+        invalidPlaceholder: "(invalid date)",
+        timezone: "America/Los_Angeles",
+      },
+    },
+    { title: "Owner", field: "Owner", width: 120 },
+    { title: "AvaxNodeOp", field: "AvaxNodeOpAmt", formatter: formatEther },
+    { title: "AvaxUser", field: "AvaxUserAmt", formatter: formatEther },
+    { title: "GGPSlash", field: "GgpSlashAmt", formatter: formatEther },
+    { title: "Error", field: "MinipoolError" },
+    {
+      title: "NodeAddr",
+      field: "NodeAddr",
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "MultisigAddr",
+      field: "MultisigAddr",
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ClaimMinipoolTxID",
+      field: "ClaimMinipoolTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ExportC2PTxID",
+      field: "ExportC2PTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ImportC2PTxID",
+      field: "ImportC2PTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ExportC2PTxID",
+      field: "ExportC2PTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "StakeMinipoolTxID",
+      field: "StakeMinipoolTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "RecordStakingStartTxID",
+      field: "RecordStakingStartTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "RecordStakingEndTxID",
+      field: "RecordStakingEndTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ExportP2CTxID",
+      field: "ExportP2CTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "ImportP2CTxID",
+      field: "ImportP2CTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "RecordStakingErrorTxID",
+      field: "RecordStakingErrorTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "CancelMinipoolTxID",
+      field: "CancelMinipoolTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+  ],
+};
+
+export { orcDef, minipoolsDef, dashboardDef };

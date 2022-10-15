@@ -12,8 +12,6 @@ BUILD_DATE := `date '+%Y-%m-%d'`
 VERSION_PATH := "github.com/multisig-labs/panopticon/pkg/version"
 LDFLAGS := "-X " + VERSION_PATH + ".BuildDate=" + BUILD_DATE + " -X " + VERSION_PATH + ".Version=" + VERSION + " -X " + VERSION_PATH + ".GitCommit=" + GIT_COMMIT
 
-export AUTH_TOKEN := env_var("AUTH_TOKEN")
-
 # Print out some help
 default:
 	@just --list --unsorted
@@ -27,7 +25,7 @@ server: compile
 
 # Run server and server files from disk, not embedded files
 dev: compile
-	bin/panopticon server --v
+	OPEN_BROWSER=false VERBOSE=true bin/panopticon server
 
 # Copy ABIs from ../gogopool-contracts
 copy-contracts:

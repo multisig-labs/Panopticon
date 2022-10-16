@@ -1,6 +1,8 @@
 import { deploymentFn as deploymentFnAnrFly } from "./anr-fly.js";
 import { deploymentFn as deploymentFnAnrLocal } from "./anr-local.js";
 
+// Return whichever deployment is selected in localStorage
+
 let DEPLOYMENT;
 
 async function init() {

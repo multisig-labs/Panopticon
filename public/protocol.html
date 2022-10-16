@@ -1,46 +1,34 @@
 {{template "layout" .}} {{define "content"}}
-<div class="masthead mb-1">
+<div class="masthead mb-3">
   <div class="container-xxl bd-gutter">
     <div class="col-md-8 mx-auto text-center mt-5">
-      <h1 class="mb-1 fw-semibold">
+      <h1 class="mb-3 fw-semibold">
         <span class="d-inline-block blinking">👁</span> Panopticon <span class="d-inline-block blinking">👁</span>
       </h1>
     </div>
   </div>
 </div>
 
-<div class="container w-95 text-center text-muted">
+<div class="container w-95 text-left">
   <div id="blockchain-metrics"></div>
 </div>
 
-<div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
-  <h3 class="text-center">Minipools</h3>
-  <div id="minipools"><div class="loader">Loading...</div></div>
-</div>
-
 <div class="container w-95 text-center border border-5 rounded pb-3">
-  <h3 class="text-center">Protocol Parmeters</h3>
+  <h3 class="text-center">Protocol Dashboard</h3>
   <div id="dashboard"><div class="loader">Loading...</div></div>
 </div>
 
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
-  import { GoGoPool } from "/js/gogopool.js";
-  import { Blockchain } from "/js/blockchain.js";
-  import { dashboardDef, minipoolsDef } from "/js/tabulator.js";
+  import { GoGoPool, Blockchain } from "/js/gogopool.js";
+  import { dashboardDef } from "/js/tabulator.js";
   let GGP, BC;
 
   async function initData() {
     GGP = new GoGoPool(DEPLOYMENT);
     BC = new Blockchain(DEPLOYMENT);
 
-    await Promise.all([
-      BC.fetchData(),
-      GGP.fetchContracts(),
-      GGP.fetchDashboardData(),
-      // GGP.fetchMinipools({ status: [1, 2, 3] }),
-      GGP.fetchMinipools(),
-    ]);
+    await Promise.all([BC.fetchData(), GGP.fetchContracts(), GGP.fetchDashboardData()]);
     console.log("GGP Loaded", GGP);
   }
 
@@ -49,10 +37,8 @@
   BC.refreshDataLoop(() => (document.getElementById("blockchain-metrics").innerHTML = BC.statusLine()));
 
   const tableDashboard = new Tabulator("#dashboard", dashboardDef);
-  const tableMinipools = new Tabulator("#minipools", minipoolsDef);
   GGP.refreshDataLoop(() => {
     tableDashboard.updateOrAddData(GGP.dashboardAsTabulatorData());
-    tableMinipools.updateOrAddData(GGP.minipoolsAsTabulatorData());
   });
 </script>
 {{ end }}

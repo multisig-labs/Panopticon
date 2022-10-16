@@ -94,10 +94,24 @@ async function cb58Decode(message) {
   const checksum = buffer.slice(-4);
   const newChecksum = (await sha256(payload)).slice(-4);
 
-  if ((checksum[0] ^ newChecksum[0]) | (checksum[1] ^ newChecksum[1]) | (checksum[2] ^ newChecksum[2]) | (checksum[3] ^ newChecksum[3]))
+  if (
+    (checksum[0] ^ newChecksum[0]) |
+    (checksum[1] ^ newChecksum[1]) |
+    (checksum[2] ^ newChecksum[2]) |
+    (checksum[3] ^ newChecksum[3])
+  )
     throw new Error("Invalid checksum");
   return payload;
 }
+
+// Usage
+// const pipeline = pipeAsyncFunctions(...fns);
+// const promises = objs.map((obj) => pipeline(obj));
+// const xobjs = await Promise.all(promises);
+const pipeAsyncFunctions =
+  (...fns) =>
+  (arg) =>
+    fns.reduce((p, f) => p.then(f), Promise.resolve(arg));
 
 // Generic formatters
 const formatters = {
@@ -122,4 +136,4 @@ const formatters = {
   },
 };
 
-export { MINIPOOL_STATUS_MAP, ORC_STATE_MAP, formatters, sha256, cb58Encode, cb58Decode, makeRpc };
+export { MINIPOOL_STATUS_MAP, ORC_STATE_MAP, formatters, pipeAsyncFunctions, sha256, cb58Encode, cb58Decode, makeRpc };

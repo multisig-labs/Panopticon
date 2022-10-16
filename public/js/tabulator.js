@@ -20,13 +20,16 @@ function formatTxID(cell, formatterParams, onRendered) {
 const dashboardDef = {
   data: [], // Filled in later by JS
   index: "title",
-  height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
   groupBy: "contract", // contract name
   groupHeader: function (value, count, data, group) {
-    return `${value} ${data[0].address.substring(0, 6)} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
+    return `${value} ${data[0].address.substring(
+      0,
+      6
+    )} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
   },
   selectable: true,
   clipboard: "copy",
@@ -42,7 +45,7 @@ const dashboardDef = {
 const minipoolsDef = {
   data: [], // Filled in later by JS
   index: "index",
-  height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
@@ -155,7 +158,7 @@ const orcDef = {
     return data;
   },
   index: "ID",
-  height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
@@ -225,13 +228,6 @@ const orcDef = {
       responsive: 9,
     },
     {
-      title: "ExportC2PTxID",
-      field: "ExportC2PTxID",
-      formatter: formatTxID,
-      minWidth: 5000,
-      responsive: 9,
-    },
-    {
       title: "StakeMinipoolTxID",
       field: "StakeMinipoolTxID",
       formatter: formatTxID,
@@ -246,13 +242,6 @@ const orcDef = {
       responsive: 9,
     },
     {
-      title: "RecordStakingEndTxID",
-      field: "RecordStakingEndTxID",
-      formatter: formatTxID,
-      minWidth: 5000,
-      responsive: 9,
-    },
-    {
       title: "ExportP2CTxID",
       field: "ExportP2CTxID",
       formatter: formatTxID,
@@ -262,6 +251,13 @@ const orcDef = {
     {
       title: "ImportP2CTxID",
       field: "ImportP2CTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "RecordStakingEndTxID",
+      field: "RecordStakingEndTxID",
       formatter: formatTxID,
       minWidth: 5000,
       responsive: 9,

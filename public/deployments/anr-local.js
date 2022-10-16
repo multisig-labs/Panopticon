@@ -16,6 +16,7 @@
 const deployment = {
   host: "http://localhost:8545",
   rpc: "http://localhost:8545/ext/bc/C/rpc",
+  orc: "http://localhost:7450",
   chain: {
     name: "custom",
     chainId: 43112,
@@ -24,6 +25,7 @@ const deployment = {
   abis: {},
   addresses: {
     Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
+    Multicall: "0x3A07D36c8bA41d3d2464E48D836e654F75435C83",
   },
   addressLabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
@@ -122,6 +124,20 @@ const deployment = {
       ],
     },
   ],
+  transforms: {
+    minipool: [
+      "convertToObj",
+      "stripNumberKeys",
+      "formatEther",
+      "bigToNum",
+      "unixToISO",
+      "labelAddresses",
+      "addStatusName",
+      "decodeErrorMsg",
+      "encodeNodeID",
+      "encodeTxID",
+    ],
+  },
 };
 
 export default deployment;

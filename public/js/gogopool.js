@@ -1,192 +1,9 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { utils as ethersUtils, providers, Contract } from "https://cdn.skypack.dev/ethers";
 import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
-import { MINIPOOL_STATUS_MAP, formatters, cb58Encode, makeRpc } from "/js/utils.js";
-
-async function transformMinipools(mps, labels = {}) {
-  // etherjs sends an obj with unnecessary data
-  function stripNumberKeys(obj) {
-    const newObj = Object.assign({}, obj);
-    for (const k of Object.keys(newObj)) {
-      if (k.match("[0-9]+")) {
-        delete newObj[k];
-      }
-    }
-    return newObj;
-  }
-
-  function labelAddresses(obj, labels) {
-    const newObj = Object.assign({}, obj);
-    for (const [k, v] of Object.entries(newObj)) {
-      if (typeof v === "string" && labels[v]) {
-        newObj[k] = labels[v];
-      }
-    }
-    return newObj;
-  }
-
-  function formatEther(obj) {
-    const newObj = Object.assign({}, obj);
-    for (const k of Object.keys(newObj)) {
-      if (k.match("Amt$")) {
-        newObj[k] = ethersUtils.formatEther(newObj[k]);
-      }
-    }
-    return newObj;
-  }
-
-  function bigToNum(obj) {
-    const newObj = Object.assign({}, obj);
-    for (const k of Object.keys(newObj)) {
-      if (newObj[k].constructor.name === "BigNumber") {
-        newObj[k] = newObj[k].toNumber();
-      }
-    }
-    return newObj;
-  }
-
-  function unixToISO(obj) {
-    const newObj = Object.assign({}, obj);
-    for (const k of Object.keys(newObj)) {
-      if (k.match("Time$")) {
-        newObj[k] = DateTime.fromSeconds(newObj[k]);
-      }
-    }
-    return newObj;
-  }
-
-  function addStatusName(obj) {
-    const newObj = Object.assign({}, obj);
-    newObj.statusName = MINIPOOL_STATUS_MAP[newObj.status];
-    return newObj;
-  }
-
-  function decodeErrorMsg(obj) {
-    const newObj = Object.assign({}, obj);
-    newObj.errorMsg = ethersUtils.toUtf8String(ethersUtils.stripZeros(newObj.errorCode));
-    return newObj;
-  }
-
-  async function encodeNodeID(obj) {
-    const newObj = Object.assign({}, obj);
-    newObj.nodeAddr = obj.nodeID;
-    const b = ethersUtils.arrayify(ethersUtils.getAddress(newObj.nodeAddr));
-    const bec = await cb58Encode(b);
-    newObj.nodeID = `NodeID-${bec}`;
-    return newObj;
-  }
-
-  // Stored as 0x123 but its a P-chain tx so we need CB58
-  async function encodeTxID(obj) {
-    const newObj = Object.assign({}, obj);
-    const b = ethersUtils.arrayify(newObj.txID);
-    const bec = await cb58Encode(b);
-    newObj.txID = bec;
-    return newObj;
-  }
-
-  let xmps = mps
-    .map((mp) => stripNumberKeys(mp))
-    .map((mp) => labelAddresses(mp, labels))
-    .map((mp) => formatEther(mp))
-    .map((mp) => bigToNum(mp))
-    .map((mp) => unixToISO(mp))
-    .map((mp) => addStatusName(mp))
-    .map((mp) => decodeErrorMsg(mp));
-
-  // Argh b58c.encode is async so we have to await
-  xmps = await Promise.all(xmps.map((mp) => encodeNodeID(mp)));
-  xmps = await Promise.all(xmps.map((mp) => encodeTxID(mp)));
-  return xmps;
-}
-
-class Blockchain {
-  host;
-  data;
-
-  constructor({ host = this.required() }) {
-    Object.assign(this, {
-      host,
-    });
-  }
-
-  async fetchData() {
-    const metrics = [
-      {
-        name: "nodeID",
-        url: "/ext/info",
-        method: "info.getNodeID",
-        resultFn: (v) => v.nodeID,
-      },
-      {
-        name: "IP",
-        url: "/ext/info",
-        method: "info.getNodeIP",
-        resultFn: (v) => v.ip,
-      },
-      {
-        name: "heightP",
-        url: "/ext/bc/P",
-        method: "platform.getHeight",
-        resultFn: (v) => v.height,
-      },
-      {
-        name: "timestampP",
-        url: "/ext/bc/P",
-        method: "platform.getTimestamp",
-        resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
-      },
-      {
-        name: "blockNumberC",
-        url: "/ext/bc/C/rpc",
-        method: "eth_blockNumber",
-        params: [],
-        resultFn: (v) => parseInt(v, 16),
-      },
-      {
-        name: "timestampC",
-        url: "/ext/index/C/block",
-        method: "index.getLastAccepted",
-        resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
-      },
-    ];
-    const promises = metrics.map((m) =>
-      fetch(`${this.host}${m.url}`, makeRpc(m.method, m.params)).then((res) => res.json())
-    );
-    let results = await Promise.all(promises);
-
-    this.data = {};
-
-    for (let i = 0; i < metrics.length; i++) {
-      const value = metrics[i].resultFn ? metrics[i].resultFn.call(this, results[i].result) : results[i].result;
-      this.data[metrics[i].name] = value;
-    }
-
-    // console.log("Blockchain Data", this.data);
-    return this.data;
-  }
-
-  statusLine() {
-    const d = this.data;
-    return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
-  }
-
-  refreshDataLoop(fn) {
-    const poll = async () => {
-      // console.log("Polling for blockchain data");
-      await this.fetchData();
-      fn();
-      setTimeout(poll, 10000);
-    };
-    poll();
-  }
-
-  required() {
-    throw new Error("Missing argument.");
-  }
-}
+import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
+import { transformer } from "/js/transformer.js";
 
 class GoGoPool {
   // Required Params
@@ -197,6 +14,7 @@ class GoGoPool {
   rpc;
   addressLabels;
   dashboard;
+  transforms;
   // Internal data
   contracts;
   mccontracts;
@@ -213,6 +31,7 @@ class GoGoPool {
     chain = this.required(),
     rpc = this.required(),
     dashboard = [],
+    transforms = [],
     addressLabels = {},
   }) {
     Object.assign(this, {
@@ -221,6 +40,7 @@ class GoGoPool {
       chain,
       rpc,
       dashboard,
+      transforms,
       addressLabels,
     });
     this.contracts = {};
@@ -280,12 +100,11 @@ class GoGoPool {
 
     let results;
     try {
-      console.log("foo");
-      results = await this.multicallProvider.all(calls);
+      results = await this.multicallProvider.tryAll(calls);
     } catch (err) {
       console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
     }
-    console.log("Multicall Results", results);
+    // console.log("Multicall Results", results);
     if (!results) return [];
 
     let i = 0;
@@ -333,8 +152,8 @@ class GoGoPool {
 
     const promises = status.map((s) => this.contracts.MinipoolManager.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
-    this.minipoolsData = await transformMinipools(results.flat(), this.addressLabels);
-    console.log("Minipools", this.minipoolsData);
+    this.minipoolsData = await transformer(this.transforms.minipool, this.addressLabels, results.flat());
+    // console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
 
@@ -373,4 +192,4 @@ class GoGoPool {
   }
 }
 
-export { GoGoPool, Blockchain };
+export { GoGoPool };

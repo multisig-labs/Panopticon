@@ -25,6 +25,7 @@ const deployment = {
   abis: {},
   addresses: {
     Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
+    Multicall: "0x3A07D36c8bA41d3d2464E48D836e654F75435C83",
   },
   addressLabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
@@ -46,6 +47,72 @@ const deployment = {
         },
       ],
     },
+    { contract: "MinipoolManager", metrics: [] },
+    {
+      contract: "ProtocolDAO",
+      metrics: [
+        { fn: "getGGPRewardsEligibilityMinLength", desc: "" },
+        {
+          fn: "getGGPRewardCycleLength",
+          desc: "Seconds",
+        },
+        {
+          fn: "getTotalGGPCirculatingSupply",
+          desc: "",
+          formatter: "formatEther",
+        },
+        // Needs an arg, wat do?
+        // { fn: "getClaimingContractPerc" },
+        { fn: "getInflationIntervalRate", desc: "" },
+        {
+          fn: "getInflationIntervalStartTime",
+          formatter: "unixToISO",
+        },
+        { fn: "getInflationInterval", desc: "Seconds" },
+        { fn: "getMinipoolMinStakingAmount", formatter: "formatEther" },
+        { fn: "getMinipoolNodeCommissionFeePercentage", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinipoolAvaxAssignmentMax", formatter: "formatEther" },
+        { fn: "getMinipoolAvaxAssignmentMin", formatter: "formatEther" },
+        { fn: "getExpectedRewardRate", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMaxCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
+        { fn: "getDelegationDurationLimit", desc: "Seconds" },
+        { fn: "getTargetGGAVAXReserveRate", desc: "", formatter: "formatEtherPct" },
+      ],
+    },
+    {
+      contract: "TokenggAVAX",
+      metrics: [
+        { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
+        { fn: "lastSync", desc: null, formatter: "unixToISO" },
+        { fn: "rewardsCycleEnd", desc: null, formatter: "unixToISO" },
+        { fn: "lastRewardAmount", desc: null, formatter: "formatEther" },
+        { fn: "totalReleasedAssets", desc: null, formatter: "formatEther" },
+        { fn: "stakingTotalAssets", desc: null, formatter: "formatEther" },
+        {
+          fn: "amountAvailableForStaking",
+          desc: null,
+          formatter: "formatEther",
+        },
+      ],
+    },
+    {
+      contract: "Staking",
+      metrics: [
+        {
+          fn: "getTotalGGPStake",
+          title: "Total GGP Stake",
+          desc: "Total GGP in vault assigned to the Staking contract",
+          formatter: "formatEther",
+        },
+        {
+          fn: "getStakerCount",
+          title: "Staker Count",
+          desc: "",
+          formatter: "bigToNumber",
+        },
+      ],
+    },
     {
       contract: "Storage",
       metrics: [
@@ -56,27 +123,27 @@ const deployment = {
         },
       ],
     },
-    { contract: "MinipoolManager", metrics: [] },
-    {
-      contract: "TokenggAVAX",
-      metrics: [
-        { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
-        { fn: "lastSync", formatter: "unixToISO" },
-        { fn: "rewardsCycleEnd", formatter: "unixToISO" },
-        { fn: "lastRewardAmount", formatter: "formatEther" },
-        { fn: "totalReleasedAssets", formatter: "formatEther" },
-        { fn: "stakingTotalAssets", formatter: "formatEther" },
-        { fn: "amountAvailableForStaking", formatter: "formatEther" },
-      ],
-    },
   ],
+  transforms: {
+    minipool: [
+      "convertToObj",
+      "stripNumberKeys",
+      "formatEther",
+      "bigToNum",
+      "unixToISO",
+      "labelAddresses",
+      "addStatusName",
+      "decodeErrorMsg",
+      "encodeNodeID",
+      "encodeTxID",
+    ],
+  },
 };
 
 export default deployment;
 
 // HACK Since only Chrome has the above "assert" syntax
 const contracts = deployment.dashboard.map((v) => v.contract);
-console.log(contracts);
 export async function deploymentFn() {
   async function fetchABIs(names) {
     const abis = {};

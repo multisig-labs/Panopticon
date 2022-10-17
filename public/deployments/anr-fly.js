@@ -69,9 +69,30 @@ const deployment = {
           title: "getClaimingContractPerc (DAOClaim)",
           formatter: "formatEtherPct",
         },
+        {
+          fn: "getClaimingContractDistribution",
+          args: ["NOPClaim"],
+          title: "getClaimingContractDistribution (NOPClaim)",
+          formatter: "formatEther",
+        },
+        {
+          fn: "getClaimingContractDistribution",
+          args: ["ProtocolDAOClaim"],
+          title: "getClaimingContractDistribution (DAOClaim)",
+          formatter: "formatEther",
+        },
       ],
     },
-    { contract: "MinipoolManager", metrics: [] },
+    {
+      contract: "MinipoolManager",
+      metrics: [
+        {
+          fn: "getTotalAvaxLiquidStakerAmt",
+          desc: "total AVAX *actually* withdrawn from ggAVAX and sent to Rialto",
+          formatter: "formatEther",
+        },
+      ],
+    },
     {
       contract: "ProtocolDAO",
       metrics: [

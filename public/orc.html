@@ -16,8 +16,21 @@
 
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
+  import { Orc } from "/js/orc.js";
   import { orcDef } from "/js/tabulator.js";
+  let ORC;
 
-  const table = new Tabulator("#orc", orcDef);
+  async function initData() {
+    ORC = new Orc(DEPLOYMENT);
+    await ORC.fetchMinipools();
+  }
+
+  await initData();
+
+  const tableMinipools = new Tabulator("#orc", orcDef);
+
+  ORC.refreshDataLoop(() => {
+    tableMinipools.updateOrAddData(ORC.minipoolsAsTabulatorData());
+  });
 </script>
 {{end}}

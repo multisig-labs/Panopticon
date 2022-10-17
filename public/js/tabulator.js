@@ -6,6 +6,10 @@ function formatEther(cell, formatterParams, onRendered) {
   return formatters.formatEther(cell.getValue());
 }
 
+function formatUnixTime(cell, formatterParams, onRendered) {
+  return formatters.unixToISO(cell.getValue());
+}
+
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
   if (tx.substring(0, 2) === "0x") {
@@ -147,16 +151,7 @@ const minipoolsDef = {
 };
 
 const orcDef = {
-  ajaxURL: `${DEPLOYMENT.orc}/all_minipools`,
-  ajaxConfig: {
-    headers: {
-      Authorization: `Basic ${btoa(`admin:${ORC_AUTH_TOKEN}`)}`,
-    },
-  },
-  ajaxResponse: function (url, params, response) {
-    const data = response.Minipools;
-    return data;
-  },
+  data: [], // Filled in later by JS
   index: "ID",
   // height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
@@ -273,6 +268,13 @@ const orcDef = {
       title: "CancelMinipoolTxID",
       field: "CancelMinipoolTxID",
       formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "DeletedAt",
+      field: "DeletedAt",
+      formatter: formatUnixTime,
       minWidth: 5000,
       responsive: 9,
     },

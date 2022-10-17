@@ -47,6 +47,30 @@ const deployment = {
         },
       ],
     },
+    {
+      contract: "RewardsPool",
+      metrics: [
+        { fn: "canCycleStart", desc: "" },
+        { fn: "getRewardCycleStartTime", formatter: "unixToISO" },
+        { fn: "getRewardCyclesPassed", desc: "" },
+        { fn: "getRewardCycleTotalAmount", formatter: "formatEther" },
+        { fn: "inflationCalculate", formatter: "formatEther" },
+        { fn: "getLastInflationCalcTime", formatter: "unixToISO" },
+        { fn: "getInflationIntervalsPassed" },
+        {
+          fn: "getClaimingContractPerc",
+          args: ["NOPClaim"],
+          title: "getClaimingContractPerc (NOPClaim)",
+          formatter: "formatEtherPct",
+        },
+        {
+          fn: "getClaimingContractPerc",
+          args: ["ProtocolDAOClaim"],
+          title: "getClaimingContractPerc (DAOClaim)",
+          formatter: "formatEtherPct",
+        },
+      ],
+    },
     { contract: "MinipoolManager", metrics: [] },
     {
       contract: "ProtocolDAO",

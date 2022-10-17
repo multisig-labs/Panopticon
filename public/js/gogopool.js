@@ -94,7 +94,7 @@ class GoGoPool {
     for (const obj of this.dashboard) {
       const c = this.mccontracts[obj.contract];
       for (const metric of obj.metrics) {
-        calls.push(c[metric.fn].call());
+        calls.push(c[metric.fn].call(this, ...(metric.args || [])));
       }
     }
 

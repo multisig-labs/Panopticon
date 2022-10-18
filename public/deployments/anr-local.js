@@ -137,6 +137,7 @@ const deployment = {
       "encodeNodeID",
       "encodeTxID",
     ],
+    staker: ["convertToObj", "stripNumberKeys", "labelAddresses"],
   },
 };
 

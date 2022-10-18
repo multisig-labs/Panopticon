@@ -153,6 +153,45 @@ const minipoolsDef = {
   ],
 };
 
+const stakersDef = {
+  data: [], // Filled in later by JS
+  index: "stakerAddr",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  // rowFormatter: function (row) {
+  //   let data = row.getData();
+  //   if (data.ggpSlashAmt > 0) {
+  //     row.getElement().style.backgroundColor = "#ff0000bf";
+  //   }
+  // },
+  columns: [
+    { title: "StakerAddr", field: "stakerAddr", zwidth: 100 },
+    { title: "MP Count", field: "minipoolCount", width: 100 },
+    {
+      title: "Start",
+      field: "rewardsStartTime",
+      width: 90,
+      formatter: "datetime",
+      sorter: "date",
+      formatterParams: {
+        inputFormat: "iso",
+        outputFormat: "MM/dd/yy",
+        invalidPlaceholder: "(invalid date)",
+        timezone: "America/Los_Angeles",
+      },
+    },
+    { title: "ggpStaked", field: "ggpStaked", width: 150 },
+    { title: "avaxStaked", field: "avaxStaked", width: 150 },
+    { title: "avaxAssigned", field: "avaxAssigned", width: 150 },
+    { title: "ggpRewards", field: "ggpRewards", width: 150 },
+  ],
+};
+
 const orcDef = {
   data: [], // Filled in later by JS
   index: "ID",
@@ -284,4 +323,4 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, dashboardDef };
+export { orcDef, minipoolsDef, stakersDef, dashboardDef };

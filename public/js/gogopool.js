@@ -2,6 +2,7 @@
 
 import { utils as ethersUtils, providers, Contract } from "https://cdn.skypack.dev/ethers";
 import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
+import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
 import { transformer } from "/js/transformer.js";
 
@@ -22,6 +23,7 @@ class GoGoPool {
   multicallProvider;
   minipoolsData;
   dashboardData;
+  stakersData;
   isLoaded;
 
   // Deconstruct parms from a DEPLOYMENT descriptor
@@ -47,6 +49,7 @@ class GoGoPool {
     this.mccontracts = {};
     this.minipoolsData = [];
     this.dashboardData = [];
+    this.stakersData = [];
     this.isLoaded = false;
   }
 
@@ -161,12 +164,36 @@ class GoGoPool {
     return this.minipoolsData;
   }
 
+  async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
+    await this.until((_) => this.isLoaded);
+
+    const results = await this.contracts.Staking.getStakers(0, 0);
+    console.log("Stakers Raw", results);
+    this.stakersData = await transformer(this.transforms.staker, this.addressLabels, results);
+    // Because names are not consistent we do it manually
+    this.stakersData.map((s) => {
+      s.ggpStaked = ethersUtils.formatEther(s.ggpStaked);
+      s.avaxStaked = ethersUtils.formatEther(s.avaxStaked);
+      s.avaxAssigned = ethersUtils.formatEther(s.avaxAssigned);
+      s.ggpRewards = ethersUtils.formatEther(s.ggpRewards);
+      s.rewardsStartTime = DateTime.fromSeconds(s.rewardsStartTime.toNumber());
+    });
+    console.log("Stakers", this.stakersData);
+    return this.stakersData;
+  }
+
+  stakersAsTabulatorData() {
+    return this.stakersData;
+  }
+  stakersData;
+
   // Helpers
   refreshDataLoop(fn) {
     const poll = async () => {
       // console.log("Polling for data");
       await this.fetchDashboardData();
       await this.fetchMinipools();
+      await this.fetchStakers();
       fn();
       setTimeout(poll, 5000);
     };

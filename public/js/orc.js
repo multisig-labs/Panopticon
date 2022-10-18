@@ -6,6 +6,7 @@ import { makeRpc } from "/js/utils.js";
 class Orc {
   orc;
   minipools;
+  info;
 
   constructor({ orc = this.required() }) {
     Object.assign(this, {
@@ -24,6 +25,19 @@ class Orc {
     }).then((res) => res.json());
     this.minipools = response.Minipools;
     return this.minipools;
+  }
+
+  async fetchInfo() {
+    const response = await fetch(`${this.orc}/info`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(`admin:${ORC_AUTH_TOKEN}`)}`,
+        "User-Agent": "Panopticon",
+      },
+    }).then((res) => res.json());
+    this.info = response;
+    return this.info;
   }
 
   minipoolsAsTabulatorData() {

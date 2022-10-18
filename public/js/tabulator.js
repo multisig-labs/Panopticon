@@ -12,6 +12,9 @@ function formatUnixTime(cell, formatterParams, onRendered) {
 
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
+  if (tx == "11111111111111111111111111111111LpoYY") {
+    return "";
+  }
   if (tx.substring(0, 2) === "0x") {
     return `<a href="https://anr.fly.dev/cgi-bin/txc/${tx}" target="_blank">${tx}</a>`;
   } else {

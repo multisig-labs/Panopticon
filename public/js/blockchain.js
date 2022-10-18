@@ -50,7 +50,11 @@ class Blockchain {
         name: "timestampC",
         url: "/ext/index/C/block",
         method: "index.getLastAccepted",
-        resultFn: (v) => DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT),
+        resultFn: (v) => {
+          const dt = DateTime.fromISO(v.timestamp).toLocaleString(DateTime.DATETIME_SHORT);
+          const unix = DateTime.fromISO(v.timestamp).toFormat("X");
+          return `${dt} unix: ${unix}`;
+        },
       },
     ];
     const promises = metrics.map((m) =>

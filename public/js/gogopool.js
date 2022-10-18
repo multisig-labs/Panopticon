@@ -168,7 +168,6 @@ class GoGoPool {
     await this.until((_) => this.isLoaded);
 
     const results = await this.contracts.Staking.getStakers(0, 0);
-    console.log("Stakers Raw", results);
     this.stakersData = await transformer(this.transforms.staker, this.addressLabels, results);
     // Because names are not consistent we do it manually
     this.stakersData.map((s) => {
@@ -178,7 +177,7 @@ class GoGoPool {
       s.ggpRewards = ethersUtils.formatEther(s.ggpRewards);
       s.rewardsStartTime = DateTime.fromSeconds(s.rewardsStartTime.toNumber());
     });
-    console.log("Stakers", this.stakersData);
+    // console.log("Stakers", this.stakersData);
     return this.stakersData;
   }
 

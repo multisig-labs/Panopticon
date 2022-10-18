@@ -150,6 +150,8 @@ const minipoolsDef = {
       minWidth: 5000,
       responsive: 9,
     },
+    { title: "startTimeUnix", field: "startTimeUnix", minWidth: 5000, responsive: 9 },
+    { title: "endTimeUnix", field: "endTimeUnix", minWidth: 5000, responsive: 9 },
   ],
 };
 
@@ -170,7 +172,7 @@ const stakersDef = {
   //   }
   // },
   columns: [
-    { title: "StakerAddr", field: "stakerAddr", zwidth: 100 },
+    { title: "StakerAddr", field: "stakerAddr" },
     { title: "MP Count", field: "minipoolCount", width: 100 },
     {
       title: "Start",

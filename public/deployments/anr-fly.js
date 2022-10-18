@@ -186,11 +186,9 @@ const deployment = {
   },
 };
 
-export default deployment;
-
 // HACK Since only Chrome has the above "assert" syntax
 const contracts = deployment.dashboard.map((v) => v.contract);
-export async function deploymentFn() {
+async function deploymentFn() {
   async function fetchABIs(names) {
     const abis = {};
     const promises = names.map((name) => fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json()));
@@ -204,3 +202,5 @@ export async function deploymentFn() {
   deployment.abis = await fetchABIs(contracts);
   return deployment;
 }
+
+export { deployment, deploymentFn };

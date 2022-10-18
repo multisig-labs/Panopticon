@@ -130,9 +130,14 @@ const formatters = {
   },
   formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),
-  unixToISO: (v) => {
+  unixToISOOnly: (v) => {
     if (v.toNumber) v = v.toNumber();
     return DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT);
+  },
+  unixToISO: (v) => {
+    if (v.toNumber) v = v.toNumber();
+    const dt = DateTime.fromSeconds(v).toLocaleString(DateTime.DATETIME_SHORT);
+    return `${dt} (${v})`;
   },
 };
 

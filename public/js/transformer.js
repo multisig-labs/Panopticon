@@ -37,6 +37,7 @@ async function transformer(transforms, addressLabels, objs) {
     unixToISO: (obj) => {
       for (const k of Object.keys(obj)) {
         if (k.match("Time$")) {
+          obj[`${k}Unix`] = obj[k];
           obj[k] = DateTime.fromSeconds(obj[k]);
         }
       }

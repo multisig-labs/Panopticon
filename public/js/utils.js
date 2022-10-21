@@ -120,6 +120,13 @@ const formatters = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }),
+  formatInflationAmt: (v) => {
+    const newTokens = v[1].sub(v[0]);
+    return ethersUtils.formatEther(newTokens).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  },
   formatEtherPct: (v) => {
     const p = parseFloat(ethersUtils.formatEther(v)) * 100;
     return (

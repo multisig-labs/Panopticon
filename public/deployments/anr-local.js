@@ -50,23 +50,23 @@ const deployment = {
     {
       contract: "RewardsPool",
       metrics: [
-        { fn: "canCycleStart", desc: "" },
-        { fn: "getRewardCycleStartTime", formatter: "unixToISO" },
-        { fn: "getRewardCyclesPassed", desc: "" },
-        { fn: "getRewardCycleTotalAmount", formatter: "formatEther" },
-        { fn: "inflationCalculate", formatter: "formatEther" },
-        { fn: "getLastInflationCalcTime", formatter: "unixToISO" },
-        { fn: "getInflationIntervalsPassed" },
+        { fn: "canRewardsCycleStart", desc: "" },
+        { fn: "getRewardsCycleStartTime", formatter: "unixToISO" },
+        { fn: "getRewardsCyclesElapsed", desc: "" },
+        { fn: "getRewardsCycleTotalAmount", formatter: "formatEther" },
+        { fn: "getInflationIntervalStartTime", formatter: "unixToISO" },
+        { fn: "getInflationIntervalsElapsed" },
+        { fn: "getInflationAmt", formatter: "formatInflationAmt" },
         {
-          fn: "getClaimingContractPerc",
+          fn: "getClaimingContractDistribution",
           args: ["NOPClaim"],
-          title: "getClaimingContractPerc (NOPClaim)",
+          title: "getClaimingContractDistribution (NOPClaim)",
           formatter: "formatEtherPct",
         },
         {
-          fn: "getClaimingContractPerc",
+          fn: "getClaimingContractDistribution",
           args: ["ProtocolDAOClaim"],
-          title: "getClaimingContractPerc (DAOClaim)",
+          title: "getClaimingContractDistribution (DAOClaim)",
           formatter: "formatEtherPct",
         },
         {
@@ -87,7 +87,7 @@ const deployment = {
       contract: "MinipoolManager",
       metrics: [
         {
-          fn: "getTotalAvaxLiquidStakerAmt",
+          fn: "getTotalAVAXLiquidStakerAmt",
           desc: "total AVAX *actually* withdrawn from ggAVAX and sent to Rialto",
           formatter: "formatEther",
         },
@@ -96,9 +96,9 @@ const deployment = {
     {
       contract: "ProtocolDAO",
       metrics: [
-        { fn: "getGGPRewardsEligibilityMinLength", desc: "" },
+        { fn: "getRewardsEligibilityMinSeconds", desc: "" },
         {
-          fn: "getGGPRewardCycleLength",
+          fn: "getRewardsCycleSeconds",
           desc: "Seconds",
         },
         {
@@ -109,19 +109,14 @@ const deployment = {
         // Needs an arg, wat do?
         // { fn: "getClaimingContractPerc" },
         { fn: "getInflationIntervalRate", desc: "" },
-        {
-          fn: "getInflationIntervalStartTime",
-          formatter: "unixToISO",
-        },
-        { fn: "getInflationInterval", desc: "Seconds" },
+        { fn: "getInflationIntervalSeconds", desc: "Seconds" },
         { fn: "getMinipoolMinStakingAmount", formatter: "formatEther" },
-        { fn: "getMinipoolNodeCommissionFeePercentage", desc: "", formatter: "formatEtherPct" },
-        { fn: "getMinipoolAvaxAssignmentMax", formatter: "formatEther" },
-        { fn: "getMinipoolAvaxAssignmentMin", formatter: "formatEther" },
-        { fn: "getExpectedRewardRate", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinipoolNodeCommissionFeePct", desc: "", formatter: "formatEtherPct" },
+        { fn: "getMinipoolMaxAVAXAssignment", formatter: "formatEther" },
+        { fn: "getMinipoolMinAVAXAssignment", formatter: "formatEther" },
+        { fn: "getExpectedAVAXRewardsRate", desc: "", formatter: "formatEtherPct" },
         { fn: "getMaxCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
         { fn: "getMinCollateralizationRatio", desc: "", formatter: "formatEtherPct" },
-        { fn: "getDelegationDurationLimit", desc: "Seconds" },
         { fn: "getTargetGGAVAXReserveRate", desc: "", formatter: "formatEtherPct" },
       ],
     },
@@ -131,7 +126,7 @@ const deployment = {
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
         { fn: "lastSync", desc: null, formatter: "unixToISO" },
         { fn: "rewardsCycleEnd", desc: null, formatter: "unixToISO" },
-        { fn: "lastRewardAmount", desc: null, formatter: "formatEther" },
+        { fn: "lastRewardsAmount", desc: null, formatter: "formatEther" },
         { fn: "totalReleasedAssets", desc: null, formatter: "formatEther" },
         { fn: "stakingTotalAssets", desc: null, formatter: "formatEther" },
         {

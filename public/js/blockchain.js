@@ -14,6 +14,7 @@ class Blockchain {
   }
 
   async fetchData() {
+    if (!this.host) return;
     const metrics = [
       {
         name: "nodeID",
@@ -74,7 +75,7 @@ class Blockchain {
   }
 
   statusLine() {
-    const d = this.data;
+    const d = this.data || {};
     return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
   }
 

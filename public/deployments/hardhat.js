@@ -14,18 +14,18 @@
 // };
 
 const deployment = {
-  host: "http://localhost:8545",
-  rpc: "http://localhost:8545/ext/bc/C/rpc",
-  orc: "http://localhost:7450",
+  host: null,
+  rpc: "http://localhost:8545",
+  orc: null,
   chain: {
-    name: "custom",
-    chainId: 43112,
+    name: "localhost",
+    chainId: 31337,
   },
   // abis, // On Chrome we could just do this.
   abis: {},
   addresses: {
     Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-    Multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
+    Multicall3: "0x4091bF7460DF3C92206094CD177AB37DAe7d5acA",
   },
   addressLabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
@@ -37,10 +37,21 @@ const deployment = {
   },
   dashboard: [
     {
+      contract: "Multicall3",
+      metrics: [
+        {
+          fn: "getCurrentBlockTimestamp",
+          title: "block.Timestamp",
+          desc: "",
+          formatter: "unixToISO",
+        },
+      ],
+    },
+    {
       contract: "Oracle",
       metrics: [
         {
-          fn: "getGGPPriceInAVAX",
+          fn: "getGGPPrice",
           title: "GGP @ TS",
           desc: "GGP price in AVAX at a particular timestamp",
           formatter: "formatEtherAtTime",
@@ -50,7 +61,7 @@ const deployment = {
     {
       contract: "RewardsPool",
       metrics: [
-        { fn: "canStartRewardsCycle", desc: "" },
+        { fn: "canRewardsCycleStart", desc: "" },
         { fn: "getRewardsCycleStartTime", formatter: "unixToISO" },
         { fn: "getRewardsCyclesElapsed", desc: "" },
         { fn: "getRewardsCycleTotalAmount", formatter: "formatEther" },
@@ -59,26 +70,26 @@ const deployment = {
         { fn: "getInflationAmt", formatter: "formatInflationAmt" },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ClaimNodeOp"],
-          title: "getClaimingContractDistribution (NodeOp)",
+          args: ["NOPClaim"],
+          title: "getClaimingContractDistribution (NOPClaim)",
           formatter: "formatEtherPct",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ClaimProtocolDAO"],
-          title: "getClaimingContractDistribution (DAO)",
+          args: ["ProtocolDAOClaim"],
+          title: "getClaimingContractDistribution (DAOClaim)",
           formatter: "formatEtherPct",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ClaimNodeOp"],
-          title: "getClaimingContractDistribution (NodeOp)",
+          args: ["NOPClaim"],
+          title: "getClaimingContractDistribution (NOPClaim)",
           formatter: "formatEther",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ClaimProtocolDAO"],
-          title: "getClaimingContractDistribution (DAO)",
+          args: ["ProtocolDAOClaim"],
+          title: "getClaimingContractDistribution (DAOClaim)",
           formatter: "formatEther",
         },
       ],
@@ -126,7 +137,7 @@ const deployment = {
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
         { fn: "lastSync", desc: null, formatter: "unixToISO" },
         { fn: "rewardsCycleEnd", desc: null, formatter: "unixToISO" },
-        { fn: "lastRewardsAmt", desc: null, formatter: "formatEther" },
+        { fn: "lastRewardsAmount", desc: null, formatter: "formatEther" },
         { fn: "totalReleasedAssets", desc: null, formatter: "formatEther" },
         { fn: "stakingTotalAssets", desc: null, formatter: "formatEther" },
         {

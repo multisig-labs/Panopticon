@@ -1,5 +1,6 @@
 import { deploymentFn as deploymentFnAnrFly } from "./anr-fly.js";
 import { deploymentFn as deploymentFnAnrLocal } from "./anr-local.js";
+import { deploymentFn as deploymentFnHardhat } from "./hardhat.js";
 
 // Return whichever deployment is selected in localStorage
 
@@ -14,6 +15,9 @@ async function init() {
       break;
     case "anr-local":
       DEPLOYMENT = await deploymentFnAnrLocal();
+      break;
+    case "hardhat":
+      DEPLOYMENT = await deploymentFnHardhat();
       break;
   }
 }

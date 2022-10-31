@@ -54,11 +54,12 @@ class GoGoPool {
   }
 
   async fetchContracts() {
-    // Make a standard ethers provider
-    this.provider = new providers.JsonRpcProvider(this.rpc, this.chain);
+    // Make a standard ethers provider (static means stop querying for chainid all the time)
+    this.provider = new providers.StaticJsonRpcProvider(this.rpc, this.chain);
     // Make a Multicall provider as well
     this.multicallProvider = new MCProvider();
     await this.multicallProvider.init(this.provider);
+    this.multicallProvider.multicall3 = { address: this.addresses.Multicall3 };
 
     // Get Storage contract, where we can look up other addresses
     this.contracts.Storage = await new Contract(this.addresses.Storage, this.abis.Storage.abi, this.provider);
@@ -71,7 +72,8 @@ class GoGoPool {
         const address = await this.contracts.Storage.getAddress(
           ethersUtils.solidityKeccak256(["string", "string"], ["contract.address", name])
         );
-        this.addresses[name] = address;
+        // If we have an address (like multicall3) then dont look in storage
+        this.addresses[name] = this.addresses[name] || address;
 
         // Make a standard ethers contract
         const contract = await new Contract(this.addresses[name], this.abis[name].abi, this.provider);
@@ -97,7 +99,11 @@ class GoGoPool {
     for (const obj of this.dashboard) {
       const c = this.mccontracts[obj.contract];
       for (const metric of obj.metrics) {
-        calls.push(c[metric.fn].call(this, ...(metric.args || [])));
+        try {
+          calls.push(c[metric.fn].call(this, ...(metric.args || [])));
+        } catch (err) {
+          console.log("cant find fn in contract for metric:", metric);
+        }
       }
     }
 
@@ -105,9 +111,9 @@ class GoGoPool {
     try {
       results = await this.multicallProvider.tryAll(calls);
     } catch (err) {
-      console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.");
+      console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.", err);
     }
-    // console.log("Multicall Results", results);
+
     if (!results) return [];
 
     let i = 0;
@@ -133,9 +139,7 @@ class GoGoPool {
 
   // Reformat data shape to fit Tabulator table
   dashboardAsTabulatorData() {
-    while (this.dashboardData.length > 0) {
-      this.dashboardData.pop();
-    }
+    this.dashboardData = [];
     for (const obj of this.dashboard) {
       for (const metric of obj.metrics) {
         this.dashboardData.push({

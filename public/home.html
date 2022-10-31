@@ -42,10 +42,10 @@
     await Promise.all([
       BC.fetchData(),
       GGP.fetchContracts(),
-      GGP.fetchDashboardData(),
+      // GGP.fetchDashboardData(),
       // GGP.fetchMinipools({ status: [1, 2, 3] }),
-      GGP.fetchMinipools(),
-      GGP.fetchStakers(),
+      // GGP.fetchMinipools(),
+      // GGP.fetchStakers(),
     ]);
     console.log("GGP Loaded", GGP);
   }

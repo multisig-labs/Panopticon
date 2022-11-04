@@ -9,10 +9,10 @@ import { transformer } from "/js/transformer.js";
 class GoGoPool {
   // Required Params
   addresses;
-  abis;
-  // Optional Params
   chain;
+  contracts;
   rpc;
+  // Optional Params
   addressLabels;
   dashboard;
   transforms;
@@ -29,8 +29,8 @@ class GoGoPool {
   // Deconstruct parms from a DEPLOYMENT descriptor
   constructor({
     addresses = this.required(),
-    abis = this.required(),
     chain = this.required(),
+    contracts = this.required(),
     rpc = this.required(),
     dashboard = [],
     transforms = [],
@@ -38,8 +38,8 @@ class GoGoPool {
   }) {
     Object.assign(this, {
       addresses,
-      abis,
       chain,
+      contracts,
       rpc,
       dashboard,
       transforms,
@@ -53,6 +53,16 @@ class GoGoPool {
     this.isLoaded = false;
   }
 
+  getContracts() {
+    const data = [];
+    for (const c in this.contracts) {
+      data.push({ name: c, address: this.addresses[c] });
+    }
+    console.log(data);
+    return data;
+  }
+
+  // Get addrs of contracts from storage, and if we have an ABI instantiate the contract as well
   async fetchContracts() {
     // Make a standard ethers provider (static means stop querying for chainid all the time)
     this.provider = new providers.StaticJsonRpcProvider(this.rpc, this.chain);
@@ -66,7 +76,7 @@ class GoGoPool {
     this.mccontracts.Storage = await new MCContract(this.addresses.Storage, this.abis.Storage.abi);
 
     // Loop through all other contract names we have abis for
-    for (const name of Object.keys(this.abis)) {
+    for (const name of this.contractNames) {
       if (name === "Storage") continue;
       try {
         const address = await this.contracts.Storage.getAddress(
@@ -107,14 +117,21 @@ class GoGoPool {
       }
     }
 
-    let results;
-    try {
-      results = await this.multicallProvider.tryAll(calls);
-    } catch (err) {
-      console.error("ERROR in Multicall, so we dont know which call failed. Check your deployment descriptor.", err);
+    let results = [];
+
+    for (let batch of this.getBatch(calls)) {
+      try {
+        results = results.concat(await this.multicallProvider.tryAll(batch));
+      } catch (err) {
+        console.error(
+          "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
+          err
+        );
+        console.error(batch);
+      }
     }
 
-    if (!results) return [];
+    if (results.length == 0) return results;
 
     let i = 0;
     for (const obj of this.dashboard) {
@@ -211,7 +228,7 @@ class GoGoPool {
     throw new Error("Missing argument.");
   }
 
-  // await until(_ => flag == true);
+  // usage: await until(_ => flag == true);
   until(conditionFunction) {
     const poll = (resolve) => {
       if (conditionFunction()) resolve();
@@ -219,6 +236,12 @@ class GoGoPool {
     };
 
     return new Promise(poll);
+  }
+
+  *getBatch(records, batchsize = 50) {
+    while (records.length) {
+      yield records.splice(0, batchsize);
+    }
   }
 }
 

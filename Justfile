@@ -29,15 +29,9 @@ dev: compile
 
 # Copy ABIs from ../gogopool-contracts
 copy-contracts:
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/utils/Multicall3.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/MinipoolManager.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/Oracle.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/ProtocolDAO.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/RewardsPool.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/Staking.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/Storage.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/tokens/TokenggAVAX.sol ./public/contracts
-	cp -r ../gogopool-contracts/artifacts/contracts/contract/Vault.sol ./public/contracts
+	cat ../gogopool-contracts/artifacts/contracts/contract/*.sol/*.json \
+	| jq  'select(.contractName != null) | {contractName: .contractName, abi: .abi}' \
+	| jq -s > public/deployments/contracts.json
 
 fly-deploy:
   fly deploy --config fly.toml --app panopticon

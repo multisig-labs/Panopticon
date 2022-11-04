@@ -28,11 +28,16 @@
   <div id="dashboard"><div class="loader">Loading...</div></div>
 </div>
 
+<div class="container w-95 text-center border border-5 rounded pb-3">
+  <h3 class="text-center">Contracts</h3>
+  <div id="contracts"><div class="loader">Loading...</div></div>
+</div>
+
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { GoGoPool } from "/js/gogopool.js";
   import { Blockchain } from "/js/blockchain.js";
-  import { dashboardDef, minipoolsDef, stakersDef } from "/js/tabulator.js";
+  import { contractsDef, dashboardDef, minipoolsDef, stakersDef } from "/js/tabulator.js";
   let GGP, BC;
 
   async function initData() {
@@ -42,15 +47,17 @@
     await Promise.all([
       BC.fetchData(),
       GGP.fetchContracts(),
-      // GGP.fetchDashboardData(),
+      GGP.fetchDashboardData(),
       // GGP.fetchMinipools({ status: [1, 2, 3] }),
-      // GGP.fetchMinipools(),
-      // GGP.fetchStakers(),
+      GGP.fetchMinipools(),
+      GGP.fetchStakers(),
     ]);
-    console.log("GGP Loaded", GGP);
+    console.log("Data Loaded", GGP, BC);
   }
-
   await initData();
+
+  contractsDef.data = GGP.getContracts();
+  const tableContracts = new Tabulator("#contracts", contractsDef);
 
   BC.refreshDataLoop(() => (document.getElementById("blockchain-metrics").innerHTML = BC.statusLine()));
 

@@ -1,18 +1,3 @@
-// Only chrome supports this syntax, dang it
-// import Storage from "/contracts/Storage.sol/Storage.json" assert { type: "json" };
-// import MinipoolManager from "/contracts/MinipoolManager.sol/MinipoolManager.json" assert { type: "json" };
-// import TokenggAVAX from "/contracts/TokenggAVAX.sol/TokenggAVAX.json" assert { type: "json" };
-// import Oracle from "/contracts/Oracle.sol/Oracle.json" assert { type: "json" };
-// import Staking from "/contracts/Staking.sol/Staking.json" assert { type: "json" };
-
-// const abis = {
-//   Storage,
-//   MinipoolManager,
-//   TokenggAVAX,
-//   Oracle,
-//   Staking,
-// };
-
 const deployment = {
   host: null,
   rpc: "http://localhost:8545",
@@ -21,11 +6,11 @@ const deployment = {
     name: "localhost",
     chainId: 31337,
   },
-  // abis, // On Chrome we could just do this.
-  abis: {},
+  contracts: [], // will merge in contracts.json
+  // If a contract name is not is storage check here for it as well
   addresses: {
     Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-    Multicall3: "0x4091bF7460DF3C92206094CD177AB37DAe7d5acA",
+    Multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
   },
   addressLabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
@@ -35,23 +20,27 @@ const deployment = {
     "0xCC1cc77F3E1F122C00D1Db7BCc52f3504B9BbBcB": "cam",
     "0xAb755865Ba9516097fB9421b8FaF1DC9d1BA4B45": "deployer",
   },
+  transforms: {
+    minipool: [
+      "convertToObj",
+      "stripNumberKeys",
+      "formatEther",
+      "bigToNum",
+      "unixToISO",
+      "labelAddresses",
+      "addStatusName",
+      "decodeErrorMsg",
+      "encodeNodeID",
+      "encodeTxID",
+    ],
+    staker: ["convertToObj", "stripNumberKeys", "labelAddresses"],
+  },
   dashboard: [
-    {
-      contract: "Multicall3",
-      metrics: [
-        {
-          fn: "getCurrentBlockTimestamp",
-          title: "block.Timestamp",
-          desc: "",
-          formatter: "unixToISO",
-        },
-      ],
-    },
     {
       contract: "Oracle",
       metrics: [
         {
-          fn: "getGGPPrice",
+          fn: "getGGPPriceInAVAX",
           title: "GGP @ TS",
           desc: "GGP price in AVAX at a particular timestamp",
           formatter: "formatEtherAtTime",
@@ -61,7 +50,7 @@ const deployment = {
     {
       contract: "RewardsPool",
       metrics: [
-        { fn: "canRewardsCycleStart", desc: "" },
+        { fn: "canStartRewardsCycle", desc: "" },
         { fn: "getRewardsCycleStartTime", formatter: "unixToISO" },
         { fn: "getRewardsCyclesElapsed", desc: "" },
         { fn: "getRewardsCycleTotalAmount", formatter: "formatEther" },
@@ -70,26 +59,26 @@ const deployment = {
         { fn: "getInflationAmt", formatter: "formatInflationAmt" },
         {
           fn: "getClaimingContractDistribution",
-          args: ["NOPClaim"],
-          title: "getClaimingContractDistribution (NOPClaim)",
+          args: ["ClaimNodeOp"],
+          title: "getClaimingContractDistribution (NodeOp)",
           formatter: "formatEtherPct",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ProtocolDAOClaim"],
-          title: "getClaimingContractDistribution (DAOClaim)",
+          args: ["ClaimProtocolDAO"],
+          title: "getClaimingContractDistribution (DAO)",
           formatter: "formatEtherPct",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["NOPClaim"],
-          title: "getClaimingContractDistribution (NOPClaim)",
+          args: ["ClaimNodeOp"],
+          title: "getClaimingContractDistribution (NodeOp)",
           formatter: "formatEther",
         },
         {
           fn: "getClaimingContractDistribution",
-          args: ["ProtocolDAOClaim"],
-          title: "getClaimingContractDistribution (DAOClaim)",
+          args: ["ClaimProtocolDAO"],
+          title: "getClaimingContractDistribution (DAO)",
           formatter: "formatEther",
         },
       ],
@@ -137,7 +126,7 @@ const deployment = {
         { fn: "totalAssets", desc: "friendly desc", formatter: "formatEther" },
         { fn: "lastSync", desc: null, formatter: "unixToISO" },
         { fn: "rewardsCycleEnd", desc: null, formatter: "unixToISO" },
-        { fn: "lastRewardsAmount", desc: null, formatter: "formatEther" },
+        { fn: "lastRewardsAmt", desc: null, formatter: "formatEther" },
         { fn: "totalReleasedAssets", desc: null, formatter: "formatEther" },
         { fn: "stakingTotalAssets", desc: null, formatter: "formatEther" },
         {
@@ -175,37 +164,10 @@ const deployment = {
       ],
     },
   ],
-  transforms: {
-    minipool: [
-      "convertToObj",
-      "stripNumberKeys",
-      "formatEther",
-      "bigToNum",
-      "unixToISO",
-      "labelAddresses",
-      "addStatusName",
-      "decodeErrorMsg",
-      "encodeNodeID",
-      "encodeTxID",
-    ],
-    staker: ["convertToObj", "stripNumberKeys", "labelAddresses"],
-  },
 };
 
-// HACK Since only Chrome has the above "assert" syntax
-const contracts = deployment.dashboard.map((v) => v.contract);
 async function deploymentFn() {
-  async function fetchABIs(names) {
-    const abis = {};
-    const promises = names.map((name) => fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json()));
-    const responses = await Promise.all(promises);
-    for (let i = 0; i < contracts.length; i++) {
-      abis[contracts[i]] = responses[i];
-    }
-    return abis;
-  }
-
-  deployment.abis = await fetchABIs(contracts);
+  deployment.contracts = await fetch("/deployments/contracts.json").then((res) => res.json());
   return deployment;
 }
 

@@ -49,6 +49,22 @@ const dashboardDef = {
   ],
 };
 
+const contractsDef = {
+  data: [], // Filled in later by JS
+  index: "name",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { title: "Contract", field: "name", width: 150 },
+    { title: "Address", field: "address" },
+  ],
+};
+
 const minipoolsDef = {
   data: [], // Filled in later by JS
   index: "index",
@@ -150,6 +166,8 @@ const minipoolsDef = {
       minWidth: 5000,
       responsive: 9,
     },
+    { title: "avaxNodeOpInitialAmt", field: "avaxNodeOpInitialAmt", minWidth: 5000, responsive: 9 },
+    { title: "initialStartTimeUnix", field: "initialStartTimeUnix", minWidth: 5000, responsive: 9 },
     { title: "startTimeUnix", field: "startTimeUnix", minWidth: 5000, responsive: 9 },
     { title: "endTimeUnix", field: "endTimeUnix", minWidth: 5000, responsive: 9 },
   ],
@@ -325,4 +343,4 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, stakersDef, dashboardDef };
+export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef };

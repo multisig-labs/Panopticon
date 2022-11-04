@@ -75,11 +75,14 @@ class Blockchain {
   }
 
   statusLine() {
+    // If hardhat then just return
+    if (!this.host) return "";
     const d = this.data || {};
     return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
   }
 
   refreshDataLoop(fn) {
+    if (!this.host) return;
     const poll = async () => {
       // console.log("Polling for blockchain data");
       await this.fetchData();

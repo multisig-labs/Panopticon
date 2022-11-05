@@ -1,39 +1,21 @@
 const deployment = {
-  host: null,
-  rpc: "http://localhost:8545",
-  orc: null,
+  avaURL: null,
+  ethURL: "http://localhost:8545",
+  orcURL: null,
   chain: {
     name: "localhost",
     chainId: 31337,
   },
-  contracts: [], // will merge in contracts.json
-  // If a contract name is not is storage check here for it as well
-  addresses: {
-    Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-    Multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
-  },
-  addressLabels: {
+  contracts: {}, // will merge in contracts.json
+  storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
+  multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
+  EOALabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
     "0xB654A60A22b9c307B4a0B8C200CdB75A78c4187c": "rialto",
     "0xC70f1A9B1CBb13C7fF1A8a847f8EF188d89730e0": "alice",
     "0xcF14BAa2352770904C2BB17783FFf2a92C48bf7a": "bob",
     "0xCC1cc77F3E1F122C00D1Db7BCc52f3504B9BbBcB": "cam",
     "0xAb755865Ba9516097fB9421b8FaF1DC9d1BA4B45": "deployer",
-  },
-  transforms: {
-    minipool: [
-      "convertToObj",
-      "stripNumberKeys",
-      "formatEther",
-      "bigToNum",
-      "unixToISO",
-      "labelAddresses",
-      "addStatusName",
-      "decodeErrorMsg",
-      "encodeNodeID",
-      "encodeTxID",
-    ],
-    staker: ["convertToObj", "stripNumberKeys", "labelAddresses"],
   },
   dashboard: [
     {
@@ -53,7 +35,7 @@ const deployment = {
         { fn: "canStartRewardsCycle", desc: "" },
         { fn: "getRewardsCycleStartTime", formatter: "unixToISO" },
         { fn: "getRewardsCyclesElapsed", desc: "" },
-        { fn: "getRewardsCycleTotalAmount", formatter: "formatEther" },
+        { fn: "getRewardsCycleTotalAmt", formatter: "formatEther" },
         { fn: "getInflationIntervalStartTime", formatter: "unixToISO" },
         { fn: "getInflationIntervalsElapsed" },
         { fn: "getInflationAmt", formatter: "formatInflationAmt" },
@@ -110,7 +92,7 @@ const deployment = {
         // { fn: "getClaimingContractPerc" },
         { fn: "getInflationIntervalRate", desc: "" },
         { fn: "getInflationIntervalSeconds", desc: "Seconds" },
-        { fn: "getMinipoolMinStakingAmount", formatter: "formatEther" },
+        { fn: "getMinipoolMinStakingAmt", formatter: "formatEther" },
         { fn: "getMinipoolNodeCommissionFeePct", desc: "", formatter: "formatEtherPct" },
         { fn: "getMinipoolMaxAVAXAssignment", formatter: "formatEther" },
         { fn: "getMinipoolMinAVAXAssignment", formatter: "formatEther" },

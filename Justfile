@@ -27,11 +27,15 @@ server: compile
 dev: compile
 	OPEN_BROWSER=false VERBOSE=true bin/panopticon server
 
-# Copy ABIs from ../gogopool-contracts
+# Copy ABIs from ../gogopool-contracts (excluding Base*)
 copy-contracts:
-	cat ../gogopool-contracts/artifacts/contracts/contract/*.sol/*.json \
-	| jq  'select(.contractName != null) | {contractName: .contractName, abi: .abi}' \
-	| jq -s > public/deployments/contracts.json
+	#!/usr/bin/env bash
+	set -euo pipefail
+	cat \
+	   ../gogopool-contracts/artifacts/contracts/contract/*.sol/*.json \
+	   ../gogopool-contracts/artifacts/contracts/contract/tokens/*.sol/*.json \
+	| jq  'select(.contractName != null and (.contractName|startswith("Base")|not)) | {(.contractName): {abi: .abi}}' \
+	| jq -s add > public/deployments/contracts.json
 
 fly-deploy:
   fly deploy --config fly.toml --app panopticon

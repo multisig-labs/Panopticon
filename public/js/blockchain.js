@@ -4,17 +4,17 @@ import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { makeRpc } from "/js/utils.js";
 
 class Blockchain {
-  host;
+  avaURL;
   data;
 
-  constructor({ host = this.required() }) {
+  constructor({ avaURL = this.required() }) {
     Object.assign(this, {
-      host,
+      avaURL,
     });
   }
 
   async fetchData() {
-    if (!this.host) return;
+    if (!this.avaURL) return;
     const metrics = [
       {
         name: "nodeID",
@@ -59,7 +59,7 @@ class Blockchain {
       },
     ];
     const promises = metrics.map((m) =>
-      fetch(`${this.host}${m.url}`, makeRpc(m.method, m.params)).then((res) => res.json())
+      fetch(`${this.avaURL}${m.url}`, makeRpc(m.method, m.params)).then((res) => res.json())
     );
     let results = await Promise.all(promises);
 
@@ -76,13 +76,13 @@ class Blockchain {
 
   statusLine() {
     // If hardhat then just return
-    if (!this.host) return "";
+    if (!this.avaURL) return "";
     const d = this.data || {};
     return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
   }
 
   refreshDataLoop(fn) {
-    if (!this.host) return;
+    if (!this.avaURL) return;
     const poll = async () => {
       // console.log("Polling for blockchain data");
       await this.fetchData();

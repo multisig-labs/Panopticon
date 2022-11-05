@@ -6,7 +6,7 @@ import { MINIPOOL_STATUS_MAP, pipeAsyncFunctions, cb58Encode } from "/js/utils.j
 
 // transforms look like ["stripNumberKeys", "formatEther"]
 // Fn will take array of objs and send them through the defined transforms
-async function transformer(transforms, addressLabels, objs) {
+async function transformer(transforms, EOALabels, objs) {
   const xfns = {
     // Etherjs sends a weird obj, so make it a standard one
     convertToObj: async (obj) => Object.assign({}, obj),
@@ -45,8 +45,8 @@ async function transformer(transforms, addressLabels, objs) {
     },
     labelAddresses: (obj) => {
       for (const [k, v] of Object.entries(obj)) {
-        if (typeof v === "string" && addressLabels[v]) {
-          obj[k] = addressLabels[v];
+        if (typeof v === "string" && EOALabels[v]) {
+          obj[k] = EOALabels[v];
         }
       }
       return obj;
@@ -82,4 +82,25 @@ async function transformer(transforms, addressLabels, objs) {
   return xobjs;
 }
 
-export { transformer };
+async function minipoolTransformer(EOALabels, objs) {
+  const pipeline = [
+    "convertToObj",
+    "stripNumberKeys",
+    "formatEther",
+    "bigToNum",
+    "unixToISO",
+    "labelAddresses",
+    "addStatusName",
+    "decodeErrorMsg",
+    "encodeNodeID",
+    "encodeTxID",
+  ];
+  return await transformer(pipeline, EOALabels, objs);
+}
+
+async function stakerTransformer(EOALabels, objs) {
+  const pipeline = ["convertToObj", "stripNumberKeys", "labelAddresses"];
+  return await transformer(pipeline, EOALabels, objs);
+}
+
+export { minipoolTransformer, stakerTransformer };

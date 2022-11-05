@@ -4,18 +4,18 @@ import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { makeRpc } from "/js/utils.js";
 
 class Orc {
-  orc;
+  orcURL;
   minipools;
   info;
 
-  constructor({ orc = this.required() }) {
+  constructor({ orcURL = this.required() }) {
     Object.assign(this, {
-      orc,
+      orcURL,
     });
   }
 
   async fetchMinipools() {
-    const response = await fetch(`${this.orc}/all_minipools`, {
+    const response = await fetch(`${this.orcURL}/all_minipools`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ class Orc {
   }
 
   async fetchInfo() {
-    const response = await fetch(`${this.orc}/info`, {
+    const response = await fetch(`${this.orcURL}/info`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

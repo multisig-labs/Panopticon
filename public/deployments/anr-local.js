@@ -1,33 +1,15 @@
-// Only chrome supports this syntax, dang it
-// import Storage from "/contracts/Storage.sol/Storage.json" assert { type: "json" };
-// import MinipoolManager from "/contracts/MinipoolManager.sol/MinipoolManager.json" assert { type: "json" };
-// import TokenggAVAX from "/contracts/TokenggAVAX.sol/TokenggAVAX.json" assert { type: "json" };
-// import Oracle from "/contracts/Oracle.sol/Oracle.json" assert { type: "json" };
-// import Staking from "/contracts/Staking.sol/Staking.json" assert { type: "json" };
-
-// const abis = {
-//   Storage,
-//   MinipoolManager,
-//   TokenggAVAX,
-//   Oracle,
-//   Staking,
-// };
-
 const deployment = {
-  host: "http://localhost:8545",
-  rpc: "http://localhost:8545/ext/bc/C/rpc",
-  orc: "http://localhost:7450",
+  avaURL: "http://localhost:8545",
+  ethURL: "http://localhost:8545/ext/bc/C/rpc",
+  orcURL: "http://localhost:7450",
   chain: {
     name: "custom",
     chainId: 43112,
   },
-  // abis, // On Chrome we could just do this.
-  abis: {},
-  addresses: {
-    Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-    Multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
-  },
-  addressLabels: {
+  contracts: {}, // will merge in contracts.json
+  storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
+  multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
+  EOALabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
     "0xB654A60A22b9c307B4a0B8C200CdB75A78c4187c": "rialto",
     "0xC70f1A9B1CBb13C7fF1A8a847f8EF188d89730e0": "alice",
@@ -53,7 +35,7 @@ const deployment = {
         { fn: "canStartRewardsCycle", desc: "" },
         { fn: "getRewardsCycleStartTime", formatter: "unixToISO" },
         { fn: "getRewardsCyclesElapsed", desc: "" },
-        { fn: "getRewardsCycleTotalAmount", formatter: "formatEther" },
+        { fn: "getRewardsCycleTotalAmt", formatter: "formatEther" },
         { fn: "getInflationIntervalStartTime", formatter: "unixToISO" },
         { fn: "getInflationIntervalsElapsed" },
         { fn: "getInflationAmt", formatter: "formatInflationAmt" },
@@ -110,7 +92,7 @@ const deployment = {
         // { fn: "getClaimingContractPerc" },
         { fn: "getInflationIntervalRate", desc: "" },
         { fn: "getInflationIntervalSeconds", desc: "Seconds" },
-        { fn: "getMinipoolMinStakingAmount", formatter: "formatEther" },
+        { fn: "getMinipoolMinAVAXStakingAmt", formatter: "formatEther" },
         { fn: "getMinipoolNodeCommissionFeePct", desc: "", formatter: "formatEtherPct" },
         { fn: "getMinipoolMaxAVAXAssignment", formatter: "formatEther" },
         { fn: "getMinipoolMinAVAXAssignment", formatter: "formatEther" },
@@ -164,37 +146,10 @@ const deployment = {
       ],
     },
   ],
-  transforms: {
-    minipool: [
-      "convertToObj",
-      "stripNumberKeys",
-      "formatEther",
-      "bigToNum",
-      "unixToISO",
-      "labelAddresses",
-      "addStatusName",
-      "decodeErrorMsg",
-      "encodeNodeID",
-      "encodeTxID",
-    ],
-    staker: ["convertToObj", "stripNumberKeys", "labelAddresses"],
-  },
 };
 
-// HACK Since only Chrome has the above "assert" syntax
-const contracts = deployment.dashboard.map((v) => v.contract);
 async function deploymentFn() {
-  async function fetchABIs(names) {
-    const abis = {};
-    const promises = names.map((name) => fetch(`/contracts/${name}.sol/${name}.json`).then((res) => res.json()));
-    const responses = await Promise.all(promises);
-    for (let i = 0; i < contracts.length; i++) {
-      abis[contracts[i]] = responses[i];
-    }
-    return abis;
-  }
-
-  deployment.abis = await fetchABIs(contracts);
+  deployment.contracts = await fetch("/deployments/contracts.json").then((res) => res.json());
   return deployment;
 }
 

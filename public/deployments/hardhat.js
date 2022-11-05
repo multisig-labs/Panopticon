@@ -92,7 +92,7 @@ const deployment = {
         // { fn: "getClaimingContractPerc" },
         { fn: "getInflationIntervalRate", desc: "" },
         { fn: "getInflationIntervalSeconds", desc: "Seconds" },
-        { fn: "getMinipoolMinStakingAmt", formatter: "formatEther" },
+        { fn: "getMinipoolMinAVAXStakingAmt", formatter: "formatEther" },
         { fn: "getMinipoolNodeCommissionFeePct", desc: "", formatter: "formatEtherPct" },
         { fn: "getMinipoolMaxAVAXAssignment", formatter: "formatEther" },
         { fn: "getMinipoolMinAVAXAssignment", formatter: "formatEther" },

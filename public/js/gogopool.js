@@ -58,6 +58,7 @@ class GoGoPool {
     for (const c in this.contracts) {
       data.push({ name: c, address: this.contracts[c].address });
     }
+    data.push({ name: "Multicall3", address: this.multicall3 });
     return data;
   }
 
@@ -241,7 +242,7 @@ class GoGoPool {
     return new Promise(poll);
   }
 
-  *getBatch(records, batchsize = 50) {
+  *getBatch(records, batchsize = window.BATCHSIZE || 50) {
     while (records.length) {
       yield records.splice(0, batchsize);
     }

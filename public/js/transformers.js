@@ -1,12 +1,11 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { DateTime } from "https://cdn.skypack.dev/luxon";
 import { utils as ethersUtils } from "https://cdn.skypack.dev/ethers";
-import { MINIPOOL_STATUS_MAP, pipeAsyncFunctions, cb58Encode } from "/js/utils.js";
+import { pipeAsyncFunctions, cb58Encode } from "/js/utils.js";
 
 // transforms look like ["stripNumberKeys", "formatEther"]
 // Fn will take array of objs and send them through the defined transforms
-async function transformer(transforms, EOALabels, objs) {
+async function transformer(transforms, objs) {
   const xfns = {
     // Etherjs sends a weird obj, so make it a standard one
     convertToObj: async (obj) => Object.assign({}, obj),
@@ -18,45 +17,8 @@ async function transformer(transforms, EOALabels, objs) {
       }
       return obj;
     },
-    formatEther: async (obj) => {
-      for (const k of Object.keys(obj)) {
-        if (k.match("Amt$")) {
-          obj[k] = ethersUtils.formatEther(obj[k]);
-        }
-      }
-      return obj;
-    },
-    bigToNum: async (obj) => {
-      for (const k of Object.keys(obj)) {
-        if (obj[k].constructor.name === "BigNumber") {
-          obj[k] = obj[k].toNumber();
-        }
-      }
-      return obj;
-    },
-    unixToISO: (obj) => {
-      for (const k of Object.keys(obj)) {
-        if (k.match("Time$")) {
-          obj[`${k}Unix`] = obj[k];
-          obj[k] = DateTime.fromSeconds(obj[k]);
-        }
-      }
-      return obj;
-    },
-    labelAddresses: (obj) => {
-      for (const [k, v] of Object.entries(obj)) {
-        if (typeof v === "string" && EOALabels[v]) {
-          obj[k] = EOALabels[v];
-        }
-      }
-      return obj;
-    },
-    addStatusName: (obj) => {
-      obj.statusName = MINIPOOL_STATUS_MAP[obj.status];
-      return obj;
-    },
-    decodeErrorMsg: (obj) => {
-      obj.errorMsg = ethersUtils.toUtf8String(ethersUtils.stripZeros(obj.errorCode));
+    indexToNum: (obj) => {
+      obj.index = obj.index.toNumber();
       return obj;
     },
     encodeNodeID: async (obj) => {
@@ -82,25 +44,14 @@ async function transformer(transforms, EOALabels, objs) {
   return xobjs;
 }
 
-async function minipoolTransformer(EOALabels, objs) {
-  const pipeline = [
-    "convertToObj",
-    "stripNumberKeys",
-    "formatEther",
-    "bigToNum",
-    "unixToISO",
-    "labelAddresses",
-    "addStatusName",
-    "decodeErrorMsg",
-    "encodeNodeID",
-    "encodeTxID",
-  ];
-  return await transformer(pipeline, EOALabels, objs);
+async function minipoolTransformer(objs) {
+  const pipeline = ["convertToObj", "stripNumberKeys", "indexToNum", "encodeNodeID", "encodeTxID"];
+  return await transformer(pipeline, objs);
 }
 
-async function stakerTransformer(EOALabels, objs) {
-  const pipeline = ["convertToObj", "stripNumberKeys", "labelAddresses"];
-  return await transformer(pipeline, EOALabels, objs);
+async function stakerTransformer(objs) {
+  const pipeline = ["convertToObj", "stripNumberKeys"];
+  return await transformer(pipeline, objs);
 }
 
 export { minipoolTransformer, stakerTransformer };

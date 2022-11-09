@@ -97,7 +97,10 @@ class GoGoPool {
           this.contracts[name].mccontract = mccontract;
         }
       } catch (e) {
-        console.log(`error [${name}]`, e);
+        console.log(
+          `error in getAddress, ensure that storage addr ${this.storage} points to a Storage contract. [${name}]`,
+          e
+        );
       }
     }
     console.log(this.contracts);
@@ -180,7 +183,7 @@ class GoGoPool {
 
     const promises = status.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
-    this.minipoolsData = await minipoolTransformer(this.EOALabels, results.flat());
+    this.minipoolsData = await minipoolTransformer(results.flat());
     // console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
@@ -192,16 +195,52 @@ class GoGoPool {
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
     await this.until((_) => this.isLoaded);
 
-    const results = await this.contracts.Staking.contract.getStakers(0, 0);
-    this.stakersData = await stakerTransformer(this.EOALabels, results);
-    // Because names are not consistent we do it manually
-    this.stakersData.map((s) => {
-      s.ggpStaked = ethersUtils.formatEther(s.ggpStaked);
-      s.avaxStaked = ethersUtils.formatEther(s.avaxStaked);
-      s.avaxAssigned = ethersUtils.formatEther(s.avaxAssigned);
-      s.ggpRewards = ethersUtils.formatEther(s.ggpRewards);
-      s.rewardsStartTime = DateTime.fromSeconds(s.rewardsStartTime.toNumber());
-    });
+    let results = await this.contracts.Staking.contract.getStakers(0, 0);
+    this.stakersData = await stakerTransformer(results);
+
+    // For each staker we want to call a couple funcs, so mush them all together for speed into batches
+    const calls = [];
+    const fns = [
+      "getMinimumGGPStake",
+      "getEffectiveRewardsRatio",
+      "getCollateralizationRatio",
+      "getAVAXAssignedHighWater",
+    ];
+
+    for (const s of this.stakersData) {
+      const c = this.contracts["Staking"].mccontract;
+      for (const fn of fns) {
+        try {
+          // Un-label the addr argh
+          const addr = s.stakerAddrHex || s.stakerAddr;
+          calls.push(c[fn].call(this, addr));
+        } catch (err) {
+          console.log("error", err);
+        }
+      }
+    }
+
+    results = [];
+
+    for (let batch of this.getBatch(calls)) {
+      try {
+        results = results.concat(await this.multicallProvider.tryAll(batch));
+      } catch (err) {
+        console.error(
+          "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
+          err
+        );
+        console.error(batch);
+      }
+    }
+
+    // Now add the results of the batch to each staker
+    for (const [index, s] of this.stakersData.entries()) {
+      s.getMinimumGGPStake = results[index * 3];
+      s.getEffectiveRewardsRatio = results[index * 3 + 1];
+      s.getCollateralizationRatio = results[index * 3 + 2];
+      s.getAVAXAssignedHighWater = results[index * 3 + 3];
+    }
     // console.log("Stakers", this.stakersData);
     return this.stakersData;
   }
@@ -209,7 +248,6 @@ class GoGoPool {
   stakersAsTabulatorData() {
     return this.stakersData;
   }
-  stakersData;
 
   // Helpers
   refreshDataLoop(fn) {

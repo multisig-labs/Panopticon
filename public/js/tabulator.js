@@ -10,6 +10,22 @@ function formatUnixTime(cell, formatterParams, onRendered) {
   return formatters.unixToISO(cell.getValue());
 }
 
+function formatEtherPct(cell, formatterParams, onRendered) {
+  return formatters.formatEtherPct(cell.getValue());
+}
+
+function formatMPStatus(cell, formatterParams, onRendered) {
+  return formatters.formatMPStatus(cell.getValue());
+}
+
+function formatErrorMsg(cell, formatterParams, onRendered) {
+  return formatters.formatErrorMsg(cell.getValue());
+}
+
+function labelAddress(cell, formatterParams, onRendered) {
+  return formatters.labelAddress(cell.getValue(), DEPLOYMENT.EOALabels);
+}
+
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
   if (tx == "11111111111111111111111111111111LpoYY") {
@@ -91,7 +107,8 @@ const minipoolsDef = {
     { title: "NodeID", field: "nodeID" },
     {
       title: "Status",
-      field: "statusName",
+      field: "status",
+      formatter: formatMPStatus,
       width: 90,
     },
     { title: "Dur", field: "duration", width: 60 },
@@ -99,36 +116,23 @@ const minipoolsDef = {
       title: "Start",
       field: "startTime",
       width: 90,
-      formatter: "datetime",
-      sorter: "date",
-      formatterParams: {
-        inputFormat: "iso",
-        outputFormat: "MM/dd/yy",
-        invalidPlaceholder: "(invalid date)",
-        timezone: "America/Los_Angeles",
-      },
+      formatter: formatUnixTime,
     },
     {
       title: "End",
       field: "endTime",
       width: 90,
-      formatter: "datetime",
-      sorter: "date",
-      formatterParams: {
-        inputFormat: "iso",
-        outputFormat: "MM/dd/yy",
-        invalidPlaceholder: "(invalid date)",
-        timezone: "America/Los_Angeles",
-      },
+      formatter: formatUnixTime,
     },
-    { title: "Owner", field: "owner", width: 120 },
+    { title: "Owner", field: "owner", formatter: labelAddress, width: 120 },
     {
       title: "AvaxNodeOp",
       field: "avaxNodeOpAmt",
+      formatter: formatEther,
     },
-    { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt" },
-    { title: "GGPSlash", field: "ggpSlashAmt" },
-    { title: "Error", field: "errorMsg" },
+    { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt", formatter: formatEther },
+    { title: "GGPSlash", field: "ggpSlashAmt", formatter: formatEther },
+    { title: "Error", field: "errorCode", formatter: formatErrorMsg },
     {
       title: "NodeAddr",
       field: "nodeAddr",
@@ -138,24 +142,28 @@ const minipoolsDef = {
     {
       title: "MultisigAddr",
       field: "multisigAddr",
+      formatter: labelAddress,
       minWidth: 5000,
       responsive: 9,
     },
     {
       title: "avaxTotalRewardAmt",
       field: "avaxTotalRewardAmt",
+      formatter: formatEther,
       minWidth: 5000,
       responsive: 9,
     },
     {
       title: "avaxNodeOpRewardAmt",
       field: "avaxNodeOpRewardAmt",
+      formatter: formatEther,
       minWidth: 5000,
       responsive: 9,
     },
     {
       title: "avaxLiquidStakerRewardAmt",
       field: "avaxLiquidStakerRewardAmt",
+      formatter: formatEther,
       minWidth: 5000,
       responsive: 9,
     },
@@ -166,10 +174,8 @@ const minipoolsDef = {
       minWidth: 5000,
       responsive: 9,
     },
-    { title: "avaxNodeOpInitialAmt", field: "avaxNodeOpInitialAmt", minWidth: 5000, responsive: 9 },
-    { title: "initialStartTimeUnix", field: "initialStartTimeUnix", minWidth: 5000, responsive: 9 },
-    { title: "startTimeUnix", field: "startTimeUnix", minWidth: 5000, responsive: 9 },
-    { title: "endTimeUnix", field: "endTimeUnix", minWidth: 5000, responsive: 9 },
+    { title: "startTime", field: "startTime", formatter: formatUnixTime, minWidth: 5000, responsive: 9 },
+    { title: "endTime", field: "endTime", formatter: formatUnixTime, minWidth: 5000, responsive: 9 },
   ],
 };
 
@@ -190,25 +196,24 @@ const stakersDef = {
   //   }
   // },
   columns: [
-    { title: "StakerAddr", field: "stakerAddr" },
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "StakerAddr", field: "stakerAddr", formatter: labelAddress, width: 150 },
     { title: "MP Count", field: "minipoolCount", width: 100 },
     {
       title: "Start",
       field: "rewardsStartTime",
-      width: 90,
-      formatter: "datetime",
-      sorter: "date",
-      formatterParams: {
-        inputFormat: "iso",
-        outputFormat: "MM/dd/yy",
-        invalidPlaceholder: "(invalid date)",
-        timezone: "America/Los_Angeles",
-      },
+      width: 120,
+      formatter: formatUnixTime,
     },
-    { title: "ggpStaked", field: "ggpStaked", width: 150 },
-    { title: "avaxStaked", field: "avaxStaked", width: 150 },
-    { title: "avaxAssigned", field: "avaxAssigned", width: 150 },
-    { title: "ggpRewards", field: "ggpRewards", width: 150 },
+    { title: "ggpStaked", field: "ggpStaked", formatter: formatEther, width: 150 },
+    { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 150 },
+    { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
+    { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
+    { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted" },
+    { title: "minGGPStake", field: "getMinimumGGPStake", formatter: formatEther, width: 150 },
+    { title: "CollatRatio", field: "getCollateralizationRatio", formatter: formatEtherPct, width: 150 },
+    { title: "EffectiveRewardsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
+    { title: "AVAXAssignedHighWater", field: "getAVAXAssignedHighWater", formatter: formatEther, width: 150 },
   ],
 };
 

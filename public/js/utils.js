@@ -1,4 +1,4 @@
-import { utils as ethersUtils } from "https://cdn.skypack.dev/ethers";
+import { utils as ethersUtils, constants as ethersConstants } from "https://cdn.skypack.dev/ethers";
 import { DateTime } from "https://cdn.skypack.dev/luxon";
 
 const ORC_STATE_MAP = {
@@ -128,6 +128,10 @@ const formatters = {
     });
   },
   formatEtherPct: (v) => {
+    if (v.eq(ethersConstants.MaxUint256)) {
+      return "∞";
+    }
+
     const p = parseFloat(ethersUtils.formatEther(v)) * 100;
     return (
       p.toLocaleString(undefined, {
@@ -135,6 +139,10 @@ const formatters = {
       }) + "%"
     );
   },
+
+  formatMPStatus: (v) => MINIPOOL_STATUS_MAP[v],
+  formatErrorMsg: (v) => ethersUtils.toUtf8String(ethersUtils.stripZeros(v)),
+  labelAddress: (v, EOALabels) => EOALabels[v] || v,
   formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),
   unixToISOOnly: (v) => {

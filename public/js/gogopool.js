@@ -184,7 +184,7 @@ class GoGoPool {
     const promises = status.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
     this.minipoolsData = await minipoolTransformer(results.flat());
-    // console.log("Minipools", this.minipoolsData);
+    console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
 

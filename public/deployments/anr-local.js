@@ -2,6 +2,8 @@ const deployment = {
   avaURL: "http://localhost:8545",
   ethURL: "http://localhost:8545/ext/bc/C/rpc",
   orcURL: "http://localhost:7450",
+  pExplorerURL: "http://localhost:8545/cgi-bin/txp",
+  cExplorerURL: "http://localhost:8545/cgi-bin/txc",
   chain: {
     name: "custom",
     chainId: 43112,
@@ -153,4 +155,4 @@ async function deploymentFn() {
   return deployment;
 }
 
-export { deployment, deploymentFn };
+export { deploymentFn };

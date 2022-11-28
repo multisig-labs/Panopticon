@@ -25,6 +25,20 @@
         "
     />
   </div>
+  <div class="mb-3">
+    <label for="txid" class="form-label">Staking Transaction Explorer</label>
+    <input
+      type="text"
+      class="form-control"
+      id="txid"
+      placeholder="P-chain staking txid, enter to go"
+      _="on keyup[event.key=='Enter'] 
+        set theTxid to my value
+        then set theUrl to `http://localhost:8545/validator_node_info/${theTxid}`
+        then call window.open(theUrl)
+        "
+    />
+  </div>
 </div>
 
 <script type="module"></script>

@@ -6,6 +6,10 @@ function formatEther(cell, formatterParams, onRendered) {
   return formatters.formatEther(cell.getValue());
 }
 
+function formatAvax(cell, formatterParams, onRendered) {
+  return formatters.formatAvax(cell.getValue());
+}
+
 function formatUnixTime(cell, formatterParams, onRendered) {
   return formatters.unixToISO(cell.getValue());
 }
@@ -28,13 +32,14 @@ function labelAddress(cell, formatterParams, onRendered) {
 
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
-  if (tx == "11111111111111111111111111111111LpoYY") {
+  // These are zero values converted to CB58
+  if (tx === "11111111111111111111111111111111LpoYY" || tx === "111111111111111111111115WtNroYg1XQm1fmuvF") {
     return "";
   }
   if (tx.substring(0, 2) === "0x") {
-    return `<a href="https://anr.fly.dev/cgi-bin/txc/${tx}" target="_blank">${tx}</a>`;
+    return `<a href="${DEPLOYMENT.cExplorerURL}/${tx}" target="_blank">${tx}</a>`;
   } else {
-    return `<a href="https://anr.fly.dev/cgi-bin/txp/${tx}" target="_blank">${tx}</a>`;
+    return `<a href="${DEPLOYMENT.pExplorerURL}/${tx}" target="_blank">${tx}</a>`;
   }
 }
 
@@ -88,9 +93,9 @@ const minipoolsDef = {
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
-  groupBy: "statusName",
+  groupBy: "status",
   groupHeader: function (value, count, data, group) {
-    return `${value}<span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
+    return `${formatters.formatMPStatus(value)}<span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
   },
   selectable: true,
   clipboard: "copy",
@@ -168,14 +173,26 @@ const minipoolsDef = {
       responsive: 9,
     },
     {
-      title: "txID",
+      title: "Staking txID",
       field: "txID",
       formatter: formatTxID,
       minWidth: 5000,
       responsive: 9,
     },
-    { title: "startTime", field: "startTime", formatter: formatUnixTime, minWidth: 5000, responsive: 9 },
-    { title: "endTime", field: "endTime", formatter: formatUnixTime, minWidth: 5000, responsive: 9 },
+    {
+      title: "avaxNodeOpInitialAmt",
+      field: "avaxNodeOpInitialAmt",
+      formatter: formatEther,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "initialStartTime",
+      field: "initialStartTime",
+      formatter: formatUnixTime,
+      minWidth: 5000,
+      responsive: 9,
+    },
   ],
 };
 
@@ -200,7 +217,7 @@ const stakersDef = {
     { title: "StakerAddr", field: "stakerAddr", formatter: labelAddress, width: 150 },
     { title: "MP Count", field: "minipoolCount", width: 100 },
     {
-      title: "Start",
+      title: "rwdStart",
       field: "rewardsStartTime",
       width: 120,
       formatter: formatUnixTime,
@@ -208,12 +225,12 @@ const stakersDef = {
     { title: "ggpStaked", field: "ggpStaked", formatter: formatEther, width: 150 },
     { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 150 },
     { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
-    { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
-    { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted" },
+    { title: "collatRatio", field: "getCollateralizationRatio", formatter: formatEtherPct, width: 150 },
     { title: "minGGPStake", field: "getMinimumGGPStake", formatter: formatEther, width: 150 },
-    { title: "CollatRatio", field: "getCollateralizationRatio", formatter: formatEtherPct, width: 150 },
-    { title: "EffectiveRewardsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
-    { title: "AVAXAssignedHighWater", field: "getAVAXAssignedHighWater", formatter: formatEther, width: 150 },
+    { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
+    { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted", width: 150 },
+    { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
+    { title: "AVAXAssigHighWater", field: "getAVAXAssignedHighWater", formatter: formatEther, width: 150 },
   ],
 };
 
@@ -235,9 +252,19 @@ const orcDef = {
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
     { title: "ID", field: "ID", width: 5 },
     { title: "NodeID", field: "NodeID" },
-    { title: "State", field: "State", width: 90 },
-    { title: "Status", field: "Status", width: 70 },
+    { title: "State", field: "State", width: 90, formatter: (cell) => ORC_STATE_MAP[cell.getValue()] },
+    // { title: "Status", field: "Status", width: 70 },
     { title: "Dur", field: "Duration", width: 60 },
+    {
+      title: "End",
+      field: "end",
+      width: 60,
+      mutator: function (value, data) {
+        const end = luxon.DateTime.fromSeconds(data.InitialStartTime + data.Duration);
+        const dur = end.diffNow(["days", "hours"]);
+        return end.toRelative({ style: "short" });
+      },
+    },
     {
       title: "Created",
       field: "CreatedAt",
@@ -251,10 +278,10 @@ const orcDef = {
         timezone: "America/Los_Angeles",
       },
     },
-    { title: "Owner", field: "Owner", width: 120 },
-    { title: "AvaxNodeOp", field: "AvaxNodeOpAmt", formatter: formatEther },
-    { title: "AvaxUser", field: "AvaxUserAmt", formatter: formatEther },
-    { title: "GGPSlash", field: "GgpSlashAmt", formatter: formatEther },
+    { title: "Owner", field: "Owner", formatter: labelAddress, width: 120 },
+    { title: "AvaxNodeOp", field: "AvaxNodeOpAmt", formatter: formatAvax },
+    { title: "AvaxUser", field: "AvaxUserAmt", formatter: formatAvax },
+    { title: "GGPSlash", field: "GgpSlashAmt", formatter: formatAvax },
     { title: "Error", field: "MinipoolError" },
     {
       title: "NodeAddr",
@@ -320,6 +347,13 @@ const orcDef = {
     {
       title: "RecordStakingEndTxID",
       field: "RecordStakingEndTxID",
+      formatter: formatTxID,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "RecreateMinipoolTxID",
+      field: "RecreateMinipoolTxID",
       formatter: formatTxID,
       minWidth: 5000,
       responsive: 9,

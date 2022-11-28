@@ -1,6 +1,6 @@
 (function () {
   this.ToasterBox = function () {
-    // globel variable
+    // global variable
     this.toasterContainer = null;
     this.toasterCloseBtn = null;
     const _ = this;
@@ -80,8 +80,7 @@
     this.toasterContainer.classList.add(this.options.position);
     this.toasterContainer.style.maxWidth = this.options.maxWidth + "px";
     if (this.options.backgroundColor !== null) {
-      this.toasterContainer.style.backgroundColor =
-        this.options.backgroundColor;
+      this.toasterContainer.style.backgroundColor = this.options.backgroundColor;
     }
     if (this.options.className !== null) {
       this.toasterContainer.classList.add(this.options.className);
@@ -104,8 +103,7 @@
       if (this.options.closeIcon) {
         this.toasterCloseBtn.innerHTML = this.options.closeIcon;
       } else {
-        this.toasterCloseBtn.innerHTML =
-          "<img src='./close.svg' alt='close icon' width='20' class='inverted'/>";
+        this.toasterCloseBtn.innerHTML = "<img src='./close.svg' alt='close icon' width='20' class='inverted'/>";
       }
       this.toasterContainer.append(this.toasterCloseBtn);
     }
@@ -118,10 +116,7 @@
 
   function initializeEvents() {
     if (this.toasterCloseBtn) {
-      this.toasterCloseBtn.addEventListener(
-        "click",
-        this.closeToaster.bind(this)
-      );
+      this.toasterCloseBtn.addEventListener("click", this.closeToaster.bind(this));
     }
   }
   // overwrite default property

@@ -153,4 +153,4 @@ async function deploymentFn() {
   return deployment;
 }
 
-export { deployment, deploymentFn };
+export { deploymentFn };

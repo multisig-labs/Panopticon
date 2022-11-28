@@ -19,12 +19,14 @@ const ORC_STATE_MAP = {
   14: "ImportP2CStrt",
   15: "ImportP2CFin",
   16: "RecStkEndStrt",
-  17: "RecStkErrStrt",
-  18: "CancelMPStrt",
-  19: "RecStkEndFin",
-  20: "RecStkErrorFin",
-  21: "CancelMPFin",
-  22: "MPError",
+  17: "RecreateMPStrt",
+  18: "RecStkErrStrt",
+  19: "CancelMPStrt",
+  20: "RecStkEndFin",
+  21: "RecreateMPFin",
+  22: "RecStkErrorFin",
+  23: "CancelMPFin",
+  24: "MPError",
 };
 
 const MINIPOOL_STATUS_MAP = {
@@ -120,6 +122,11 @@ const formatters = {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }),
+  formatAvax: (v) =>
+    parseFloat(v / 1_000_000_000).toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }),
   formatInflationAmt: (v) => {
     const newTokens = v[1].sub(v[0]);
     return ethersUtils.formatEther(newTokens).toLocaleString(undefined, {
@@ -151,6 +158,7 @@ const formatters = {
   },
   unixToISO: (v) => {
     if (v?.toNumber) v = v.toNumber();
+    if (v === 0) return v;
     const dt = DateTime.fromSeconds(v || 0).toLocaleString(DateTime.DATETIME_SHORT);
     return `${dt} (${v})`;
   },

@@ -45,6 +45,8 @@ async function transformer(transforms, objs) {
 }
 
 async function minipoolTransformer(objs) {
+  // indexToNum is necessary because Tabulator.js requires an int key for each row, BigInt doesnt work
+  // the encode* transforms are async in order to use cb58, not sure how to do async in tabulator formatters, so doing it here
   const pipeline = ["convertToObj", "stripNumberKeys", "indexToNum", "encodeNodeID", "encodeTxID"];
   return await transformer(pipeline, objs);
 }

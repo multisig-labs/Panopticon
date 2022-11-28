@@ -600,6 +600,19 @@
       {
         "inputs": [
           {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          }
+        ],
+        "name": "finishFailedMinipoolByMultisig",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "string",
             "name": "contractName",
             "type": "string"
@@ -713,6 +726,11 @@
               },
               {
                 "internalType": "uint256",
+                "name": "avaxNodeOpInitialAmt",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
               },
@@ -720,6 +738,11 @@
                 "internalType": "bytes32",
                 "name": "txID",
                 "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "initialStartTime",
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",
@@ -819,6 +842,11 @@
               },
               {
                 "internalType": "uint256",
+                "name": "avaxNodeOpInitialAmt",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
               },
@@ -826,6 +854,11 @@
                 "internalType": "bytes32",
                 "name": "txID",
                 "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "initialStartTime",
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",
@@ -948,6 +981,11 @@
               },
               {
                 "internalType": "uint256",
+                "name": "avaxNodeOpInitialAmt",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
               },
@@ -955,6 +993,11 @@
                 "internalType": "bytes32",
                 "name": "txID",
                 "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "initialStartTime",
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",
@@ -1111,6 +1154,19 @@
         "type": "function"
       },
       {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          }
+        ],
+        "name": "recreateMinipool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
         "inputs": [],
         "name": "version",
         "outputs": [
@@ -1173,11 +1229,6 @@
       },
       {
         "inputs": [],
-        "name": "MultisigDisabled",
-        "type": "error"
-      },
-      {
-        "inputs": [],
         "name": "MultisigNotFound",
         "type": "error"
       },
@@ -1207,7 +1258,13 @@
           {
             "indexed": true,
             "internalType": "address",
-            "name": "addr",
+            "name": "multisig",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "actor",
             "type": "address"
           }
         ],
@@ -1220,7 +1277,13 @@
           {
             "indexed": true,
             "internalType": "address",
-            "name": "addr",
+            "name": "multisig",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "actor",
             "type": "address"
           }
         ],
@@ -1233,7 +1296,13 @@
           {
             "indexed": true,
             "internalType": "address",
-            "name": "addr",
+            "name": "multisig",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "actor",
             "type": "address"
           }
         ],
@@ -1590,6 +1659,12 @@
             "indexed": true,
             "internalType": "uint256",
             "name": "price",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "timestamp",
             "type": "uint256"
           }
         ],
@@ -2073,6 +2148,11 @@
       },
       {
         "inputs": [],
+        "name": "ContractHasNotBeenInitialized",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "ContractNotFound",
         "type": "error"
       },
@@ -2135,6 +2215,19 @@
           }
         ],
         "name": "GGPInflated",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "value",
+            "type": "uint256"
+          }
+        ],
+        "name": "MultisigRewardsTransfered",
         "type": "event"
       },
       {
@@ -3052,7 +3145,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "stakerAddress",
+            "name": "stakerAddr",
             "type": "address"
           },
           {
@@ -3330,7 +3423,7 @@
         "outputs": [
           {
             "internalType": "address",
-            "name": "r",
+            "name": "",
             "type": "address"
           }
         ],
@@ -3349,7 +3442,7 @@
         "outputs": [
           {
             "internalType": "bool",
-            "name": "r",
+            "name": "",
             "type": "bool"
           }
         ],
@@ -3387,7 +3480,7 @@
         "outputs": [
           {
             "internalType": "bytes32",
-            "name": "r",
+            "name": "",
             "type": "bytes32"
           }
         ],
@@ -3419,7 +3512,7 @@
         "outputs": [
           {
             "internalType": "int256",
-            "name": "r",
+            "name": "",
             "type": "int256"
           }
         ],
@@ -3457,8 +3550,21 @@
         "outputs": [
           {
             "internalType": "uint256",
-            "name": "r",
+            "name": "",
             "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "newGuardian",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
           }
         ],
         "stateMutability": "view",
@@ -4543,25 +4649,6 @@
           {
             "indexed": true,
             "internalType": "address",
-            "name": "previousOwner",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "newOwner",
-            "type": "address"
-          }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "address",
             "name": "from",
             "type": "address"
           },
@@ -4661,52 +4748,6 @@
           }
         ],
         "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "string",
-            "name": "_name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "_symbol",
-            "type": "string"
-          },
-          {
-            "internalType": "uint8",
-            "name": "_decimals",
-            "type": "uint8"
-          }
-        ],
-        "name": "__ERC20Upgradeable_init",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "contract ERC20",
-            "name": "_asset",
-            "type": "address"
-          },
-          {
-            "internalType": "string",
-            "name": "_name",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "_symbol",
-            "type": "string"
-          }
-        ],
-        "name": "__ERC4626Upgradeable_init",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -5013,7 +5054,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "owner",
+            "name": "_owner",
             "type": "address"
           }
         ],
@@ -5032,7 +5073,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "owner",
+            "name": "_owner",
             "type": "address"
           }
         ],
@@ -5098,19 +5139,6 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
           }
         ],
         "stateMutability": "view",
@@ -5298,13 +5326,6 @@
       },
       {
         "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
         "name": "rewardsCycleEnd",
         "outputs": [
           {
@@ -5451,19 +5472,6 @@
             "type": "bool"
           }
         ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "newOwner",
-            "type": "address"
-          }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
       },

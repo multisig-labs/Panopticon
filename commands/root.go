@@ -28,7 +28,7 @@ func init() {
 const rootCmdName = "panopticon"
 
 const asciiArt = `
- Panopticon 👁👁
+ 👁 Panopticon 👁
 
 `
 

@@ -2,6 +2,8 @@ const deployment = {
   avaURL: "https://anr.fly.dev",
   ethURL: "https://anr.fly.dev/ext/bc/C/rpc",
   orcURL: "https://orchestrator.fly.dev",
+  pExplorerURL: "https://anr.fly.dev/cgi-bin/txp",
+  cExplorerURL: "https://anr.fly.dev/cgi-bin/txc",
   chain: {
     name: "custom",
     chainId: 43112,

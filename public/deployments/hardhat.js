@@ -2,6 +2,8 @@ const deployment = {
   avaURL: null,
   ethURL: "http://localhost:8545",
   orcURL: null,
+  pExplorerURL: null,
+  cExplorerURL: null,
   chain: {
     name: "localhost",
     chainId: 31337,

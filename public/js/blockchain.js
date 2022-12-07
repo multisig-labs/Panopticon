@@ -1,7 +1,7 @@
 // Etherjs read-only interface to Avalanche Blockchain parameters
 
 import { DateTime } from "https://cdn.skypack.dev/luxon";
-import { makeRpc } from "/js/utils.js";
+import { makeRpc } from "./utils.js";
 
 class Blockchain {
   avaURL;

@@ -1,5 +1,5 @@
-import { ORC_STATE_MAP, formatters } from "/js/utils.js";
-import { DEPLOYMENT } from "/deployments/selected.js";
+import { ORC_STATE_MAP, formatters } from "./utils.js";
+import { DEPLOYMENT } from "../deployments/selected.js";
 
 // Formatters specific for use in Tabulator cells
 function formatEther(cell, formatterParams, onRendered) {

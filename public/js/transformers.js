@@ -1,7 +1,7 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
 import { utils as ethersUtils } from "https://cdn.skypack.dev/ethers";
-import { pipeAsyncFunctions, cb58Encode } from "/js/utils.js";
+import { pipeAsyncFunctions, cb58Encode } from "./utils.js";
 
 // transforms look like ["stripNumberKeys", "formatEther"]
 // Fn will take array of objs and send them through the defined transforms

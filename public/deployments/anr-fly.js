@@ -1,16 +1,37 @@
 const deployment = {
-  avaURL: "https://anr.fly.dev",
-  ethURL: "https://anr.fly.dev/ext/bc/C/rpc",
-  orcURL: "https://orchestrator.fly.dev",
-  pExplorerURL: "https://anr.fly.dev/cgi-bin/txp",
-  cExplorerURL: "https://anr.fly.dev/cgi-bin/txc",
+  baseURLs: {
+    ava: "https://anr.fly.dev",
+    eth: "https://anr.fly.dev/ext/bc/C/rpc",
+    orc: {
+      url: "https://orchestrator.fly.dev",
+      user: "admin",
+      password: "sekret",
+    },
+  },
   chain: {
     name: "custom",
     chainId: 43112,
   },
+  addresses: {
+    Multicall: "0x3A07D36c8bA41d3d2464E48D836e654F75435C83",
+    WAVAX: "0x4FeF9f4d231Ee924d47E0aF4f66dc63972d21bad",
+    Storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
+    OneInchMock: "0xf1C1A8625e0e5645a1d30972eD42159772eFf2d5",
+    Vault: "0xAC0b8Bb0cC456427Af85Dd4906123E4C0eCc36c9",
+    Oracle: "0x7D9B78E545Ec4a11F72ceEC022CA00F488747dD9",
+    ProtocolDAO: "0xc0154E9cBC75fBfcC357E5a25fB461498575462a",
+    MultisigManager: "0x471277fDa89D4F08577477A10Ee1Ef484D3aA2Eb",
+    TokenGGP: "0xfAbddBBf27Cd558EdBab042fA0bB2119c68194D1",
+    TokenggAVAX: "0xBACA5746afe31E50B6428Dfa0e19C333718aE5F2",
+    MinipoolManager: "0xFB7EC923a63c59300F0c3eBD164131C5cD97f339",
+    RewardsPool: "0x0c8De90B0C8206A5f271B022a5C33Fa1dBA36097",
+    ClaimNodeOp: "0x7209E192AA92D442314255142dcb834B34d0AEce",
+    Staking: "0x3f1F12b672CEA8d9F798b43AF57Fbe4Ad9cbf8BD",
+    ClaimProtocolDAO: "0xaF3713Bb5f365e8Bc7be6f0A0E713B1a2a4d87d0",
+    Multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
+    Ocyticus: "0x86e8838cc9E85b8eAA1D5e1660E4bd748ADEF509",
+  },
   contracts: {}, // will merge in contracts.json
-  storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-  multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
   EOALabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
     "0xB654A60A22b9c307B4a0B8C200CdB75A78c4187c": "rialto",
@@ -150,8 +171,10 @@ const deployment = {
   ],
 };
 
+import c from "./contracts.json" assert { type: "json" };
+
 async function deploymentFn() {
-  deployment.contracts = await fetch("/deployments/contracts.json").then((res) => res.json());
+  deployment.contracts = c;
   return deployment;
 }
 

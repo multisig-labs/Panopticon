@@ -3,8 +3,8 @@
 import { utils as ethersUtils, providers, Contract, constants } from "https://cdn.skypack.dev/ethers";
 import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
 import { DateTime } from "https://cdn.skypack.dev/luxon";
-import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
-import { minipoolTransformer, stakerTransformer } from "/js/transformers.js";
+import { MINIPOOL_STATUS_MAP, formatters } from "./utils.js";
+import { minipoolTransformer, stakerTransformer } from "./transformers.js";
 
 class GoGoPool {
   // Required Params

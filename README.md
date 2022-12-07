@@ -2,7 +2,7 @@
 
 Read-only web ui for keeping tabs on the GoGoPool Protocol.
 
-Built with modern tech but using old skool techniques. No React/Vue/Svetle/etc. Just locally-sourced, organic HTML and Javascript (ECMA2020).
+Built with modern tech but using old skool techniques. No React/Vue/Svelte/etc. Just locally-sourced, organic HTML and Javascript (ECMA2020).
 
 - Built-in Go web server, so the entire app + html compiles down into a single binary.
 - Liberal use of `<script type="module">` and https://skypack.dev

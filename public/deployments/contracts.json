@@ -69,6 +69,11 @@
         "type": "error"
       },
       {
+        "inputs": [],
+        "name": "RewardsCycleNotStarted",
+        "type": "error"
+      },
+      {
         "anonymous": false,
         "inputs": [
           {
@@ -333,6 +338,11 @@
       },
       {
         "inputs": [],
+        "name": "CancellationTooEarly",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "ContractNotFound",
         "type": "error"
       },
@@ -379,6 +389,11 @@
       {
         "inputs": [],
         "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidStartTime",
         "type": "error"
       },
       {
@@ -1063,6 +1078,29 @@
             "type": "address"
           },
           {
+            "internalType": "uint256",
+            "name": "endTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "avaxTotalRewardAmt",
+            "type": "uint256"
+          }
+        ],
+        "name": "recordStakingEndThenCycle",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
             "internalType": "bytes32",
             "name": "errorCode",
             "type": "bytes32"
@@ -1092,19 +1130,6 @@
           }
         ],
         "name": "recordStakingStart",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "nodeID",
-            "type": "address"
-          }
-        ],
-        "name": "recreateMinipool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1168,6 +1193,11 @@
       {
         "inputs": [],
         "name": "MultisigAlreadyRegistered",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MultisigLimitReached",
         "type": "error"
       },
       {
@@ -1251,6 +1281,19 @@
         ],
         "name": "RegisteredMultisig",
         "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "MULTISIG_LIMIT",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       },
       {
         "inputs": [
@@ -1702,6 +1745,11 @@
         "type": "error"
       },
       {
+        "inputs": [],
+        "name": "ValueNotWithinRange",
+        "type": "error"
+      },
+      {
         "inputs": [
           {
             "internalType": "string",
@@ -1794,6 +1842,19 @@
       {
         "inputs": [],
         "name": "getMinCollateralizationRatio",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getMinipoolCancelMoratoriumSeconds",
         "outputs": [
           {
             "internalType": "uint256",
@@ -2036,6 +2097,11 @@
       {
         "inputs": [],
         "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MaximumTokensReached",
         "type": "error"
       },
       {
@@ -2321,6 +2387,11 @@
       {
         "inputs": [],
         "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidRewardsStartTime",
         "type": "error"
       },
       {
@@ -2885,6 +2956,24 @@
           }
         ],
         "name": "increaseAVAXAssigned",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "stakerAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "increaseAVAXAssignedHighWater",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3603,6 +3692,11 @@
       },
       {
         "inputs": [],
+        "name": "InvalidToken",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "MustBeGuardian",
         "type": "error"
       },
@@ -3773,6 +3867,19 @@
       {
         "inputs": [
           {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          }
+        ],
+        "name": "addAllowedToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "string",
             "name": "networkContractName",
             "type": "string"
@@ -3846,10 +3953,18 @@
       {
         "inputs": [
           {
-            "internalType": "string",
-            "name": "fromContractName",
-            "type": "string"
-          },
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          }
+        ],
+        "name": "removeAllowedToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
           {
             "internalType": "string",
             "name": "toContractName",

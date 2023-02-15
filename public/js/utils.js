@@ -1,5 +1,5 @@
-import { utils as ethersUtils, constants as ethersConstants } from "https://cdn.skypack.dev/ethers";
-import { DateTime } from "https://cdn.skypack.dev/luxon";
+import { utils as ethersUtils, constants as ethersConstants } from "https://esm.sh/ethers@5.7.2";
+import { DateTime } from "https://esm.sh/luxon@3.2.1";
 
 const ORC_STATE_MAP = {
   0: "Prelaunch",

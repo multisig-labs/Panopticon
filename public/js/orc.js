@@ -1,8 +1,5 @@
 // Etherjs read-only interface to Rialto Orchestrator
 
-import { DateTime } from "https://cdn.skypack.dev/luxon";
-import { makeRpc } from "/js/utils.js";
-
 class Orc {
   orcURL;
   minipools;

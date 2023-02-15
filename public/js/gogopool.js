@@ -1,8 +1,7 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { utils as ethersUtils, providers, Contract, constants } from "https://cdn.skypack.dev/ethers";
-import { Contract as MCContract, Provider as MCProvider } from "https://cdn.skypack.dev/ethcall";
-import { DateTime } from "https://cdn.skypack.dev/luxon";
+import { utils as ethersUtils, providers, Contract, constants } from "https://esm.sh/ethers@5.7.2";
+import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
 import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
 import { minipoolTransformer, stakerTransformer } from "/js/transformers.js";
 
@@ -204,7 +203,7 @@ class GoGoPool {
       "getMinimumGGPStake",
       "getEffectiveRewardsRatio",
       "getCollateralizationRatio",
-      "getAVAXAssignedHighWater",
+      "getAVAXValidatingHighWater",
     ];
 
     for (const s of this.stakersData) {

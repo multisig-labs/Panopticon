@@ -143,6 +143,7 @@ const minipoolsDef = {
     { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt", formatter: formatEther },
     { title: "GGPSlash", field: "ggpSlashAmt", formatter: formatEther },
     { title: "Error", field: "errorCode", formatter: formatErrorMsg },
+    { title: "Error", field: "errorCode", formatter: formatErrorMsg, minWidth: 5000, responsive: 9 },
     {
       title: "NodeAddr",
       field: "nodeAddr",
@@ -288,6 +289,7 @@ const orcDef = {
     { title: "AvaxUser", field: "AvaxUserAmt", formatter: formatAvax },
     { title: "GGPSlash", field: "GgpSlashAmt", formatter: formatAvax },
     { title: "Error", field: "MinipoolError" },
+    { title: "Error", field: "MinipoolError", minWidth: 5000, responsive: 9 },
     {
       title: "NodeAddr",
       field: "NodeAddr",

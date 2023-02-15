@@ -33,7 +33,12 @@ function labelAddress(cell, formatterParams, onRendered) {
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
   // These are zero values converted to CB58
-  if (tx === "11111111111111111111111111111111LpoYY" || tx === "111111111111111111111115WtNroYg1XQm1fmuvF") {
+  if (
+    tx === undefined ||
+    tx === null ||
+    tx === "11111111111111111111111111111111LpoYY" ||
+    tx === "111111111111111111111115WtNroYg1XQm1fmuvF"
+  ) {
     return "";
   }
   if (tx.substring(0, 2) === "0x") {
@@ -237,7 +242,7 @@ const stakersDef = {
 const orcDef = {
   data: [], // Filled in later by JS
   index: "ID",
-  // height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  height: 900, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,

@@ -118,7 +118,7 @@ const pipeAsyncFunctions =
 // Generic formatters
 const formatters = {
   formatEther: (v) =>
-    parseFloat(ethersUtils.formatEther(v)).toLocaleString(undefined, {
+    parseFloat(ethersUtils.formatEther(v || 0)).toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }),

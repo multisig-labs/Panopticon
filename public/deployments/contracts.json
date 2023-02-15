@@ -7,11 +7,6 @@
             "internalType": "contract Storage",
             "name": "storageAddress",
             "type": "address"
-          },
-          {
-            "internalType": "contract ERC20",
-            "name": "ggp_",
-            "type": "address"
           }
         ],
         "stateMutability": "nonpayable",
@@ -131,19 +126,6 @@
             "internalType": "uint256",
             "name": "",
             "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "ggp",
-        "outputs": [
-          {
-            "internalType": "contract ERC20",
-            "name": "",
-            "type": "address"
           }
         ],
         "stateMutability": "view",
@@ -321,16 +303,6 @@
             "internalType": "contract Storage",
             "name": "storageAddress",
             "type": "address"
-          },
-          {
-            "internalType": "contract ERC20",
-            "name": "ggp_",
-            "type": "address"
-          },
-          {
-            "internalType": "contract TokenggAVAX",
-            "name": "ggAVAX_",
-            "type": "address"
           }
         ],
         "stateMutability": "nonpayable",
@@ -349,6 +321,16 @@
       {
         "inputs": [],
         "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "DelegationFeeOutOfBounds",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "DurationOutOfBounds",
         "type": "error"
       },
       {
@@ -403,6 +385,11 @@
       },
       {
         "inputs": [],
+        "name": "MinipoolDurationExceeded",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "MinipoolNotFound",
         "type": "error"
       },
@@ -419,6 +406,11 @@
       {
         "inputs": [],
         "name": "MustBeMultisig",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "NagativeCycleDuration",
         "type": "error"
       },
       {
@@ -577,19 +569,6 @@
       {
         "inputs": [
           {
-            "internalType": "address",
-            "name": "nodeID",
-            "type": "address"
-          }
-        ],
-        "name": "finishFailedMinipoolByMultisig",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
             "internalType": "uint256",
             "name": "duration",
             "type": "uint256"
@@ -696,6 +675,11 @@
                 "internalType": "bytes32",
                 "name": "txID",
                 "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "creationTime",
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",
@@ -812,6 +796,11 @@
                 "internalType": "bytes32",
                 "name": "txID",
                 "type": "bytes32"
+              },
+              {
+                "internalType": "uint256",
+                "name": "creationTime",
+                "type": "uint256"
               },
               {
                 "internalType": "uint256",
@@ -954,6 +943,11 @@
               },
               {
                 "internalType": "uint256",
+                "name": "creationTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
                 "name": "initialStartTime",
                 "type": "uint256"
               },
@@ -1016,25 +1010,12 @@
       },
       {
         "inputs": [],
-        "name": "ggAVAX",
+        "name": "minStakingDuration",
         "outputs": [
           {
-            "internalType": "contract TokenggAVAX",
+            "internalType": "uint256",
             "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "ggp",
-        "outputs": [
-          {
-            "internalType": "contract ERC20",
-            "name": "",
-            "type": "address"
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
@@ -1088,7 +1069,7 @@
             "type": "uint256"
           }
         ],
-        "name": "recordStakingEndThenCycle",
+        "name": "recordStakingEndThenMaybeCycle",
         "outputs": [],
         "stateMutability": "payable",
         "type": "function"
@@ -1716,12 +1697,27 @@
       },
       {
         "inputs": [],
+        "name": "ContractAlreadyRegistered",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "ContractNotFound",
         "type": "error"
       },
       {
         "inputs": [],
         "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ExistingContractNotRegistered",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidContract",
         "type": "error"
       },
       {
@@ -1958,19 +1954,6 @@
       },
       {
         "inputs": [],
-        "name": "getTotalGGPCirculatingSupply",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
         "name": "initialize",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -1985,6 +1968,24 @@
           }
         ],
         "name": "pauseContract",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "contractName",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "contractAddr",
+            "type": "address"
+          }
+        ],
+        "name": "registerContract",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -2036,12 +2037,35 @@
       {
         "inputs": [
           {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
+            "internalType": "string",
+            "name": "name",
+            "type": "string"
           }
         ],
-        "name": "setTotalGGPCirculatingSupply",
+        "name": "unregisterContract",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "contractName",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "existingAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "newAddr",
+            "type": "address"
+          }
+        ],
+        "name": "upgradeContract",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -2354,11 +2378,6 @@
             "internalType": "contract Storage",
             "name": "storageAddress",
             "type": "address"
-          },
-          {
-            "internalType": "contract ERC20",
-            "name": "ggp_",
-            "type": "address"
           }
         ],
         "stateMutability": "nonpayable",
@@ -2501,7 +2520,7 @@
             "type": "uint256"
           }
         ],
-        "name": "decreaseGGPRewards",
+        "name": "decreaseAVAXValidating",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -2512,9 +2531,14 @@
             "internalType": "address",
             "name": "stakerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
           }
         ],
-        "name": "decreaseMinipoolCount",
+        "name": "decreaseGGPRewards",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -2546,7 +2570,7 @@
             "type": "address"
           }
         ],
-        "name": "getAVAXAssignedHighWater",
+        "name": "getAVAXStake",
         "outputs": [
           {
             "internalType": "uint256",
@@ -2565,7 +2589,26 @@
             "type": "address"
           }
         ],
-        "name": "getAVAXStake",
+        "name": "getAVAXValidating",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "stakerAddr",
+            "type": "address"
+          }
+        ],
+        "name": "getAVAXValidatingHighWater",
         "outputs": [
           {
             "internalType": "uint256",
@@ -2736,25 +2779,6 @@
             "type": "address"
           }
         ],
-        "name": "getMinipoolCount",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "stakerAddr",
-            "type": "address"
-          }
-        ],
         "name": "getRewardsStartTime",
         "outputs": [
           {
@@ -2800,12 +2824,12 @@
               },
               {
                 "internalType": "uint256",
-                "name": "avaxAssignedHighWater",
+                "name": "avaxValidating",
                 "type": "uint256"
               },
               {
                 "internalType": "uint256",
-                "name": "minipoolCount",
+                "name": "avaxValidatingHighWater",
                 "type": "uint256"
               },
               {
@@ -2884,12 +2908,12 @@
               },
               {
                 "internalType": "uint256",
-                "name": "avaxAssignedHighWater",
+                "name": "avaxValidating",
                 "type": "uint256"
               },
               {
                 "internalType": "uint256",
-                "name": "minipoolCount",
+                "name": "avaxValidatingHighWater",
                 "type": "uint256"
               },
               {
@@ -2930,19 +2954,6 @@
         "type": "function"
       },
       {
-        "inputs": [],
-        "name": "ggp",
-        "outputs": [
-          {
-            "internalType": "contract ERC20",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
         "inputs": [
           {
             "internalType": "address",
@@ -2956,24 +2967,6 @@
           }
         ],
         "name": "increaseAVAXAssigned",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "stakerAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
-        ],
-        "name": "increaseAVAXAssignedHighWater",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3009,7 +3002,7 @@
             "type": "uint256"
           }
         ],
-        "name": "increaseGGPRewards",
+        "name": "increaseAVAXValidating",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3020,9 +3013,14 @@
             "internalType": "address",
             "name": "stakerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
           }
         ],
-        "name": "increaseMinipoolCount",
+        "name": "increaseGGPRewards",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3052,9 +3050,14 @@
             "internalType": "address",
             "name": "stakerAddr",
             "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
           }
         ],
-        "name": "resetAVAXAssignedHighWater",
+        "name": "restakeGGP",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3072,7 +3075,7 @@
             "type": "uint256"
           }
         ],
-        "name": "restakeGGP",
+        "name": "setAVAXValidatingHighWater",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -4058,9 +4061,50 @@
   "TokenGGP": {
     "abi": [
       {
-        "inputs": [],
+        "inputs": [
+          {
+            "internalType": "contract Storage",
+            "name": "storageAddress",
+            "type": "address"
+          }
+        ],
         "stateMutability": "nonpayable",
         "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "ContractNotFound",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MaximumTokensReached",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardian",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardianOrValidContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeMultisig",
+        "type": "error"
       },
       {
         "anonymous": false,
@@ -4120,6 +4164,19 @@
             "internalType": "bytes32",
             "name": "",
             "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "MAX_SUPPLY",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
           }
         ],
         "stateMutability": "view",
@@ -4203,6 +4260,19 @@
           }
         ],
         "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -4358,6 +4428,19 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "version",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       }
     ]
   },
@@ -4427,25 +4510,6 @@
         "anonymous": false,
         "inputs": [
           {
-            "indexed": false,
-            "internalType": "address",
-            "name": "previousAdmin",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "internalType": "address",
-            "name": "newAdmin",
-            "type": "address"
-          }
-        ],
-        "name": "AdminChanged",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
             "indexed": true,
             "internalType": "address",
             "name": "owner",
@@ -4465,19 +4529,6 @@
           }
         ],
         "name": "Approval",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "beacon",
-            "type": "address"
-          }
-        ],
-        "name": "BeaconUpgraded",
         "type": "event"
       },
       {
@@ -4591,19 +4642,6 @@
           }
         ],
         "name": "Transfer",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "implementation",
-            "type": "address"
-          }
-        ],
-        "name": "Upgraded",
         "type": "event"
       },
       {
@@ -4885,6 +4923,11 @@
             "internalType": "contract ERC20",
             "name": "asset",
             "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "initialDeposit",
+            "type": "uint256"
           }
         ],
         "name": "initialize",
@@ -4922,7 +4965,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "",
+            "name": "_owner",
             "type": "address"
           }
         ],
@@ -4941,7 +4984,7 @@
         "inputs": [
           {
             "internalType": "address",
-            "name": "",
+            "name": "_owner",
             "type": "address"
           }
         ],
@@ -5170,19 +5213,6 @@
         "type": "function"
       },
       {
-        "inputs": [],
-        "name": "proxiableUUID",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
         "inputs": [
           {
             "internalType": "uint256",
@@ -5379,37 +5409,6 @@
           }
         ],
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "newImplementation",
-            "type": "address"
-          }
-        ],
-        "name": "upgradeTo",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "newImplementation",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
-        ],
-        "name": "upgradeToAndCall",
-        "outputs": [],
-        "stateMutability": "payable",
         "type": "function"
       },
       {

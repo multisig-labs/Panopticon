@@ -9,8 +9,8 @@ const deployment = {
     chainId: 31337,
   },
   contracts: {}, // will merge in contracts.json
-  storage: "0xAE77fDd010D498678FCa3cC23e6E11f120Bf576c",
-  multicall3: "0x6E79E232E9Bcc6aeA69f3fA2C9afFC7D1C90Be44",
+  storage: "0xbf81Dc1F4a38D63c93dfb10b9b8819cF60180F1e",
+  multicall3: "0x02871815f996Ebe1473A1C24F0dacF0f6965dB5F",
   EOALabels: {
     "0xE992bAb78A4901f4AF1C3356a9c6310Da0BA8bee": "nodeOp1",
     "0xB654A60A22b9c307B4a0B8C200CdB75A78c4187c": "rialto",

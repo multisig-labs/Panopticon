@@ -23,7 +23,7 @@ compile:
 server: compile
 	bin/panopticon server
 
-# Run server and server files from disk, not embedded files
+# Run server and serve files from disk, not embedded files
 dev: compile
 	OPEN_BROWSER=false VERBOSE=true bin/panopticon server
 

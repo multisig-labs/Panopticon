@@ -85,11 +85,6 @@ const deployment = {
           fn: "getRewardsCycleSeconds",
           desc: "Seconds",
         },
-        {
-          fn: "getTotalGGPCirculatingSupply",
-          desc: "",
-          formatter: "formatEther",
-        },
         // Needs an arg, wat do?
         // { fn: "getClaimingContractPerc" },
         { fn: "getInflationIntervalRate", desc: "" },

@@ -359,8 +359,8 @@ const orcDef = {
       responsive: 9,
     },
     {
-      title: "RecreateMinipoolTxID",
-      field: "RecreateMinipoolTxID",
+      title: "RecordStakingEndThenMaybeCycleTxID",
+      field: "RecordStakingEndThenMaybeCycleTxID",
       formatter: formatTxID,
       minWidth: 5000,
       responsive: 9,

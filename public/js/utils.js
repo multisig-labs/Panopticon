@@ -128,6 +128,7 @@ const formatters = {
       maximumFractionDigits: 6,
     }),
   formatInflationAmt: (v) => {
+    if (!v || v.length != 2) return "err";
     const newTokens = v[1].sub(v[0]);
     return ethersUtils.formatEther(newTokens).toLocaleString(undefined, {
       minimumFractionDigits: 2,

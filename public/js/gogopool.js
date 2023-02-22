@@ -183,7 +183,7 @@ class GoGoPool {
     const promises = status.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
     this.minipoolsData = await minipoolTransformer(results.flat());
-    console.log("Minipools", this.minipoolsData);
+    // console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
 
@@ -204,6 +204,7 @@ class GoGoPool {
       "getEffectiveRewardsRatio",
       "getCollateralizationRatio",
       "getAVAXValidatingHighWater",
+      "getEffectiveGGPStaked",
     ];
 
     for (const s of this.stakersData) {
@@ -214,7 +215,7 @@ class GoGoPool {
           const addr = s.stakerAddrHex || s.stakerAddr;
           calls.push(c[fn].call(this, addr));
         } catch (err) {
-          console.log("error", err);
+          console.error("error calling fn", fn, err);
         }
       }
     }
@@ -234,11 +235,13 @@ class GoGoPool {
     }
 
     // Now add the results of the batch to each staker
+    const l = fns.length;
     for (const [index, s] of this.stakersData.entries()) {
-      s.getMinimumGGPStake = results[index * 3];
-      s.getEffectiveRewardsRatio = results[index * 3 + 1];
-      s.getCollateralizationRatio = results[index * 3 + 2];
-      s.getAVAXAssignedHighWater = results[index * 3 + 3];
+      s.getMinimumGGPStake = results[index * l];
+      s.getEffectiveRewardsRatio = results[index * l + 1];
+      s.getCollateralizationRatio = results[index * l + 2];
+      s.getAVAXAssignedHighWater = results[index * l + 3];
+      s.getEffectiveGGPStaked = results[index * l + 4];
     }
     // console.log("Stakers", this.stakersData);
     return this.stakersData;

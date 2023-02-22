@@ -237,6 +237,7 @@ const stakersDef = {
     { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted", width: 150 },
     { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
     { title: "AVAXValidgHighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 150 },
+    { title: "getEffectiveGGPStaked", field: "getEffectiveGGPStaked", formatter: formatEther, width: 150 },
   ],
 };
 

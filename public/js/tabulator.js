@@ -232,12 +232,13 @@ const stakersDef = {
     { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 150 },
     { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
     { title: "collatRatio", field: "getCollateralizationRatio", formatter: formatEtherPct, width: 150 },
-    { title: "minGGPStake", field: "getMinimumGGPStake", formatter: formatEther, width: 150 },
     { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
     { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted", width: 150 },
+    { title: "minGGPStake", field: "getMinimumGGPStake", formatter: formatEther, width: 150 },
     { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
     { title: "AVAXValidgHighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 150 },
-    { title: "getEffectiveGGPStaked", field: "getEffectiveGGPStaked", formatter: formatEther, width: 150 },
+    { title: "EffectGGPStaked", field: "getEffectiveGGPStaked", formatter: formatEther, width: 150 },
+    { title: "CollatRatio", field: "getCollateralizationRatio", formatter: formatEther, width: 150 },
   ],
 };
 

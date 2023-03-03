@@ -240,7 +240,7 @@ class GoGoPool {
       s.getMinimumGGPStake = results[index * l];
       s.getEffectiveRewardsRatio = results[index * l + 1];
       s.getCollateralizationRatio = results[index * l + 2];
-      s.getAVAXAssignedHighWater = results[index * l + 3];
+      s.getAVAXValidatingHighWater = results[index * l + 3];
       s.getEffectiveGGPStaked = results[index * l + 4];
     }
     // console.log("Stakers", this.stakersData);

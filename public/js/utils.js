@@ -1,5 +1,5 @@
 import { utils as ethersUtils, constants as ethersConstants } from "https://esm.sh/ethers@5.7.2";
-import { DateTime } from "https://esm.sh/luxon@3.2.1";
+import { DateTime, Duration } from "https://esm.sh/luxon@3.2.1";
 
 const ORC_STATE_MAP = {
   0: "Prelaunch",
@@ -150,6 +150,10 @@ const formatters = {
 
   formatMPStatus: (v) => MINIPOOL_STATUS_MAP[v],
   formatErrorMsg: (v) => ethersUtils.toUtf8String(ethersUtils.stripZeros(v)),
+  formatDuration: (v) => {
+    const dur = Duration.fromMillis(v * 1000).toFormat("dd:hh:mm:ss");
+    return dur + " (" + v + ")";
+  },
   labelAddress: (v, EOALabels) => EOALabels[v] || v,
   formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),

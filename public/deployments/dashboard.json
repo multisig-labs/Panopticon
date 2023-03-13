@@ -53,17 +53,27 @@
   {
     "contract": "ProtocolDAO",
     "metrics": [
-      { "fn": "getRewardsEligibilityMinSeconds", "desc": "" },
+      { "fn": "getRewardsEligibilityMinSeconds", "desc": "", "formatter": "formatDuration" },
       {
         "fn": "getRewardsCycleSeconds",
-        "desc": "Seconds"
+        "desc": "Seconds",
+        "formatter": "formatDuration"
       },
       { "fn": "getInflationIntervalRate", "desc": "" },
-      { "fn": "getInflationIntervalSeconds", "desc": "Seconds" },
+      { "fn": "getInflationIntervalSeconds", "desc": "Seconds", "formatter": "formatDuration" },
       { "fn": "getMinipoolMinAVAXStakingAmt", "formatter": "formatEther" },
       { "fn": "getMinipoolNodeCommissionFeePct", "desc": "", "formatter": "formatEtherPct" },
+      { "fn": "getMinipoolMinDuration", "desc": "Seconds", "formatter": "formatDuration" },
+      { "fn": "getMinipoolMaxDuration", "desc": "Seconds", "formatter": "formatDuration" },
+      { "fn": "getMinipoolCycleDuration", "desc": "Seconds", "formatter": "formatDuration" },
+      { "fn": "getMinipoolCycleDelayTolerance", "desc": "Seconds" },
       { "fn": "getMinipoolMaxAVAXAssignment", "formatter": "formatEther" },
       { "fn": "getMinipoolMinAVAXAssignment", "formatter": "formatEther" },
+      {
+        "fn": "getMinipoolCancelMoratoriumSeconds",
+        "desc": "Duration before cancel is allowed",
+        "formatter": "formatDuration"
+      },
       { "fn": "getExpectedAVAXRewardsRate", "desc": "", "formatter": "formatEtherPct" },
       { "fn": "getMaxCollateralizationRatio", "desc": "", "formatter": "formatEtherPct" },
       { "fn": "getMinCollateralizationRatio", "desc": "", "formatter": "formatEtherPct" },

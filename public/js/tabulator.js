@@ -30,6 +30,10 @@ function labelAddress(cell, formatterParams, onRendered) {
   return formatters.labelAddress(cell.getValue(), DEPLOYMENT.EOALabels);
 }
 
+function formatDuration(cell, formatterParams, onRendered) {
+  return formatters.formatDuration(cell.getValue());
+}
+
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
   // These are zero values converted to CB58

@@ -5,11 +5,13 @@ import { makeRpc } from "/js/utils.js";
 
 class Blockchain {
   avaURL;
+  ethURL;
   data;
 
-  constructor({ avaURL = this.required() }) {
+  constructor({ avaURL = this.required(), ethURL = this.required() }) {
     Object.assign(this, {
       avaURL,
+      ethURL,
     });
   }
 
@@ -85,6 +87,12 @@ class Blockchain {
     if (!this.avaURL) return "";
     const d = this.data || {};
     return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
+  }
+
+  rpcUrl() {
+    if (!this.ethURL) return "";
+    const d = this.data || {};
+    return `[RPC URL: ${this.ethURL}]`;
   }
 
   refreshDataLoop(fn) {

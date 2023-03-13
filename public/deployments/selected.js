@@ -2,6 +2,7 @@ import { deploymentFn as deploymentFnAnrFly } from "./anr-fly.js";
 import { deploymentFn as deploymentFnAnrLocal } from "./anr-local.js";
 import { deploymentFn as deploymentFnHardhat } from "./hardhat.js";
 import { deploymentFn as deploymentFnFuji } from "./fuji.js";
+import { deploymentFn as deploymentFnMainnetTest } from "./mainnet-test.js";
 
 // Return whichever deployment is selected in localStorage
 
@@ -22,6 +23,9 @@ async function init() {
       break;
     case "fuji":
       DEPLOYMENT = await deploymentFnFuji();
+      break;
+    case "mainnet-test":
+      DEPLOYMENT = await deploymentFnMainnetTest();
       break;
   }
 }

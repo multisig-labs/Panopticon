@@ -89,9 +89,7 @@ class Blockchain {
     return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
   }
 
-  rpcUrl() {
-    if (!this.ethURL) return "";
-    const d = this.data || {};
+  rpcUrlDisplay() {
     return `[RPC URL: ${this.ethURL}]`;
   }
 

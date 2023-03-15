@@ -44,10 +44,10 @@
   import { contractsDef, dashboardDef, minipoolsDef, stakersDef } from "/js/tabulator.js";
   let GGP, BC;
 
-  function copy() {
+  function copyEthRpcUrl() {
     navigator.clipboard.writeText(BC.ethURL);
   }
-  document.querySelector("#rpc-url").addEventListener("click", copy);
+  document.querySelector("#rpc-url").addEventListener("click", copyEthRpcUrl);
 
   async function initData() {
     GGP = new GoGoPool(DEPLOYMENT);

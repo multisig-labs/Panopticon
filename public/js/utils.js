@@ -152,7 +152,7 @@ const formatters = {
   formatErrorMsg: (v) => ethersUtils.toUtf8String(ethersUtils.stripZeros(v)),
   formatDuration: (v) => {
     const dur = Duration.fromMillis(v * 1000).toFormat("dd:hh:mm:ss");
-    return `${dur} (${v}`;
+    return `${dur} (${v})`;
   },
   labelAddress: (v, EOALabels) => EOALabels[v] || v,
   formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,

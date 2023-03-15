@@ -8,16 +8,13 @@
     </div>
   </div>
 </div>
-<script>
-  function copy() {}
-</script>
 
 <div class="container w-95 text-center text-muted">
   <div id="blockchain-metrics"></div>
 </div>
 
 <div class="container w-95 text-center text-muted">
-  <div class="cursor-grab" onclick="copy()" id="rpc-url"></div>
+  <div class="cursor-grab" id="rpc-url"></div>
 </div>
 
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
@@ -47,9 +44,10 @@
   import { contractsDef, dashboardDef, minipoolsDef, stakersDef } from "/js/tabulator.js";
   let GGP, BC;
 
-  copy = function () {
+  function copy() {
     navigator.clipboard.writeText(BC.ethURL);
-  };
+  }
+  document.querySelector("#rpc-url").addEventListener("click", copy);
 
   async function initData() {
     GGP = new GoGoPool(DEPLOYMENT);

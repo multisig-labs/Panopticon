@@ -17,7 +17,7 @@
 </div>
 
 <div class="container w-95 text-center text-muted">
-  <div onclick="copy()" id="rpc-url"></div>
+  <div class="cursor-grab" onclick="copy()" id="rpc-url"></div>
 </div>
 
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
@@ -72,7 +72,7 @@
 
   BC.refreshDataLoop(() => {
     document.getElementById("blockchain-metrics").innerHTML = BC.statusLine();
-    document.getElementById("rpc-url").innerHTML = BC.rpcUrl();
+    document.getElementById("rpc-url").innerHTML = BC.rpcUrlDisplay();
   });
 
   const tableDashboard = new Tabulator("#dashboard", dashboardDef);
@@ -85,8 +85,8 @@
   });
 </script>
 <style>
-  #rpc-url:hover {
-    cursor: grab;
+  .cursor-grab:hover {
+    cursor: pointer;
   }
 </style>
 {{ end }}

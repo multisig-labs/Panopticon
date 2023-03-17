@@ -1183,6 +1183,11 @@
       },
       {
         "inputs": [],
+        "name": "MultisigMustBeEnabled",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "MultisigNotFound",
         "type": "error"
       },
@@ -1242,6 +1247,25 @@
           }
         ],
         "name": "EnabledMultisig",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "multisig",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "GGPClaimed",
         "type": "event"
       },
       {
@@ -1395,6 +1419,13 @@
           }
         ],
         "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "withdrawUnclaimedGGP",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
       }
     ]
@@ -1863,7 +1894,46 @@
       },
       {
         "inputs": [],
+        "name": "getMinipoolCycleDelayTolerance",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getMinipoolCycleDuration",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
         "name": "getMinipoolMaxAVAXAssignment",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getMinipoolMaxDuration",
         "outputs": [
           {
             "internalType": "uint256",
@@ -1890,6 +1960,19 @@
       {
         "inputs": [],
         "name": "getMinipoolMinAVAXStakingAmt",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getMinipoolMinDuration",
         "outputs": [
           {
             "internalType": "uint256",

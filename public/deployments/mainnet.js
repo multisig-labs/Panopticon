@@ -5,7 +5,7 @@ const deployment = {
   pExplorerURL: "https://api.avax.network",
   cExplorerURL: "https://api.avax.network",
   chain: {
-    name: "mainnet",
+    name: "ava-mainnet",
     chainId: 43114,
   },
   storage: "0x1cEa17F9dE4De28FeB6A102988E12D4B90DfF1a9",

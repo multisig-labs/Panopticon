@@ -155,7 +155,7 @@ const formatters = {
     return `${dur} (${v})`;
   },
   labelAddress: (v, EOALabels) => EOALabels[v] || v,
-  formatEtherAtTime: (v) => `${ethersUtils.formatEther(v[0])}@${v[1]}`,
+  formatEtherAtTime: (v) => v && `${ethersUtils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),
   unixToISOOnly: (v) => {
     if (v?.toNumber) v = v.toNumber();

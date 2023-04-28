@@ -32,8 +32,8 @@ copy-contracts:
 	#!/usr/bin/env bash
 	set -euo pipefail
 	cat \
-	   ../gogopool-contracts/artifacts/contracts/contract/*.sol/*.json \
-	   ../gogopool-contracts/artifacts/contracts/contract/tokens/*.sol/*.json \
+	   ../gogopool/artifacts/contracts/contract/*.sol/*.json \
+	   ../gogopool/artifacts/contracts/contract/tokens/*.sol/*.json \
 	| jq  'select(.contractName != null and (.contractName|startswith("Base")|not)) | {(.contractName): {abi: .abi}}' \
 	| jq -s add > public/deployments/contracts.json
 

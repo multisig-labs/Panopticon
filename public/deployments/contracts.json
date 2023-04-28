@@ -419,6 +419,11 @@
         "type": "error"
       },
       {
+        "inputs": [],
+        "name": "WithdrawAmountTooLarge",
+        "type": "error"
+      },
+      {
         "anonymous": false,
         "inputs": [
           {
@@ -1651,7 +1656,7 @@
       },
       {
         "inputs": [],
-        "name": "getGGPPriceInAVAXFromOneInch",
+        "name": "getGGPPriceInAVAXFromTWAP",
         "outputs": [
           {
             "internalType": "uint256",
@@ -1693,7 +1698,7 @@
             "type": "address"
           }
         ],
-        "name": "setOneInch",
+        "name": "setTWAP",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -2241,7 +2246,7 @@
             "type": "uint256"
           }
         ],
-        "name": "ClaimNodeOpRewardsTransfered",
+        "name": "ClaimNodeOpRewardsTransferred",
         "type": "event"
       },
       {
@@ -2267,7 +2272,7 @@
             "type": "uint256"
           }
         ],
-        "name": "MultisigRewardsTransfered",
+        "name": "MultisigRewardsTransferred",
         "type": "event"
       },
       {
@@ -2293,7 +2298,7 @@
             "type": "uint256"
           }
         ],
-        "name": "ProtocolDAORewardsTransfered",
+        "name": "ProtocolDAORewardsTransferred",
         "type": "event"
       },
       {
@@ -2483,6 +2488,11 @@
       },
       {
         "inputs": [],
+        "name": "GGPLocked",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "InsufficientBalance",
         "type": "error"
       },
@@ -2509,6 +2519,11 @@
       {
         "inputs": [],
         "name": "MustBeMultisig",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "NotAuthorized",
         "type": "error"
       },
       {
@@ -2553,6 +2568,19 @@
         ],
         "name": "GGPWithdrawn",
         "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "authorizedStaker",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       },
       {
         "inputs": [
@@ -2929,6 +2957,11 @@
                 "internalType": "uint256",
                 "name": "rewardsStartTime",
                 "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "ggpLockedUntil",
+                "type": "uint256"
               }
             ],
             "internalType": "struct Staking.Staker",
@@ -3012,6 +3045,11 @@
               {
                 "internalType": "uint256",
                 "name": "rewardsStartTime",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "ggpLockedUntil",
                 "type": "uint256"
               }
             ],
@@ -3231,6 +3269,29 @@
         "type": "function"
       },
       {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "stakerAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ggpLockedUntil",
+            "type": "uint256"
+          }
+        ],
+        "name": "stakeGGPOnBehalfOf",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
         "inputs": [],
         "name": "version",
         "outputs": [
@@ -3264,6 +3325,11 @@
         "inputs": [],
         "stateMutability": "nonpayable",
         "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidGuardianAddress",
+        "type": "error"
       },
       {
         "inputs": [],
@@ -4572,11 +4638,6 @@
       {
         "inputs": [],
         "name": "SyncError",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "WithdrawAmountTooLarge",
         "type": "error"
       },
       {

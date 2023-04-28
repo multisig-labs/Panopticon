@@ -34,6 +34,10 @@ function formatDuration(cell, formatterParams, onRendered) {
   return formatters.formatDuration(cell.getValue());
 }
 
+function formatSnowtrace(cell, formatterParams, onRendered) {
+  return `<a target="_blank" href="https://snowtrace.io/address/${cell.getValue()}">${cell.getValue()}</a>`;
+}
+
 function formatTxID(cell, formatterParams, onRendered) {
   const tx = cell.getValue();
   // These are zero values converted to CB58
@@ -91,7 +95,7 @@ const contractsDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { title: "Contract", field: "name", width: 150 },
-    { title: "Address", field: "address" },
+    { title: "Address", field: "address", formatter: formatSnowtrace },
   ],
 };
 
@@ -224,7 +228,7 @@ const stakersDef = {
   // },
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "StakerAddr", field: "stakerAddr", formatter: labelAddress, width: 150 },
+    { title: "StakerAddr", field: "stakerAddr", formatter: formatSnowtrace, width: 150 },
     { title: "MP Count", field: "minipoolCount", width: 100 },
     {
       title: "rwdStart",
@@ -243,6 +247,7 @@ const stakersDef = {
     { title: "AVAXValidgHighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 150 },
     { title: "EffectGGPStaked", field: "getEffectiveGGPStaked", formatter: formatEther, width: 150 },
     { title: "CollatRatio", field: "getCollateralizationRatio", formatter: formatEther, width: 150 },
+    { title: "ggpLockedUntil", field: "ggpLockedUntil", formatter: formatEther, width: 150 },
   ],
 };
 

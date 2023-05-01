@@ -1,7 +1,7 @@
 const deployment = {
   avaURL: "https://api.avax.network",
   ethURL: "https://api.avax.network/ext/bc/C/rpc",
-  orcURL: "https://orchestrator-mainnet.fly.dev",
+  orcURL: "http://rialto-orc:7450",
   pExplorerURL: "https://api.avax.network",
   cExplorerURL: "https://api.avax.network",
   chain: {

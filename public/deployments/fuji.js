@@ -10,7 +10,7 @@ const deployment = {
     name: "fuji",
     chainId: 43113,
   },
-  storage: "0x26952d1aa2DEC9d69fef96d9AD8A9D8944C37cE2",
+  storage: "0x399D78327E665D21c8B9582D4843CA5DCA0e7dc4",
   multicall3: "0xcA11bde05977b3631167028862bE2a173976CA11",
   EOALabels: {
     "0x5d4d83e6743c868B2b4565B2c72845cDEfF37421": "deployer",

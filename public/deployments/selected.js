@@ -10,7 +10,7 @@ import { deploymentFn as deploymentFnMainnet } from "./mainnet.js";
 let DEPLOYMENT;
 
 async function init() {
-  if (!localStorage.getItem("deployment")) localStorage.setItem("deployment", "anr-fly");
+  if (!localStorage.getItem("deployment")) localStorage.setItem("deployment", "mainnet");
 
   switch (localStorage.getItem("deployment")) {
     case "mainnet":

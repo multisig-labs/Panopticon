@@ -282,7 +282,7 @@ class GoGoPool {
     return new Promise(poll);
   }
 
-  *getBatch(records, batchsize = window.BATCHSIZE || 50) {
+  *getBatch(records, batchsize = window.BATCHSIZE || 100) {
     while (records.length) {
       yield records.splice(0, batchsize);
     }

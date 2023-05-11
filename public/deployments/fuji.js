@@ -3,9 +3,9 @@ const deployment = {
   // ethURL: "http://fuji.multisiglabs.org/ext/bc/C/rpc",
   avaURL: "https://api.avax-test.network",
   ethURL: "https://api.avax-test.network/ext/bc/C/rpc",
-  orcURL: "https://orchestrator-fuji.fly.dev",
+  orcURL: "http://18.222.246.33:9000",
   pExplorerURL: "https://api.avax-test.network",
-  cExplorerURL: "https://api.avax-test.network",
+  cExplorerURL: "https://testnet.snowtrace.io/",
   chain: {
     name: "fuji",
     chainId: 43113,

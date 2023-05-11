@@ -3,7 +3,7 @@ const deployment = {
   ethURL: "https://api.avax.network/ext/bc/C/rpc",
   orcURL: "https://rialto-orc.scorpion-scala.ts.net",
   pExplorerURL: "https://api.avax.network",
-  cExplorerURL: "https://api.avax.network",
+  cExplorerURL: "https://snowtrace.io/",
   chain: {
     name: "ava-mainnet",
     chainId: 43114,

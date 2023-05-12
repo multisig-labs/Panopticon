@@ -1,10 +1,9 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { utils as ethersUtils, providers, Contract, constants } from "https://esm.sh/ethers@5.7.2";
+import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
 import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
 import { minipoolTransformer, stakerTransformer } from "/js/transformers.js";
-
 class GoGoPool {
   // Required Params
   ethURL;
@@ -142,19 +141,24 @@ class GoGoPool {
     let i = 0;
     for (const obj of this.dashboard) {
       for (const metric of obj.metrics) {
-        metric.rawValue = results[i];
-        switch (typeof metric.formatter) {
-          case "string":
-            metric.value = formatters[metric.formatter].call(this, results[i]);
-            break;
-          case "function":
-            metric.value = metric.formatter.call(this, results[i]);
-            break;
-          default:
-            metric.value = results[i];
-            break;
+        try {
+          metric.rawValue = results[i];
+          switch (typeof metric.formatter) {
+            case "string":
+              metric.value = formatters[metric.formatter].call(this, results[i]);
+              break;
+            case "function":
+              metric.value = metric.formatter.call(this, results[i]);
+              break;
+            default:
+              metric.value = results[i];
+              break;
+          }
+          i++;
+        } catch (err) {
+          console.log("Error formatting metric", metric);
+          metric.value = "err";
         }
-        i++;
       }
     }
     return this.dashboard;
@@ -243,12 +247,62 @@ class GoGoPool {
       s.getAVAXValidatingHighWater = results[index * l + 3];
       s.getEffectiveGGPStaked = results[index * l + 4];
     }
-    // console.log("Stakers", this.stakersData);
+
+    //
+    // REWARDS CALCULATIONS
+    //
+
+    const INVESTOR_ADDRS = { "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true };
+    const INVESTOR_DISCOUNT = 0.035;
+
+    // Manually determine eligibility from the info we have so far (easier than calling NodeOpClaim.isEligible)
+    for (const s of this.stakersData) {
+      if (s.rewardsStartTime.toNumber() > 0 && s.getAVAXValidatingHighWater.gt(0)) {
+        s.isEligible = true;
+      } else {
+        s.isEligible = false;
+      }
+    }
+
+    // make var ggpRewardsEffectiveStake which is ggp staked taking into account investor discount
+    this.stakersData
+      .filter((s) => s.isEligible)
+      .map((s) => {
+        if (INVESTOR_ADDRS[s.stakerAddr]) {
+          // For investors, use their total stake not effective stake, and calc discount off that.
+          s.ggpRewardsEffectiveStake = s.ggpStaked.div(constants.WeiPerEther).toNumber() * INVESTOR_DISCOUNT;
+          // TODO should also make sure collat ration is not > 150
+        } else {
+          s.ggpRewardsEffectiveStake = s.getEffectiveGGPStaked.div(constants.WeiPerEther).toNumber();
+        }
+      });
+
+    // Sum up all effective stake for rewards period
+    const totalGGPStaked = this.stakersData
+      .filter((s) => s.isEligible)
+      .reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
+    console.log("totalGGPStaked", totalGGPStaked);
+
+    // Calc each stakers rewards
+    this.stakersData
+      .filter((s) => s.isEligible)
+      .map((s) => {
+        s.ggpRewardsPoolPct = s.ggpRewardsEffectiveStake / totalGGPStaked;
+        s.ggpRewardsPoolAmt = 52_500 * s.ggpRewardsPoolPct;
+      });
+
+    console.log("Stakers", this.eligibleStakers());
+    // const x = this.eligibleStakers().reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
+    // console.log("totalrwds", x);
     return this.stakersData;
   }
 
+  eligibleStakers() {
+    return this.stakersData.filter((s) => s.isEligible);
+  }
+
   stakersAsTabulatorData() {
-    return this.stakersData;
+    return this.stakersData.filter((s) => s.rewardsStartTime.toNumber() != 0);
   }
 
   // Helpers
@@ -259,7 +313,7 @@ class GoGoPool {
       await this.fetchMinipools();
       await this.fetchStakers();
       fn();
-      setTimeout(poll, 5000);
+      setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
     };
     poll();
   }
@@ -284,6 +338,7 @@ class GoGoPool {
 
   *getBatch(records, batchsize = window.BATCHSIZE || 100) {
     while (records.length) {
+      console.log("Yielding", records.length);
       yield records.splice(0, batchsize);
     }
   }

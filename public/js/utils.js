@@ -119,13 +119,13 @@ const pipeAsyncFunctions =
 const formatters = {
   formatEther: (v) =>
     parseFloat(ethersUtils.formatEther(v || 0)).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }),
   formatAvax: (v) =>
     parseFloat(v / 1_000_000_000).toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }),
   formatInflationAmt: (v) => {
     if (!v || v.length != 2) return "err";
@@ -143,7 +143,15 @@ const formatters = {
     const p = parseFloat(ethersUtils.formatEther(v || 0)) * 100;
     return (
       p.toLocaleString(undefined, {
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 0,
+      }) + "%"
+    );
+  },
+  formatPct: (v) => {
+    const p = parseFloat(v) * 100;
+    return (
+      p.toLocaleString(undefined, {
+        maximumFractionDigits: 1,
       }) + "%"
     );
   },

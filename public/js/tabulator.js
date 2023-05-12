@@ -18,6 +18,16 @@ function formatEtherPct(cell, formatterParams, onRendered) {
   return formatters.formatEtherPct(cell.getValue());
 }
 
+function formatPct(cell, formatterParams, onRendered) {
+  return formatters.formatPct(cell.getValue());
+}
+
+function formatNumber(cell, formatterParams, onRendered) {
+  return cell.getValue().toLocaleString(undefined, {
+    maximumFractionDigits: 0,
+  });
+}
+
 function formatMPStatus(cell, formatterParams, onRendered) {
   return formatters.formatMPStatus(cell.getValue());
 }
@@ -231,26 +241,58 @@ const stakersDef = {
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
     { title: "StakerAddr", field: "stakerAddr", width: 150 },
-    { title: "MP Count", field: "minipoolCount", width: 100 },
     {
-      title: "rwdStart",
+      title: "Eligibility Date",
       field: "rewardsStartTime",
-      width: 120,
+      width: 70,
+      headerWordWrap: true,
       formatter: formatUnixTime,
     },
-    { title: "ggpStaked", field: "ggpStaked", formatter: formatEther, width: 150 },
-    { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 150 },
-    { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
-    { title: "collatRatio", field: "getCollateralizationRatio", formatter: formatEtherPct, width: 150 },
-    { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
-    { title: "lastRwdsCycComp", field: "lastRewardsCycleCompleted", width: 150 },
-    { title: "minGGPStake", field: "getMinimumGGPStake", formatter: formatEther, width: 150 },
-    { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
-    { title: "AVAXValidgHighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 150 },
-    { title: "EffectGGPStaked", field: "getEffectiveGGPStaked", formatter: formatEther, width: 150 },
-    { title: "CollatRatio", field: "getCollateralizationRatio", formatter: formatEther, width: 150 },
-    { title: "ggpLockedUntil", field: "ggpLockedUntil", formatter: formatEther, width: 150 },
-    { title: "Snowtrace", field: "stakerAddr", formatter: formatSnowtraceLinkIcon, width: 35 },
+    {
+      title: "GGP Rwrds Pool Pct",
+      field: "ggpRewardsPoolPct",
+      formatter: formatPct,
+      headerWordWrap: true,
+      width: 80,
+    },
+    { title: "GGP Rwrds Amt", field: "ggpRewardsPoolAmt", formatter: formatNumber, headerWordWrap: true, width: 75 },
+    {
+      title: "Collat Ratio",
+      field: "getCollateralizationRatio",
+      formatter: formatEtherPct,
+      headerWordWrap: true,
+      width: 75,
+    },
+    { title: "GGP Staked", field: "ggpStaked", formatter: formatEther, headerWordWrap: true, width: 75 },
+    // { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 75 },
+    // { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
+    // { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
+    {
+      title: "Effective GGP Staked",
+      field: "getEffectiveGGPStaked",
+      formatter: formatEther,
+      headerWordWrap: true,
+      width: 75,
+    },
+    {
+      title: "GGP Rewards Stake",
+      field: "ggpRewardsEffectiveStake",
+      formatter: formatNumber,
+      headerWordWrap: true,
+      width: 75,
+    },
+    {
+      title: "Minimum GGP Stake",
+      field: "getMinimumGGPStake",
+      formatter: formatEther,
+      headerWordWrap: true,
+      width: 75,
+    },
+    { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", width: 75 },
+    // { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
+    { title: "AVAX Validating HighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 75 },
+    { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, width: 150 },
+    { title: "Staker Addr Snowtrace", field: "stakerAddr", formatter: formatSnowtraceLinkIcon, width: 35 },
   ],
 };
 

@@ -99,7 +99,7 @@ class Blockchain {
       // console.log("Polling for blockchain data");
       await this.fetchData();
       fn();
-      setTimeout(poll, 10000);
+      setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
     };
     poll();
   }

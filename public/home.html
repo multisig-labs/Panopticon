@@ -23,7 +23,7 @@
 </div>
 
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
-  <h3 class="text-center">Stakers</h3>
+  <h3 class="text-center">NodeOps</h3>
   <div id="stakers"><div class="loader">Loading...</div></div>
 </div>
 
@@ -43,6 +43,9 @@
   import { Blockchain } from "/js/blockchain.js";
   import { contractsDef, dashboardDef, minipoolsDef, stakersDef } from "/js/tabulator.js";
   let GGP, BC;
+
+  window.POLL_INTERVAL = 60 * 1000;
+  window.BATCHSIZE = 700;
 
   function copyEthRpcUrl() {
     navigator.clipboard.writeText(BC.ethURL);

@@ -115,6 +115,10 @@ const pipeAsyncFunctions =
   (arg) =>
     fns.reduce((p, f) => p.then(f), Promise.resolve(arg));
 
+const pipe = (fns) => (data) => {
+  return fns.reduce((value, func) => func(value), data);
+};
+
 // Generic formatters
 const formatters = {
   formatEther: (v) =>
@@ -148,6 +152,7 @@ const formatters = {
     );
   },
   formatPct: (v) => {
+    if (v === undefined) return "";
     const p = parseFloat(v) * 100;
     return (
       p.toLocaleString(undefined, {
@@ -177,4 +182,14 @@ const formatters = {
   },
 };
 
-export { MINIPOOL_STATUS_MAP, ORC_STATE_MAP, formatters, pipeAsyncFunctions, sha256, cb58Encode, cb58Decode, makeRpc };
+export {
+  MINIPOOL_STATUS_MAP,
+  ORC_STATE_MAP,
+  formatters,
+  pipeAsyncFunctions,
+  pipe,
+  sha256,
+  cb58Encode,
+  cb58Decode,
+  makeRpc,
+};

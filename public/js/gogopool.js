@@ -250,10 +250,15 @@ class GoGoPool {
 
     //
     // REWARDS CALCULATIONS
-    //
+    // Should probably extract this to a generic JS class for reuse
 
-    const INVESTOR_ADDRS = { "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true };
-    const INVESTOR_DISCOUNT = 0.035;
+    const INVESTOR_ADDRS = {
+      "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true,
+      "0x443FaaE0354c0dC34681b92a6a9e252F4E89D54d": true,
+    };
+    const INVESTOR_DISCOUNT = 0.05;
+    const INVESTOR_REWARDS_SHARE = 0.1;
+    const REWARDS_AMT = 52_500;
 
     // Manually determine eligibility from the info we have so far (easier than calling NodeOpClaim.isEligible)
     for (const s of this.stakersData) {
@@ -264,36 +269,34 @@ class GoGoPool {
       }
     }
 
-    // make var ggpRewardsEffectiveStake which is ggp staked taking into account investor discount
-    this.stakersData
+    // Make 2 groups, investors and users. (do math in regular numbers)
+    const eligibleStakers = this.stakersData
       .filter((s) => s.isEligible)
       .map((s) => {
-        if (INVESTOR_ADDRS[s.stakerAddr]) {
-          // For investors, use their total stake not effective stake, and calc discount off that.
-          s.ggpRewardsEffectiveStake = s.ggpStaked.div(constants.WeiPerEther).toNumber() * INVESTOR_DISCOUNT;
-          // TODO should also make sure collat ration is not > 150
-        } else {
-          s.ggpRewardsEffectiveStake = s.getEffectiveGGPStaked.div(constants.WeiPerEther).toNumber();
-        }
+        s.ggpRewardsEffectiveStake = s.getEffectiveGGPStaked.div(constants.WeiPerEther).toNumber();
+        return s;
       });
+    const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);
+    const users = eligibleStakers.filter((s) => !INVESTOR_ADDRS[s.stakerAddr]);
 
-    // Sum up all effective stake for rewards period
-    const totalGGPStaked = this.stakersData
-      .filter((s) => s.isEligible)
-      .reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
-    console.log("totalGGPStaked", totalGGPStaked);
+    // Investors share 10% of rewards pie
+    const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
+    investors.map((s) => {
+      s.ggpInvestorRewardsPoolPct = s.ggpRewardsEffectiveStake / investorTotalGGPStaked;
+      s.ggpRewardsPoolAmt = REWARDS_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
+      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
+    });
 
-    // Calc each stakers rewards
-    this.stakersData
-      .filter((s) => s.isEligible)
-      .map((s) => {
-        s.ggpRewardsPoolPct = s.ggpRewardsEffectiveStake / totalGGPStaked;
-        s.ggpRewardsPoolAmt = 52_500 * s.ggpRewardsPoolPct;
-      });
+    // Users share 90% of rewards pie
+    const userTotalGGPStaked = users.reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
+    users.map((s) => {
+      s.ggpUserRewardsPoolPct = s.ggpRewardsEffectiveStake / userTotalGGPStaked;
+      s.ggpRewardsPoolAmt = REWARDS_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
+      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
+    });
 
-    console.log("Stakers", this.eligibleStakers());
-    // const x = this.eligibleStakers().reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
-    // console.log("totalrwds", x);
+    const totalRewardsCheck = this.eligibleStakers().reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
+    console.log("totalRewardsCheck", totalRewardsCheck);
     return this.stakersData;
   }
 

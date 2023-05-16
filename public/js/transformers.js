@@ -1,6 +1,6 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { utils as ethersUtils } from "https://esm.sh/ethers@5.7.2";
+import { utils as ethersUtils, constants } from "https://esm.sh/ethers@5.7.2";
 import { pipeAsyncFunctions, cb58Encode } from "/js/utils.js";
 
 // transforms look like ["stripNumberKeys", "formatEther"]
@@ -51,9 +51,4 @@ async function minipoolTransformer(objs) {
   return await transformer(pipeline, objs);
 }
 
-async function stakerTransformer(objs) {
-  const pipeline = ["convertToObj", "stripNumberKeys"];
-  return await transformer(pipeline, objs);
-}
-
-export { minipoolTransformer, stakerTransformer };
+export { minipoolTransformer };

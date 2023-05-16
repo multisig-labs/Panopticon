@@ -1,9 +1,9 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
+import { utils as ethersUtils, providers, Contract, constants } from "https://esm.sh/ethers@5.7.2";
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
-import { MINIPOOL_STATUS_MAP, formatters } from "/js/utils.js";
-import { minipoolTransformer, stakerTransformer } from "/js/transformers.js";
+import { MINIPOOL_STATUS_MAP, formatters, stripNumberKeys, bigToNumber } from "/js/utils.js";
+import { minipoolTransformer } from "/js/transformers.js";
 class GoGoPool {
   // Required Params
   ethURL;
@@ -198,20 +198,22 @@ class GoGoPool {
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
     await this.until((_) => this.isLoaded);
 
-    let results = await this.contracts.Staking.contract.getStakers(0, 0);
-    this.stakersData = await stakerTransformer(results);
+    let eligibleStakers = await this.contracts.Staking.contract.getStakers(0, 0);
+    eligibleStakers = eligibleStakers
+      .filter((s) => s.rewardsStartTime.gt(0) && s.avaxValidatingHighWater.gt(0))
+      .map((s) => Object.assign({}, s)) // ethers gives us weird obj, make it a normal one
+      .map(stripNumberKeys); // ethers obj has redundant keys like "1": ..., "2": ... Get rid of them for God's sake
 
-    // For each staker we want to call a couple funcs, so mush them all together for speed into batches
+    // For each ELIGIBLE staker we want to call a couple funcs, so mush them all together for speed into batches
     const calls = [];
     const fns = [
       "getMinimumGGPStake",
       "getEffectiveRewardsRatio",
       "getCollateralizationRatio",
-      "getAVAXValidatingHighWater",
       "getEffectiveGGPStaked",
     ];
 
-    for (const s of this.stakersData) {
+    for (const s of eligibleStakers) {
       const c = this.contracts["Staking"].mccontract;
       for (const fn of fns) {
         try {
@@ -224,7 +226,7 @@ class GoGoPool {
       }
     }
 
-    results = [];
+    let results = [];
 
     for (let batch of this.getBatch(calls)) {
       try {
@@ -240,15 +242,17 @@ class GoGoPool {
 
     // Now add the results of the batch to each staker
     const l = fns.length;
-    for (const [index, s] of this.stakersData.entries()) {
-      s.getMinimumGGPStake = results[index * l];
-      s.getEffectiveRewardsRatio = results[index * l + 1];
-      s.getCollateralizationRatio = results[index * l + 2];
-      s.getAVAXValidatingHighWater = results[index * l + 3];
-      s.getEffectiveGGPStaked = results[index * l + 4];
+    for (const [index, s] of eligibleStakers.entries()) {
+      fns.forEach((fnName, i) => {
+        s[fnName] = results[index * l + i];
+      });
     }
 
-    //
+    // Convert BigNums to numbers (taking into account AVAX/GGP which are in Wei)
+    eligibleStakers = eligibleStakers.map(bigToNumber);
+    console.log("eligibleStakers", eligibleStakers);
+    // return;
+
     // REWARDS CALCULATIONS
     // Should probably extract this to a generic JS class for reuse
 
@@ -256,56 +260,38 @@ class GoGoPool {
       "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true,
       "0x443FaaE0354c0dC34681b92a6a9e252F4E89D54d": true,
     };
-    const INVESTOR_DISCOUNT = 0.05;
     const INVESTOR_REWARDS_SHARE = 0.1;
     const REWARDS_AMT = 52_500;
 
-    // Manually determine eligibility from the info we have so far (easier than calling NodeOpClaim.isEligible)
-    for (const s of this.stakersData) {
-      if (s.rewardsStartTime.toNumber() > 0 && s.getAVAXValidatingHighWater.gt(0)) {
-        s.isEligible = true;
-      } else {
-        s.isEligible = false;
-      }
-    }
-
     // Make 2 groups, investors and users. (do math in regular numbers)
-    const eligibleStakers = this.stakersData
-      .filter((s) => s.isEligible)
-      .map((s) => {
-        s.ggpRewardsEffectiveStake = s.getEffectiveGGPStaked.div(constants.WeiPerEther).toNumber();
-        return s;
-      });
     const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);
     const users = eligibleStakers.filter((s) => !INVESTOR_ADDRS[s.stakerAddr]);
 
     // Investors share 10% of rewards pie
-    const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
+    const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     investors.map((s) => {
-      s.ggpInvestorRewardsPoolPct = s.ggpRewardsEffectiveStake / investorTotalGGPStaked;
+      s.ggpInvestorRewardsPoolPct = s.getEffectiveGGPStaked / investorTotalGGPStaked;
       s.ggpRewardsPoolAmt = REWARDS_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
       s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
     });
 
     // Users share 90% of rewards pie
-    const userTotalGGPStaked = users.reduce((acc, s) => acc + s.ggpRewardsEffectiveStake, 0);
+    const userTotalGGPStaked = users.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     users.map((s) => {
-      s.ggpUserRewardsPoolPct = s.ggpRewardsEffectiveStake / userTotalGGPStaked;
+      s.ggpUserRewardsPoolPct = s.getEffectiveGGPStaked / userTotalGGPStaked;
       s.ggpRewardsPoolAmt = REWARDS_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
       s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
     });
 
-    const totalRewardsCheck = this.eligibleStakers().reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
+    const totalRewardsCheck = eligibleStakers.reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
     console.log("totalRewardsCheck", totalRewardsCheck);
+
+    this.stakersData = eligibleStakers;
     return this.stakersData;
   }
 
-  eligibleStakers() {
-    return this.stakersData.filter((s) => s.isEligible);
-  }
-
   stakersAsTabulatorData() {
-    return this.stakersData.filter((s) => s.rewardsStartTime.toNumber() != 0);
+    return this.stakersData;
   }
 
   // Helpers

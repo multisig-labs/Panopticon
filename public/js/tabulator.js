@@ -23,9 +23,7 @@ function formatPct(cell, formatterParams, onRendered) {
 }
 
 function formatNumber(cell, formatterParams, onRendered) {
-  return cell.getValue().toLocaleString(undefined, {
-    maximumFractionDigits: 0,
-  });
+  return formatters.formatNumber(cell.getValue());
 }
 
 function formatMPStatus(cell, formatterParams, onRendered) {
@@ -273,32 +271,37 @@ const stakersDef = {
     {
       title: "Collat Ratio",
       field: "getCollateralizationRatio",
-      formatter: formatEtherPct,
+      formatter: formatPct,
       headerWordWrap: true,
       width: 75,
     },
-    { title: "GGP Staked", field: "ggpStaked", formatter: formatEther, headerWordWrap: true, width: 75 },
-    // { title: "avaxStaked", field: "avaxStaked", formatter: formatEther, width: 75 },
-    // { title: "avaxAssigned", field: "avaxAssigned", formatter: formatEther, width: 150 },
-    // { title: "ggpRewards", field: "ggpRewards", formatter: formatEther, width: 150 },
+    { title: "GGP Staked", field: "ggpStaked", formatter: formatNumber, headerWordWrap: true, width: 75 },
+    // { title: "avaxStaked", field: "avaxStaked", formatter: formatNumber, width: 75 },
+    // { title: "avaxAssigned", field: "avaxAssigned", formatter: formatNumber, width: 150 },
     {
       title: "Effective GGP Staked",
       field: "getEffectiveGGPStaked",
-      formatter: formatEther,
+      formatter: formatNumber,
       headerWordWrap: true,
       width: 75,
     },
-    // {
-    //   title: "Minimum GGP Stake",
-    //   field: "getMinimumGGPStake",
-    //   formatter: formatEther,
-    //   headerWordWrap: true,
-    //   width: 75,
-    // },
     { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", width: 75 },
-    // { title: "EffRwdsRatio", field: "getEffectiveRewardsRatio", formatter: formatEtherPct, width: 150 },
-    { title: "AVAX Validating HighWater", field: "getAVAXValidatingHighWater", formatter: formatEther, width: 75 },
-    { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, width: 150 },
+    {
+      title: "AVAX Validating HighWater",
+      field: "avaxValidatingHighWater",
+      formatter: formatNumber,
+      headerWordWrap: true,
+      width: 75,
+    },
+    { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, headerWordWrap: true, width: 75 },
+    {
+      title: "Minimum GGP Stake",
+      field: "getMinimumGGPStake",
+      formatter: formatNumber,
+      headerWordWrap: true,
+      width: 75,
+    },
+    { title: "GGP Rewards", field: "ggpRewards", formatter: formatNumber, width: 75 },
     { title: "Staker Addr Snowtrace", field: "stakerAddr", formatter: formatSnowtraceLinkIcon, width: 35 },
   ],
 };

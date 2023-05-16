@@ -1,4 +1,4 @@
-import { utils as ethersUtils, constants as ethersConstants } from "https://esm.sh/ethers@5.7.2";
+import { utils as ethersUtils, constants as ethersConstants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { DateTime, Duration } from "https://esm.sh/luxon@3.2.1";
 
 const ORC_STATE_MAP = {
@@ -161,6 +161,14 @@ const formatters = {
     );
   },
 
+  formatNumber: (v) => {
+    if (v === undefined) return "";
+    const p = parseFloat(v);
+    return p.toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    });
+  },
+
   formatMPStatus: (v) => MINIPOOL_STATUS_MAP[v],
   formatErrorMsg: (v) => ethersUtils.toUtf8String(ethersUtils.stripZeros(v)),
   formatDuration: (v) => {
@@ -182,6 +190,34 @@ const formatters = {
   },
 };
 
+function stripNumberKeys(obj) {
+  for (const k of Object.keys(obj)) {
+    if (k.match("[0-9]+")) {
+      delete obj[k];
+    }
+  }
+  return obj;
+}
+
+// convert based on name of key. This is where naming conventions would have helped, eh?
+function isCurrency(k) {
+  return k.match(/avax/i) || k.match(/ggpstak/i) || k.match(/ggprewards/i) || k.match(/ratio/i);
+}
+
+function bigToNumber(obj) {
+  const bigKeys = Object.keys(obj).filter((k) => BigNumber.isBigNumber(obj[k]));
+  for (const k of bigKeys) {
+    if (obj[k].toHexString() === "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
+      obj[k] = Infinity;
+    } else if (isCurrency(k)) {
+      obj[k] = obj[k].mul(100).div(ethersConstants.WeiPerEther).toNumber() / 100;
+    } else {
+      obj[k] = obj[k].toNumber();
+    }
+  }
+  return obj;
+}
+
 export {
   MINIPOOL_STATUS_MAP,
   ORC_STATE_MAP,
@@ -192,4 +228,6 @@ export {
   cb58Encode,
   cb58Decode,
   makeRpc,
+  stripNumberKeys,
+  bigToNumber,
 };

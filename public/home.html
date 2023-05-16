@@ -23,7 +23,7 @@
 </div>
 
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
-  <h3 class="text-center">NodeOps</h3>
+  <h3 class="text-center">NodeOps <span id="downloadNodeOps">📥</span></h3>
   <div id="stakers"><div class="loader">Loading...</div></div>
 </div>
 
@@ -79,6 +79,10 @@
   const tableDashboard = new Tabulator("#dashboard", dashboardDef);
   const tableMinipools = new Tabulator("#minipools", minipoolsDef);
   const tableStakers = new Tabulator("#stakers", stakersDef);
+  document
+    .querySelector("#downloadNodeOps")
+    .addEventListener("click", () => tableStakers.download("csv", "GoGoPool_NodeOps.csv"));
+
   GGP.refreshDataLoop(() => {
     tableDashboard.updateOrAddData(GGP.dashboardAsTabulatorData());
     tableMinipools.updateOrAddData(GGP.minipoolsAsTabulatorData());

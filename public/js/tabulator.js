@@ -58,9 +58,9 @@ function formatTxID(cell, formatterParams, onRendered) {
     return "";
   }
   if (tx.substring(0, 2) === "0x") {
-    return `<a href="${DEPLOYMENT.cExplorerURL}/${tx}" target="_blank">${tx}</a>`;
+    return `<a href="${DEPLOYMENT.cExplorerURL}${tx}" target="_blank">${tx}</a>`;
   } else {
-    return `<a href="${DEPLOYMENT.pExplorerURL}/${tx}" target="_blank">${tx}</a>`;
+    return `<a href="${DEPLOYMENT.pExplorerURL}${tx}" target="_blank">${tx}</a>`;
   }
 }
 

@@ -10,7 +10,7 @@ VERSION := `grep "const Version " pkg/version/version.go | sed -E 's/.*"(.+)"$$/
 GIT_COMMIT := `git rev-parse HEAD`
 BUILD_DATE := `date '+%Y-%m-%d'`
 VERSION_PATH := "github.com/multisig-labs/panopticon/pkg/version"
-LDFLAGS := "-X " + VERSION_PATH + ".BuildDate=" + BUILD_DATE + " -X " + VERSION_PATH + ".Version=" + VERSION + " -X " + VERSION_PATH + ".GitCommit=" + GIT_COMMIT
+LDFLAGS := "-s -w " + "-X " + VERSION_PATH + ".BuildDate=" + BUILD_DATE + " -X " + VERSION_PATH + ".Version=" + VERSION + " -X " + VERSION_PATH + ".GitCommit=" + GIT_COMMIT
 
 # Print out some help
 default:

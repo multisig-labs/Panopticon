@@ -1,9 +1,32 @@
 // Etherjs read-only interface to GoGoPool Protocol
 
-import { utils as ethersUtils, providers, Contract, constants } from "https://esm.sh/ethers@5.7.2";
+import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
 import { MINIPOOL_STATUS_MAP, formatters, stripNumberKeys, bigToNumber } from "/js/utils.js";
 import { minipoolTransformer } from "/js/transformers.js";
+
+// Hard-code reward cycle amounts
+const REWARDS_TOTAL_NODEOP_POOL_AMT = {
+  0: BigNumber.from("50629343838906640213406"),
+  1: BigNumber.from("50832782764109674639470"),
+  2: BigNumber.from("51037039147986861608379"),
+  3: BigNumber.from("51242116275252192212662"),
+  4: BigNumber.from("51448017443818301518451"),
+  5: BigNumber.from("51654745964849503381680"),
+  6: BigNumber.from("51862305162815038368864"),
+  7: BigNumber.from("52070698375542535638786"),
+  8: BigNumber.from("52279928954271689644796"),
+  9: BigNumber.from("52490000263708152520974"),
+  10: BigNumber.from("52700915682077643018745"),
+  11: BigNumber.from("52912678601180272864145"),
+};
+
+// Convert to eth
+for (const k in REWARDS_TOTAL_NODEOP_POOL_AMT) {
+  REWARDS_TOTAL_NODEOP_POOL_AMT[k] =
+    REWARDS_TOTAL_NODEOP_POOL_AMT[k].mul(100000).div(constants.WeiPerEther).toNumber() / 100000;
+}
+
 class GoGoPool {
   // Required Params
   ethURL;
@@ -164,6 +187,12 @@ class GoGoPool {
     return this.dashboard;
   }
 
+  rewardsCycleCount() {
+    const ctrct = this.dashboard.filter((r) => r.contract === "RewardsPool")[0];
+    const cycle = ctrct.metrics.filter((r) => r.fn === "getRewardsCycleCount")[0];
+    return cycle.value.toNumber();
+  }
+
   // Reformat data shape to fit Tabulator table
   dashboardAsTabulatorData() {
     this.dashboardData = [];
@@ -261,7 +290,7 @@ class GoGoPool {
       // "0x443FaaE0354c0dC34681b92a6a9e252F4E89D54d": true,
     };
     const INVESTOR_REWARDS_SHARE = 0.1;
-    const REWARDS_AMT = 52_500;
+    const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount()];
 
     // Make 2 groups, investors and users. (do math in regular numbers)
     const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);
@@ -271,16 +300,16 @@ class GoGoPool {
     const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     investors.map((s) => {
       s.ggpInvestorRewardsPoolPct = s.getEffectiveGGPStaked / investorTotalGGPStaked;
-      s.ggpRewardsPoolAmt = REWARDS_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
-      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
+      s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
+      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
     });
 
     // Users share 90% of rewards pie
     const userTotalGGPStaked = users.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     users.map((s) => {
       s.ggpUserRewardsPoolPct = s.getEffectiveGGPStaked / userTotalGGPStaked;
-      s.ggpRewardsPoolAmt = REWARDS_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
-      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_AMT;
+      s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
+      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
     });
 
     const totalRewardsCheck = eligibleStakers.reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);

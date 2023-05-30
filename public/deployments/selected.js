@@ -35,4 +35,10 @@ async function init() {
 }
 await init();
 
+// Overrides from URL
+const params = new URLSearchParams(document.location.search);
+if (params.get("ethURL")) {
+  DEPLOYMENT.ethURL = params.get("ethURL");
+}
+
 export { DEPLOYMENT };

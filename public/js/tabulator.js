@@ -151,7 +151,7 @@ const minipoolsDef = {
       width: 90,
       formatter: formatUnixTime,
     },
-    { title: "Owner", field: "owner", formatter: labelAddress, width: 120 },
+    { title: "Owner", field: "owner", formatter: labelAddress, sorter: "alphanum", width: 120 },
     {
       title: "AvaxNodeOp",
       field: "avaxNodeOpAmt",
@@ -238,7 +238,7 @@ const stakersDef = {
   // },
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "StakerAddr", field: "stakerAddr", width: 150 },
+    { title: "StakerAddr", field: "stakerAddr", sorter: "alphanum", width: 150 },
     {
       title: "Eligibility Date",
       field: "rewardsStartTime",
@@ -267,7 +267,13 @@ const stakersDef = {
       headerWordWrap: true,
       width: 80,
     },
-    { title: "GGP Rwrds Amt", field: "ggpRewardsPoolAmt", formatter: formatNumber, headerWordWrap: true, width: 75 },
+    {
+      title: "GGP Rwrds Amt Estimate",
+      field: "ggpRewardsPoolAmt",
+      formatter: formatNumber,
+      headerWordWrap: true,
+      width: 75,
+    },
     {
       title: "Collat Ratio",
       field: "getCollateralizationRatio",
@@ -285,7 +291,8 @@ const stakersDef = {
       headerWordWrap: true,
       width: 75,
     },
-    { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", width: 75 },
+    { title: "Unclaimed GGP Rewards", field: "ggpRewards", formatter: formatNumber, headerWordWrap: true, width: 80 },
+    { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", headerWordWrap: true, width: 75 },
     {
       title: "AVAX Validating HighWater",
       field: "avaxValidatingHighWater",
@@ -293,7 +300,6 @@ const stakersDef = {
       headerWordWrap: true,
       width: 75,
     },
-    { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, headerWordWrap: true, width: 75 },
     {
       title: "Minimum GGP Stake",
       field: "getMinimumGGPStake",
@@ -301,7 +307,7 @@ const stakersDef = {
       headerWordWrap: true,
       width: 75,
     },
-    { title: "GGP Rewards", field: "ggpRewards", formatter: formatNumber, width: 75 },
+    { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, headerWordWrap: true, width: 75 },
     { title: "Staker Addr Snowtrace", field: "stakerAddr", formatter: formatSnowtraceLinkIcon, width: 35 },
   ],
 };

@@ -356,7 +356,7 @@ class GoGoPool {
 
   *getBatch(records, batchsize = window.BATCHSIZE || 100) {
     while (records.length) {
-      console.log("Yielding", records.length);
+      console.log("Yielding Batch of ", records.length);
       yield records.splice(0, batchsize);
     }
   }

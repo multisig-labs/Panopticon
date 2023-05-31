@@ -292,7 +292,7 @@ const stakersDef = {
       width: 75,
     },
     { title: "Unclaimed GGP Rewards", field: "ggpRewards", formatter: formatNumber, headerWordWrap: true, width: 80 },
-    { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", headerWordWrap: true, width: 75 },
+    { title: "GGP Unstaked", field: "balanceOf", formatter: formatNumber, headerWordWrap: true, width: 75 },
     {
       title: "AVAX Validating HighWater",
       field: "avaxValidatingHighWater",
@@ -308,6 +308,7 @@ const stakersDef = {
       width: 75,
     },
     { title: "GGP Locked Until", field: "ggpLockedUntil", formatter: formatUnixTime, headerWordWrap: true, width: 75 },
+    { title: "Last Rwds Cycle Completed", field: "lastRewardsCycleCompleted", headerWordWrap: true, width: 75 },
     { title: "Staker Addr Snowtrace", field: "stakerAddr", formatter: formatSnowtraceLinkIcon, width: 35 },
   ],
 };

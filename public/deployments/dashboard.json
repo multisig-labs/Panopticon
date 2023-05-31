@@ -36,7 +36,7 @@
       {
         "fn": "getClaimingContractDistribution",
         "args": ["MultisigManager"],
-        "title": "getClaimingContractDistribution (rialto)",
+        "title": "getClaimingContractDistribution (Oracle)",
         "formatter": "formatEther"
       }
     ]
@@ -46,7 +46,7 @@
     "metrics": [
       {
         "fn": "getTotalAVAXLiquidStakerAmt",
-        "desc": "total AVAX *actually* withdrawn from ggAVAX and sent to Rialto",
+        "desc": "total AVAX *actually* withdrawn from ggAVAX and sent to P-Chain",
         "formatter": "formatEther"
       }
     ]
@@ -102,7 +102,7 @@
   {
     "contract": "TokenggAVAX",
     "metrics": [
-      { "fn": "totalAssets", "desc": "friendly desc", "formatter": "formatEther" },
+      { "fn": "totalAssets", "desc": "", "formatter": "formatEther" },
       { "fn": "lastSync", "desc": null, "formatter": "unixToISO" },
       { "fn": "rewardsCycleEnd", "desc": null, "formatter": "unixToISO" },
       { "fn": "lastRewardsAmt", "desc": null, "formatter": "formatEther" },

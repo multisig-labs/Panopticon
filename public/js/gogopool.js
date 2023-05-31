@@ -236,19 +236,20 @@ class GoGoPool {
     // For each ELIGIBLE staker we want to call a couple funcs, so mush them all together for speed into batches
     const calls = [];
     const fns = [
-      "getMinimumGGPStake",
-      "getEffectiveRewardsRatio",
-      "getCollateralizationRatio",
-      "getEffectiveGGPStaked",
+      ["Staking", "getMinimumGGPStake"],
+      ["Staking", "getEffectiveRewardsRatio"],
+      ["Staking", "getCollateralizationRatio"],
+      ["Staking", "getEffectiveGGPStaked"],
+      ["TokenGGP", "balanceOf"],
     ];
 
     for (const s of eligibleStakers) {
-      const c = this.contracts["Staking"].mccontract;
-      for (const fn of fns) {
+      for (const [contractName, method] of fns) {
         try {
+          const c = this.contracts[contractName].mccontract;
           // Un-label the addr argh
           const addr = s.stakerAddrHex || s.stakerAddr;
-          calls.push(c[fn].call(this, addr));
+          calls.push(c[method].call(this, addr));
         } catch (err) {
           console.error("error calling fn", fn, err);
         }
@@ -273,7 +274,7 @@ class GoGoPool {
     const l = fns.length;
     for (const [index, s] of eligibleStakers.entries()) {
       fns.forEach((fnName, i) => {
-        s[fnName] = results[index * l + i];
+        s[fnName[1]] = results[index * l + i];
       });
     }
 

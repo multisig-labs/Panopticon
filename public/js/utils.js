@@ -201,7 +201,7 @@ function stripNumberKeys(obj) {
 
 // convert based on name of key. This is where naming conventions would have helped, eh?
 function isCurrency(k) {
-  return k.match(/avax/i) || k.match(/ggpstak/i) || k.match(/ggprewards/i) || k.match(/ratio/i);
+  return k.match(/avax/i) || k.match(/ggpstak/i) || k.match(/ggprewards/i) || k.match(/ratio/i) || k.match(/balance/i);
 }
 
 function bigToNumber(obj) {

@@ -9,11 +9,12 @@
   </div>
 </div>
 
-<div class="container w-95 text-center border border-5 rounded pb-3">
+<div class="container w-95 border border-5 rounded pb-3">
   <h3 class="text-center">
     Orchestrator <i class="bi bi-info-square" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
   </h3>
-  <div id="orc"><div class="loader">Loading...</div></div>
+  <div id="jsoneditor"></div>
+  <div id="orc" class="text-center"><div class="loader">Loading...</div></div>
 </div>
 
 <!-- Modal -->
@@ -34,10 +35,22 @@
   </div>
 </div>
 
+<style>
+  .container,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl {
+    max-width: 9140px;
+  }
+</style>
+
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { Orc } from "/js/orc.js";
   import { orcDef } from "/js/tabulator.js";
+  import { JSONEditor } from "https://esm.sh/vanilla-jsoneditor";
+
   let ORC;
 
   async function initData() {
@@ -52,8 +65,26 @@
 
   const tableMinipools = new Tabulator("#orc", orcDef);
 
+  var content = { json: ORC.txLogsAsJson() };
+
+  const editor = new JSONEditor({
+    target: document.getElementById("jsoneditor"),
+    props: {
+      content,
+      mode: "table",
+      flattenColumns: false,
+      // readOnly: true,
+      onChange: (updatedContent, previousContent, { contentErrors, patchResult }) => {
+        // content is an object { json: JSONValue } | { text: string }
+        console.log("onChange", { updatedContent, previousContent, contentErrors, patchResult });
+        content = updatedContent;
+      },
+    },
+  });
+
   ORC.refreshDataLoop(() => {
     tableMinipools.updateOrAddData(ORC.minipoolsAsTabulatorData());
+    editor.update({ json: ORC.txLogsAsJson() });
   });
 </script>
 {{end}}

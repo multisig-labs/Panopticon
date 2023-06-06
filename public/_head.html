@@ -24,6 +24,9 @@
 <link rel="stylesheet" href="/css/misc.css" />
 
 <script>
-  ORC_AUTH_TOKEN = "{{.ORC_AUTH_TOKEN}}";
+  const params = new URLSearchParams(document.location.search);
+  if (params.get("apiToken")) {
+    ORC_AUTH_TOKEN = params.get("apiToken");
+  }
 </script>
 {{end}}

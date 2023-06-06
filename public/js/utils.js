@@ -1,5 +1,5 @@
 import { utils as ethersUtils, constants as ethersConstants, BigNumber } from "https://esm.sh/ethers@5.7.2";
-import { DateTime, Duration } from "https://esm.sh/luxon@3.2.1";
+import { DateTime, Duration } from "https://esm.sh/luxon@3.3.0";
 
 const ORC_STATE_MAP = {
   0: "Prelaunch",
@@ -224,6 +224,7 @@ export {
   formatters,
   pipeAsyncFunctions,
   pipe,
+  pick,
   sha256,
   cb58Encode,
   cb58Decode,

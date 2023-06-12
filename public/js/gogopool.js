@@ -227,8 +227,9 @@ class GoGoPool {
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
     await this.until((_) => this.isLoaded);
 
-    let eligibleStakers = await this.contracts.Staking.contract.getStakers(0, 0);
-    eligibleStakers = eligibleStakers
+    let allStakers = await this.contracts.Staking.contract.getStakers(0, 0);
+    // console.log("All Stakers", allStakers);
+    let eligibleStakers = allStakers
       .filter((s) => s.rewardsStartTime.gt(0) && s.avaxValidatingHighWater.gt(0))
       .map((s) => Object.assign({}, s)) // ethers gives us weird obj, make it a normal one
       .map(stripNumberKeys); // ethers obj has redundant keys like "1": ..., "2": ... Get rid of them for God's sake

@@ -210,6 +210,13 @@ const minipoolsDef = {
       responsive: 9,
     },
     {
+      title: "Created",
+      field: "creationTime",
+      minWidth: 5000,
+      formatter: formatUnixTime,
+      responsive: 9,
+    },
+    {
       title: "initialStartTime",
       field: "initialStartTime",
       formatter: formatUnixTime,

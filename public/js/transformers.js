@@ -35,6 +35,12 @@ async function transformer(transforms, objs) {
       obj.txID = bec;
       return obj;
     },
+    estimateEndTime: (obj) => {
+      if (obj.endTime.toNumber() === 0) {
+        obj.endTime = obj.startTime.add(obj.duration);
+      }
+      return obj;
+    },
   };
 
   const fns = transforms.map((name) => xfns[name]);
@@ -47,7 +53,7 @@ async function transformer(transforms, objs) {
 async function minipoolTransformer(objs) {
   // indexToNum is necessary because Tabulator.js requires an int key for each row, BigInt doesnt work
   // the encode* transforms are async in order to use cb58, not sure how to do async in tabulator formatters, so doing it here
-  const pipeline = ["convertToObj", "stripNumberKeys", "indexToNum", "encodeNodeID", "encodeTxID"];
+  const pipeline = ["convertToObj", "stripNumberKeys", "indexToNum", "encodeNodeID", "encodeTxID", "estimateEndTime"];
   return await transformer(pipeline, objs);
 }
 

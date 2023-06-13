@@ -175,6 +175,15 @@ const formatters = {
     const dur = Duration.fromMillis(v * 1000).toFormat("dd:hh:mm:ss");
     return `${dur} (${v})`;
   },
+  formatDurationHuman: (v) => {
+    if (v) {
+      const dur = Duration.fromMillis(v * 1000)
+        .rescale()
+        .toHuman({ listStyle: "long", unitDisplay: "short" });
+      console.log(dur);
+      return `${dur} (${v})`;
+    }
+  },
   labelAddress: (v, EOALabels) => EOALabels[v] || v,
   formatEtherAtTime: (v) => v && `${ethersUtils.formatEther(v[0])}@${v[1]}`,
   bigToNumber: (v) => v.toNumber(),

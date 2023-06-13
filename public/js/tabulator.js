@@ -42,6 +42,10 @@ function formatDuration(cell, formatterParams, onRendered) {
   return formatters.formatDuration(cell.getValue());
 }
 
+function formatDurationHuman(cell, formatterParams, onRendered) {
+  return formatters.formatDurationHuman(cell.getValue());
+}
+
 function formatSnowtraceLinkIcon(cell, formatterParams, onRendered) {
   return `<a class="mirror" target="_blank" href="${DEPLOYMENT.cExplorerURL}/address/${cell.getValue()}">⎋</a>`;
 }
@@ -153,14 +157,21 @@ const minipoolsDef = {
     },
     { title: "Owner", field: "owner", formatter: labelAddress, sorter: "alphanum", width: 120 },
     {
-      title: "AvaxNodeOp",
-      field: "avaxNodeOpAmt",
+      title: "avaxInital",
+      field: "avaxNodeOpInitialAmt",
+      width: 90,
       formatter: formatEther,
     },
-    { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt", formatter: formatEther },
-    { title: "GGPSlash", field: "ggpSlashAmt", formatter: formatEther },
-    { title: "Error", field: "errorCode", formatter: formatErrorMsg },
+    {
+      title: "avaxCurrent",
+      field: "avaxNodeOpAmt",
+      width: 100,
+      formatter: formatEther,
+    },
+    { title: "QueueDur", field: "queueDuration", formatter: formatDurationHuman, sorter: "number" },
+    { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt", formatter: formatEther, minWidth: 5000, responsive: 9 },
     { title: "Error", field: "errorCode", formatter: formatErrorMsg, minWidth: 5000, responsive: 9 },
+    { title: "GGPSlash", field: "ggpSlashAmt", formatter: formatEther, minWidth: 5000, responsive: 9 },
     {
       title: "NodeAddr",
       field: "nodeAddr",
@@ -199,13 +210,6 @@ const minipoolsDef = {
       title: "Staking txID",
       field: "txID",
       formatter: formatTxID,
-      minWidth: 5000,
-      responsive: 9,
-    },
-    {
-      title: "avaxNodeOpInitialAmt",
-      field: "avaxNodeOpInitialAmt",
-      formatter: formatEther,
       minWidth: 5000,
       responsive: 9,
     },

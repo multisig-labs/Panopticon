@@ -180,7 +180,7 @@ const formatters = {
       const dur = Duration.fromMillis(v * 1000)
         .rescale()
         .toHuman({ listStyle: "long", unitDisplay: "short" });
-      console.log(dur);
+      // console.log(dur);
       return `${dur} (${v})`;
     }
   },

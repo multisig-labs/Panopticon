@@ -60,22 +60,27 @@ class Blockchain {
         },
       },
     ];
-    const promises = metrics.map((m) =>
-      fetch(`${this.avaURL}${m.url}`, makeRpc(m.method, m.params)).then((res) => {
-        return res.ok && res.json();
-      })
-    );
-    let results = await Promise.all(promises);
 
-    this.data = {};
+    try {
+      const promises = metrics.map((m) =>
+        fetch(`${this.avaURL}${m.url}`, makeRpc(m.method, m.params)).then((res) => {
+          return res.ok && res.json();
+        })
+      );
+      let results = await Promise.all(promises);
 
-    for (let i = 0; i < metrics.length; i++) {
-      try {
-        const value = metrics[i].resultFn ? metrics[i].resultFn.call(this, results[i].result) : results[i].result;
-        this.data[metrics[i].name] = value;
-      } catch (err) {
-        console.debug("metric error");
+      this.data = {};
+
+      for (let i = 0; i < metrics.length; i++) {
+        try {
+          const value = metrics[i].resultFn ? metrics[i].resultFn.call(this, results[i].result) : results[i].result;
+          this.data[metrics[i].name] = value;
+        } catch (err) {
+          console.debug("metric error");
+        }
       }
+    } catch (e) {
+      console.log(e);
     }
 
     // console.log("Blockchain Data", this.data);

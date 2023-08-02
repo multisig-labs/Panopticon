@@ -91,7 +91,8 @@ class Blockchain {
     // If hardhat then just return
     if (!this.avaURL) return "";
     const d = this.data || {};
-    return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
+    // return `[C-chain blk #${d.blockNumberC} @ ${d.timestampC}] [P-chain blk #${d.heightP} @ ${d.timestampP}]`;
+    return `[C-chain blk #${d.blockNumberC} P-chain blk #${d.heightP} @ ${d.timestampP}]`;
   }
 
   rpcUrlDisplay() {

@@ -17,7 +17,13 @@
   <div class="copyable" id="rpc-url"></div>
 </div>
 
+<div class="container w-95 text-center text-muted"></div>
+
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
+  <div class="float-md-end d-none d-md-block mt-1">
+    <input id="filter-value" type="text" placeholder="filter node/owner" />
+    <button id="filter-clear">X</button>
+  </div>
   <h3 class="text-center">Minipools</h3>
   <div id="minipools"><div class="loader">Loading...</div></div>
 </div>
@@ -87,6 +93,33 @@
     tableDashboard.updateOrAddData(GGP.dashboardAsTabulatorData());
     tableMinipools.updateOrAddData(GGP.minipoolsAsTabulatorData());
     tableStakers.updateOrAddData(GGP.stakersAsTabulatorData());
+  });
+
+  var valueEl = document.getElementById("filter-value");
+
+  //Trigger setFilter function with correct parameters
+  function updateFilter() {
+    tableMinipools.setFilter([
+      [
+        { field: "nodeID", type: "like", value: valueEl.value },
+        { field: "owner", type: "like", value: valueEl.value },
+      ],
+    ]);
+  }
+
+  //Update filters on value change
+  document.getElementById("filter-value").addEventListener("keyup", updateFilter);
+  document.getElementById("filter-value").addEventListener("keyup", function (e) {
+    if (e.key == "Escape") {
+      valueEl.value = "";
+      tableMinipools.clearFilter();
+    }
+  });
+
+  //Clear filters on "Clear Filters" button click
+  document.getElementById("filter-clear").addEventListener("click", function () {
+    valueEl.value = "";
+    tableMinipools.clearFilter();
   });
 </script>
 <style>

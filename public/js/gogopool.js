@@ -289,7 +289,7 @@ class GoGoPool {
 
     const INVESTOR_ADDRS = {
       "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true,
-      // "0x443FaaE0354c0dC34681b92a6a9e252F4E89D54d": true,
+      "0x624c4F9E55d2D1158fD5dee555C3bc8110b1E936": true,
     };
     const INVESTOR_REWARDS_SHARE = 0.1;
     const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount()];

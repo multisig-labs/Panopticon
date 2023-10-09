@@ -42,12 +42,25 @@ function formatDuration(cell, formatterParams, onRendered) {
   return formatters.formatDuration(cell.getValue());
 }
 
+function formatDurationHumanUntil(cell, formatterParams, onRendered) {
+  const timestamp = Math.floor(Date.now() / 1000);
+  return formatters.formatDurationHuman(cell.getValue() - timestamp);
+}
+
 function formatDurationHuman(cell, formatterParams, onRendered) {
   return formatters.formatDurationHuman(cell.getValue());
 }
 
 function formatSnowtraceLinkIcon(cell, formatterParams, onRendered) {
   return `<a class="mirror" target="_blank" href="${DEPLOYMENT.cExplorerURL}/address/${cell.getValue()}">⎋</a>`;
+}
+
+function formatNodeIdLink(cell, formatterParams, onRendered) {
+  return `<a target="_blank" href='https://avascan.info/staking/validator/${cell.getValue()}'>${cell.getValue()}</a>`;
+}
+
+function formatGlacierAmount(cell, formatterParams, onRendered) {
+  return formatters.formatAvax(cell.getValue()[0].amount);
 }
 
 function formatTxID(cell, formatterParams, onRendered) {
@@ -69,6 +82,25 @@ function formatTxID(cell, formatterParams, onRendered) {
 }
 
 // Definitions for Tabulator tables
+const ggAVAXDef = {
+  data: [], // Filled in later by JS
+  index: "txHash",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
+    { title: "Started", field: "startTimestamp", formatter: formatUnixTime },
+    { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount },
+    { title: "Reward", field: "estimatedReward", formatter: formatAvax },
+    { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
+  ],
+};
 
 const dashboardDef = {
   data: [], // Filled in later by JS
@@ -491,4 +523,4 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef };
+export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef };

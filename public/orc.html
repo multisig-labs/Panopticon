@@ -14,7 +14,7 @@
     Orchestrator <i class="bi bi-info-square" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
   </h3>
   <div id="jsoneditor"></div>
-  <div id="orc" class="text-center"><div class="loader">Loading...</div></div>
+  <!-- <div id="orc" class="text-center"><div class="loader">Loading...</div></div> -->
 </div>
 
 <!-- Modal -->
@@ -48,7 +48,7 @@
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { Orc } from "/js/orc.js";
-  import { orcDef } from "/js/tabulator.js";
+  // import { orcDef } from "/js/tabulator.js";
   import { JSONEditor } from "https://esm.sh/vanilla-jsoneditor";
 
   let ORC;
@@ -56,14 +56,14 @@
   async function initData() {
     ORC = new Orc(DEPLOYMENT);
     await ORC.fetchInfo();
-    await ORC.fetchMinipools();
+    // await ORC.fetchMinipools();
   }
 
   await initData();
 
   document.getElementById("infoData").innerHTML = JSON.stringify(ORC.info, null, 2);
 
-  const tableMinipools = new Tabulator("#orc", orcDef);
+  // const tableMinipools = new Tabulator("#orc", orcDef);
 
   var content = { json: ORC.txLogsAsJson() };
 
@@ -83,7 +83,7 @@
   });
 
   ORC.refreshDataLoop(() => {
-    tableMinipools.updateOrAddData(ORC.minipoolsAsTabulatorData());
+    // tableMinipools.updateOrAddData(ORC.minipoolsAsTabulatorData());
     editor.update({ json: ORC.txLogsAsJson() });
   });
 </script>

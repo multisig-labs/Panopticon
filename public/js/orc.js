@@ -41,7 +41,7 @@ class Orc {
   }
 
   async fetchTxLogs() {
-    const response = await fetch(`${this.orcURL}/all_tx_logs?Limit=500`, {
+    const response = await fetch(`${this.orcURL}/all_tx_logs?limit=100`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -78,7 +78,7 @@ class Orc {
   refreshDataLoop(fn) {
     const poll = async () => {
       // console.log("Polling for orc data");
-      await this.fetchMinipools();
+      // await this.fetchMinipools();
       await this.fetchTxLogs();
       fn();
       setTimeout(poll, 10000);

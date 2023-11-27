@@ -41,6 +41,12 @@ async function transformer(transforms, objs) {
       }
       return obj;
     },
+    estimateCycleEndTime: (obj) => {
+      if (obj.startTime.toNumber() !== 0) {
+        obj.cycleEndTime = obj.startTime.add(15 * 24 * 60 * 60);
+      }
+      return obj;
+    },
     queueDuration: (obj) => {
       if (obj.creationTime.toNumber() > 0) {
         const t =
@@ -68,6 +74,7 @@ async function minipoolTransformer(objs) {
     "encodeNodeID",
     "encodeTxID",
     "estimateEndTime",
+    "estimateCycleEndTime",
     "queueDuration",
   ];
   return await transformer(pipeline, objs);

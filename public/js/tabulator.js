@@ -51,6 +51,10 @@ function formatDurationHuman(cell, formatterParams, onRendered) {
   return formatters.formatDurationHuman(cell.getValue());
 }
 
+function formatDurationHumanShort(cell, formatterParams, onRendered) {
+  return formatters.formatDurationHumanShort(cell.getValue());
+}
+
 function formatSnowtraceLinkIcon(cell, formatterParams, onRendered) {
   return `<a class="mirror" target="_blank" href="${DEPLOYMENT.cExplorerURL}/address/${cell.getValue()}">⎋</a>`;
 }
@@ -174,10 +178,10 @@ const minipoolsDef = {
       formatter: formatMPStatus,
       width: 90,
     },
-    { title: "Dur", field: "duration", width: 60 },
+    { title: "Dur", field: "duration", formatter: formatDurationHumanShort, width: 60 },
     {
       title: "Start",
-      field: "startTime",
+      field: "initialStartTime",
       width: 90,
       formatter: formatUnixTime,
     },
@@ -186,6 +190,12 @@ const minipoolsDef = {
       field: "endTime",
       width: 90,
       formatter: formatUnixTime,
+    },
+    {
+      title: "CycleEnd",
+      field: "cycleEndTime",
+      formatter: formatUnixTime,
+      width: 90,
     },
     { title: "Owner", field: "owner", formatter: labelAddress, sorter: "alphanum", width: 120 },
     {
@@ -200,7 +210,7 @@ const minipoolsDef = {
       width: 100,
       formatter: formatEther,
     },
-    { title: "QueueDur", field: "queueDuration", formatter: formatDurationHuman, sorter: "number" },
+    { title: "QueueDur", field: "queueDuration", formatter: formatDurationHuman, sorter: "number", responsive: 9 },
     { title: "AvaxLiqStkr", field: "avaxLiquidStakerAmt", formatter: formatEther, minWidth: 5000, responsive: 9 },
     { title: "Error", field: "errorCode", formatter: formatErrorMsg, minWidth: 5000, responsive: 9 },
     { title: "GGPSlash", field: "ggpSlashAmt", formatter: formatEther, minWidth: 5000, responsive: 9 },
@@ -253,8 +263,15 @@ const minipoolsDef = {
       responsive: 9,
     },
     {
-      title: "initialStartTime",
-      field: "initialStartTime",
+      title: "cycleStartTime",
+      field: "startTime",
+      formatter: formatUnixTime,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "cycleEndTime",
+      field: "cycleEndTime",
       formatter: formatUnixTime,
       minWidth: 5000,
       responsive: 9,

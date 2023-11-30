@@ -146,5 +146,76 @@
         "desc": "Address of new Guardian"
       }
     ]
+  },
+  {
+    "contract": "Vault",
+    "metrics": [
+      {
+        "fn": "balanceOf",
+        "args": ["MinipoolManager"],
+        "title": "MinipoolManager Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOf",
+        "args": ["MultisigManager"],
+        "title": "MultisigManager Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOf",
+        "args": ["Staking"],
+        "title": "Staking Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOf",
+        "args": ["ClaimNodeOp"],
+        "title": "ClaimNodeOp Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOf",
+        "args": ["ClaimProtocolDAO"],
+        "title": "ClaimProtocolDAO Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOf",
+        "args": ["ProtocolDAO"],
+        "title": "ProtocolDAO Balance (AVAX)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOfToken",
+        "args": ["ProtocolDAO", "0x69260B9483F9871ca57f81A90D91E2F96c2Cd11d"],
+        "title": "ProtocolDAO Balance (GGP)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOfToken",
+        "args": ["ClaimNodeOp", "0x69260B9483F9871ca57f81A90D91E2F96c2Cd11d"],
+        "title": "ClaimNodeOp Balance (GGP)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOfToken",
+        "args": ["ClaimProtocolDAO", "0x69260B9483F9871ca57f81A90D91E2F96c2Cd11d"],
+        "title": "ClaimProtocolDAO Balance (GGP)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOfToken",
+        "args": ["Staking", "0x69260B9483F9871ca57f81A90D91E2F96c2Cd11d"],
+        "title": "Staking Balance (GGP)",
+        "formatter": "formatEther"
+      },
+      {
+        "fn": "balanceOfToken",
+        "args": ["RewardsPool", "0x69260B9483F9871ca57f81A90D91E2F96c2Cd11d"],
+        "title": "RewardsPool Balance (GGP)",
+        "formatter": "formatEther"
+      }
+    ]
   }
 ]

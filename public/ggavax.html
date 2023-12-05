@@ -10,28 +10,13 @@
 </div>
 
 <div class="container w-95 border border-5 rounded pb-3">
-  <h3 class="text-center">
-    ggAVAX <i class="bi bi-info-square" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
-  </h3>
+  <h3 class="text-center">ggAVAX Delegations</h3>
   <div id="ggavax" class="text-center"><div class="loader">Loading...</div></div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="infoModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">ggAVAX Info</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <pre id="infoData"></pre>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
+<br />
+<div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">ggAVAX Stats</h3>
+  <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
 </div>
 
 <style>
@@ -46,14 +31,16 @@
 
 <script type="module">
   import { DEPLOYMENT } from "/deployments/selected.js";
+  import { GoGoPool } from "/js/gogopool.js";
   import { ggAVAX } from "/js/ggavax.js";
-  import { ggAVAXDef } from "/js/tabulator.js";
-
-  let GGAVAX;
+  import { ggAVAXDef, ggAVAXStatsDef } from "/js/tabulator.js";
+  let GGAVAX, GGP;
 
   async function initData() {
+    GGP = new GoGoPool(DEPLOYMENT);
     GGAVAX = new ggAVAX(DEPLOYMENT);
-    await GGAVAX.fetchCurrentDelegations();
+    await GGP.fetchContracts();
+    await Promise.all([GGP.fetchDashboardData(), GGAVAX.fetchCurrentDelegations()]);
   }
 
   await initData();
@@ -62,6 +49,14 @@
 
   GGAVAX.refreshDataLoop(() => {
     tableCurrentDelegations.updateOrAddData(GGAVAX.currentDelegations);
+  });
+
+  const tableStats = new Tabulator("#ggavax-stats", ggAVAXStatsDef);
+
+  GGP.refreshDataLoop(() => {
+    // Reusing the GGP data, but just grabbing what we want for this page
+    const data = GGP.dashboardAsTabulatorData().filter((obj) => obj.contract === "TokenggAVAX");
+    tableStats.updateOrAddData(data);
   });
 </script>
 {{end}}

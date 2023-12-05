@@ -24,7 +24,8 @@
     <input id="filter-value" type="text" placeholder="filter node/owner" />
     <button id="filter-clear">X</button>
   </div>
-  <h3 class="text-center">Minipools</h3>
+  <h3 class="d-inline-block text-center"><a href="/home">Minipools</a></h3>
+  <a href="?status=3,4,5,6" class="d-inline-block">(finished)</a>
   <div id="minipools"><div class="loader">Loading...</div></div>
 </div>
 
@@ -66,7 +67,6 @@
       BC.fetchData(),
       GGP.fetchContracts(),
       GGP.fetchDashboardData(),
-      // GGP.fetchMinipools({ status: [1, 2, 3] }),
       GGP.fetchMinipools(),
       GGP.fetchStakers(),
     ]);

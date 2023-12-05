@@ -88,7 +88,7 @@ function formatTxID(cell, formatterParams, onRendered) {
 // Definitions for Tabulator tables
 const ggAVAXDef = {
   data: [], // Filled in later by JS
-  index: "txHash",
+  index: "nodeId",
   // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
@@ -103,6 +103,24 @@ const ggAVAXDef = {
     { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount },
     { title: "Reward", field: "estimatedReward", formatter: formatAvax },
     { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
+  ],
+};
+
+const ggAVAXStatsDef = {
+  data: [], // Filled in later by JS
+  index: "title",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Variable", field: "title", width: 300 },
+    { title: "Value", field: "value" },
+    { title: "Desc", field: "desc" },
   ],
 };
 
@@ -540,4 +558,4 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef };
+export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef, ggAVAXStatsDef };

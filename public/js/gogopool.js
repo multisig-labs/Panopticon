@@ -45,6 +45,7 @@ class GoGoPool {
   dashboardData;
   stakersData;
   isLoaded;
+  statusesToFetch;
 
   // Deconstruct params from a DEPLOYMENT descriptor
   constructor({
@@ -71,6 +72,7 @@ class GoGoPool {
     this.dashboardData = [];
     this.stakersData = [];
     this.isLoaded = false;
+    this.statusesToFetch = undefined;
   }
 
   // @return [{name: "Contract1", address: "0x123"}]
@@ -97,13 +99,35 @@ class GoGoPool {
     this.contracts.Storage.contract = await new Contract(this.storage, this.contracts.Storage.abi, this.provider);
     this.contracts.Storage.mccontract = await new MCContract(this.storage, this.contracts.Storage.abi);
 
-    // Loop through all other contract names we have abis for
-    for (const name of Object.keys(this.contracts)) {
-      if (name === "Storage") continue;
+    // Use multicall to Storage to get addrs in one swoop
+
+    const contractNames = Object.keys(this.contracts).filter((n) => n !== "Storage");
+    const getAddrCalls = [];
+
+    for (const name of contractNames) {
+      const args = ethersUtils.solidityKeccak256(["string", "string"], ["contract.address", name]);
+      getAddrCalls.push(this.contracts.Storage.mccontract["getAddress"].call(this, args));
+    }
+
+    let results = [];
+
+    for (let batch of this.getBatch(getAddrCalls)) {
       try {
-        const addr = await this.contracts.Storage.contract.getAddress(
-          ethersUtils.solidityKeccak256(["string", "string"], ["contract.address", name])
+        results = results.concat(await this.multicallProvider.tryAll(batch));
+      } catch (err) {
+        console.error(
+          "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
+          err
         );
+        console.error(batch);
+      }
+    }
+
+    // Loop through all other contract names we have abis for
+    for (let i = 0; i < contractNames.length; i++) {
+      try {
+        const name = contractNames[i];
+        const addr = results[i];
 
         if (addr == constants.AddressZero) {
           console.log(`${name} not found in Storage`);
@@ -210,10 +234,16 @@ class GoGoPool {
     return this.dashboardData;
   }
 
-  async fetchMinipools({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
+  async fetchMinipools() {
+    const params = new URLSearchParams(document.location.search);
+    if (params.get("status")) {
+      this.statusesToFetch = params.get("status").split(",");
+    } else {
+      this.statusesToFetch = [0, 1, 2];
+    }
     await this.until((_) => this.isLoaded);
 
-    const promises = status.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
+    const promises = this.statusesToFetch.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
     this.minipoolsData = await minipoolTransformer(results.flat());
     console.log("Minipools", this.minipoolsData);
@@ -282,7 +312,6 @@ class GoGoPool {
     // Convert BigNums to numbers (taking into account AVAX/GGP which are in Wei)
     eligibleStakers = eligibleStakers.map(bigToNumber);
     console.log("eligibleStakers", eligibleStakers);
-    // return;
 
     // REWARDS CALCULATIONS
     // Should probably extract this to a generic JS class for reuse
@@ -328,10 +357,7 @@ class GoGoPool {
   // Helpers
   refreshDataLoop(fn) {
     const poll = async () => {
-      // console.log("Polling for data");
-      await this.fetchDashboardData();
-      await this.fetchMinipools();
-      await this.fetchStakers();
+      await Promise.all([this.fetchDashboardData(), this.fetchMinipools(), this.fetchStakers()]);
       fn();
       setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
     };

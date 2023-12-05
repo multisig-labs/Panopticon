@@ -1,7 +1,3 @@
-// Etherjs read-only interface to Rialto Orchestrator
-import { formatters, pick } from "/js/utils.js";
-import { DateTime, Interval } from "https://esm.sh/luxon@3.3.0";
-
 class ggAVAX {
   currentDelegations;
 

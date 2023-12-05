@@ -124,6 +124,36 @@ const ggAVAXStatsDef = {
   ],
 };
 
+// Definitions for Tabulator tables
+const pandasiaDef = {
+  data: [], // Filled in later by JS
+  index: "ID",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { title: "ID", field: "ID", width: 50 },
+    {
+      title: "Height",
+      field: "Height",
+      width: 100,
+    },
+    {
+      title: "Tree Type",
+      field: "TreeType",
+      width: 100,
+    },
+    {
+      title: "Root",
+      field: "Root",
+    },
+  ],
+};
+
 const dashboardDef = {
   data: [], // Filled in later by JS
   index: "title",
@@ -560,4 +590,4 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef, ggAVAXStatsDef };
+export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef, ggAVAXStatsDef, pandasiaDef };

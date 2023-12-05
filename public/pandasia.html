@@ -26,13 +26,19 @@
 </style>
 
 <script type="module">
-  import { Pandasia } from "/js/pandasia.js";
+  import { Pandasia, abi } from "/js/pandasia.js";
   import { pandasiaDef } from "/js/tabulator.js";
   let pandasia;
 
   async function initData() {
-    pandasia = new Pandasia();
+    pandasia = new Pandasia(
+      "https://api.avax-test.network/ext/bc/C/rpc",
+      43113,
+      '0xf82964f6Dd53a67D7abC6a7F2F4eE2FbF1A1316d',
+      abi
+    );
     await pandasia.fetchTrees();
+    await pandasia.fetchAirdrops();
   }
 
   await initData();

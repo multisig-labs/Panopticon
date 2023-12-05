@@ -90,9 +90,17 @@
     .addEventListener("click", () => tableStakers.download("csv", "GoGoPool_NodeOps.csv"));
 
   GGP.refreshDataLoop(() => {
+    tableDashboard.blockRedraw();
+    tableMinipools.blockRedraw();
+    tableStakers.blockRedraw();
+
     tableDashboard.updateOrAddData(GGP.dashboardAsTabulatorData());
     tableMinipools.updateOrAddData(GGP.minipoolsAsTabulatorData());
     tableStakers.updateOrAddData(GGP.stakersAsTabulatorData());
+
+    tableDashboard.restoreRedraw();
+    tableMinipools.restoreRedraw();
+    tableStakers.restoreRedraw();
   });
 
   var valueEl = document.getElementById("filter-value");

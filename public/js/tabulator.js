@@ -169,7 +169,8 @@ const contractsDef = {
 const minipoolsDef = {
   data: [], // Filled in later by JS
   index: "index",
-  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // rowHeight: 30,
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,
@@ -301,7 +302,8 @@ const minipoolsDef = {
 const stakersDef = {
   data: [], // Filled in later by JS
   index: "stakerAddr",
-  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // rowHeight: 30,
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
   responsiveLayoutCollapseStartOpen: false,

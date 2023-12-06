@@ -14,6 +14,12 @@
   <div id="pandasia-trees" class="text-center"><div class="loader">Loading...</div></div>
 </div>
 <br />
+<div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">Airdrops</h3>
+  <div id="pandasia-airdrops" class="text-center">
+    <div class="loader">Loading...</div>
+  </div>
+</div>
 
 <style>
   .container,
@@ -27,7 +33,7 @@
 
 <script type="module">
   import { Pandasia, abi } from "/js/pandasia.js";
-  import { pandasiaDef } from "/js/tabulator.js";
+  import { pandasiaDef, pandasiaAirdropsDef } from "/js/tabulator.js";
   let pandasia;
 
   async function initData() {
@@ -44,9 +50,11 @@
   await initData();
 
   const tablePandasiaTrees = new Tabulator("#pandasia-trees", pandasiaDef);
+  const tablePandasiaAirdrops = new Tabulator("#pandasia-airdrops", pandasiaAirdropsDef);
 
   pandasia.refreshDataLoop(() => {
     tablePandasiaTrees.updateOrAddData(pandasia.trees);
+    tablePandasiaAirdrops.updateOrAddData(pandasia.airdrops);
   });
 </script>
 {{end}}

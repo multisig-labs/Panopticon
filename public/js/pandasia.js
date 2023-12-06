@@ -31,17 +31,40 @@ class Pandasia {
 
   async fetchAirdrops() {
     // get airdrops in chunks of 10 until they stop returning
-    const localAirdrops = [];
+    let localAirdrops = [];
     // get airdrops takes an offset and a limit
     let offset = 0;
     let limit = 10;
     while (true) {
       // make a request to the contract
       const resp = await this.contract.getAirdrops(offset, limit);
-      // log the response and break for now
-      console.log(resp);
-      break;
+      // if the response is empty, break out of the loop
+      if (resp.length === 0) {
+        break;
+      }
+      // otherwise, add the response to the local airdrops
+      localAirdrops.push(...resp);
+      if (resp.length < limit) {
+        break;
+      }
+      // increment the offset
+      offset += limit;
     }
+
+    // set the airdrops
+    this.airdrops = localAirdrops.map((airdrop, i) => {
+      return {
+        idx: i,
+        airdropId: airdrop.id,
+        owner: airdrop.owner,
+        erc20: airdrop.erc20,
+        balance: airdrop.balance,
+        customRoot: airdrop.customRoot,
+        claimAmount: airdrop.claimAmount,
+        startsAt: airdrop.startsAt,
+        expiresAt: airdrop.expiresAt,
+      };
+    });
   }
 
   refreshDataLoop(fn) {

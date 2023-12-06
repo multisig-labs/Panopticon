@@ -154,6 +154,27 @@ const pandasiaDef = {
   ],
 };
 
+const pandasiaAirdropsDef = {
+  data: [], // Filled in later by JS
+  index: "idx",
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { title: "ID", field: "airdropId", width: 50, formatter: formatNumber },
+    { title: "Balance", field: "balance", width: 100, formatter: formatEther },
+    { title: "Token Address", field: "erc20", width: 275 },
+    { title: "Owner", field: "owner", width: 275 },
+    { title: "Starts At", field: "startsAt", width: 200, formatter: formatUnixTime },
+    { title: "Expires At", field: "expiresAt", width: 200, formatter: formatUnixTime },
+    { title: "Claim Amount", field: "claimAmount", width: 100, formatter: formatEther },
+    { title: "Custom Root", field: "customRoot", width: 275 },
+  ],
+};
+
 const dashboardDef = {
   data: [], // Filled in later by JS
   index: "title",
@@ -590,4 +611,14 @@ const orcDef = {
   ],
 };
 
-export { orcDef, minipoolsDef, stakersDef, dashboardDef, contractsDef, ggAVAXDef, ggAVAXStatsDef, pandasiaDef };
+export {
+  orcDef,
+  minipoolsDef,
+  stakersDef,
+  dashboardDef,
+  contractsDef,
+  ggAVAXDef,
+  ggAVAXStatsDef,
+  pandasiaDef,
+  pandasiaAirdropsDef,
+};

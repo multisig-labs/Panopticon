@@ -88,7 +88,7 @@ function formatTxID(cell, formatterParams, onRendered) {
 // Definitions for Tabulator tables
 const ggAVAXDef = {
   data: [], // Filled in later by JS
-  index: "nodeId",
+  index: "startTimestamp",
   // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
   layout: "fitColumns", //fit columns to width of table (optional)
   responsiveLayout: "collapse",
@@ -98,8 +98,8 @@ const ggAVAXDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
     { title: "Started", field: "startTimestamp", formatter: formatUnixTime },
+    { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
     { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount },
     { title: "Reward", field: "estimatedReward", formatter: formatAvax },
     { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },

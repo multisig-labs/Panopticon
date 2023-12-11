@@ -4,6 +4,7 @@ const deployment = {
   orcURL: "https://rialto-orc.scorpion-scala.ts.net",
   pExplorerURL: "https://subnets.avax.network/p-chain/tx/",
   cExplorerURL: "https://snowtrace.io/",
+  pandasiaURL: "https://api.pandasia.io/",
   chain: {
     name: "ava-mainnet",
     chainId: 43114,
@@ -15,6 +16,7 @@ const deployment = {
   },
   contracts: {}, // will merge in contracts.json
   dashboard: [], // will merge in dashboard.json
+  pandasia: "0x5746c7210f668e2aFc7D572C39Ff2f61a1FA593B",
 };
 
 async function deploymentFn() {

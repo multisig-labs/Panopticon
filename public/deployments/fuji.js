@@ -6,6 +6,7 @@ const deployment = {
   orcURL: "http://18.222.246.33:9000",
   pExplorerURL: "https://subnets-test.avax.network/p-chain/tx/",
   cExplorerURL: "https://testnet.snowtrace.io/",
+  pandasiaURL: "https://api-test.pandasia.io/",
   chain: {
     name: "fuji",
     chainId: 43113,
@@ -16,7 +17,8 @@ const deployment = {
     "0x5d4d83e6743c868B2b4565B2c72845cDEfF37421": "deployer",
   },
   contracts: {}, // will merge in contracts.json
-  dashboard: [], // will merge in dashboard.json
+  dashboard: [], // will merge in dashboard.json,
+  pandasia: "0x930BfF0eaa8B6056ade39C94bf8082187FA0B991",
 };
 
 async function deploymentFn() {

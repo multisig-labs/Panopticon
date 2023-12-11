@@ -34,6 +34,7 @@ class GoGoPool {
   contracts;
   storage;
   multicall3;
+  pandasia;
   // Optional Params
   EOALabels;
   transforms;
@@ -54,6 +55,7 @@ class GoGoPool {
     contracts = this.required(),
     storage = this.required(),
     multicall3 = this.required(),
+    pandasia = this.required(),
     EOALabels = {},
     transforms = [],
     dashboard = [],
@@ -67,6 +69,7 @@ class GoGoPool {
       EOALabels,
       transforms,
       dashboard,
+      pandasia,
     });
     this.minipoolsData = [];
     this.dashboardData = [];
@@ -147,6 +150,10 @@ class GoGoPool {
           e
         );
       }
+    }
+    if (this.contracts["Pandasia"]) {
+      // if we have a pandasia contract, set the address
+      this.contracts["Pandasia"].address = this.pandasia;
     }
     console.log(this.contracts);
     this.isLoaded = true;

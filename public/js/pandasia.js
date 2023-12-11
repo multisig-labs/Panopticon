@@ -1,5 +1,4 @@
-import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
-import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
+import { providers, Contract } from "https://esm.sh/ethers@5.7.2";
 
 class Pandasia {
   trees;

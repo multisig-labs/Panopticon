@@ -166,12 +166,28 @@ const pandasiaAirdropsDef = {
   columns: [
     { title: "ID", field: "airdropId", width: 50, formatter: formatNumber },
     { title: "Balance", field: "balance", width: 100, formatter: formatEther },
-    { title: "Token Address", field: "erc20", width: 275 },
-    { title: "Owner", field: "owner", width: 275 },
+    { title: "Token Address", field: "erc20", width: 300 },
+    { title: "Owner", field: "owner", width: 300 },
     { title: "Starts At", field: "startsAt", width: 200, formatter: formatUnixTime },
     { title: "Expires At", field: "expiresAt", width: 200, formatter: formatUnixTime },
     { title: "Claim Amount", field: "claimAmount", width: 100, formatter: formatEther },
-    { title: "Custom Root", field: "customRoot", width: 275 },
+    { title: "Custom Root", field: "customRoot", width: 300 },
+  ],
+};
+
+const pandasiaUsersDef = {
+  data: [], // Filled in later by JS
+  index: "idx",
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { title: "ID", field: "idx", width: 50, formatter: formatNumber },
+    { title: "C Chain Address", field: "cChainAddr", width: 300 },
+    { title: "P Chain Address", field: "pChainAddr", width: 300 },
   ],
 };
 
@@ -621,4 +637,5 @@ export {
   ggAVAXStatsDef,
   pandasiaDef,
   pandasiaAirdropsDef,
+  pandasiaUsersDef,
 };

@@ -20,6 +20,13 @@
     <div class="loader">Loading...</div>
   </div>
 </div>
+<br />
+<div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">Addresses</h3>
+  <div id="pandasia-verified" class="text-center">
+    <div class="loader">Loading...</div>
+  </div>
+</div>
 
 <style>
   .container,
@@ -32,29 +39,33 @@
 </style>
 
 <script type="module">
-  import { Pandasia, abi } from "/js/pandasia.js";
-  import { pandasiaDef, pandasiaAirdropsDef } from "/js/tabulator.js";
+  import { DEPLOYMENT } from "/deployments/selected.js";
+  import { Pandasia } from "/js/pandasia.js";
+  import { pandasiaDef, pandasiaAirdropsDef, pandasiaUsersDef } from "/js/tabulator.js";
   let pandasia;
 
   async function initData() {
-    pandasia = new Pandasia(
-      "https://api.avax-test.network/ext/bc/C/rpc",
-      43113,
-      '0xf82964f6Dd53a67D7abC6a7F2F4eE2FbF1A1316d',
-      abi
-    );
+    pandasia = new Pandasia(DEPLOYMENT);
     await pandasia.fetchTrees();
     await pandasia.fetchAirdrops();
+    await pandasia.fetchVerifiedAddresses();
   }
 
   await initData();
 
   const tablePandasiaTrees = new Tabulator("#pandasia-trees", pandasiaDef);
   const tablePandasiaAirdrops = new Tabulator("#pandasia-airdrops", pandasiaAirdropsDef);
+  const tablePandasiaVerified = new Tabulator("#pandasia-verified", pandasiaUsersDef);
+  
 
   pandasia.refreshDataLoop(() => {
-    tablePandasiaTrees.updateOrAddData(pandasia.trees);
-    tablePandasiaAirdrops.updateOrAddData(pandasia.airdrops);
+    try {
+      tablePandasiaTrees.updateOrAddData(pandasia.trees);
+      tablePandasiaAirdrops.updateOrAddData(pandasia.airdrops);
+      tablePandasiaVerified.updateOrAddData(pandasia.users);
+    } catch (e) {
+      console.log(e);
+    }
   });
 </script>
 {{end}}

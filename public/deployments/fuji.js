@@ -6,6 +6,7 @@ const deployment = {
   orcURL: "http://18.222.246.33:9000",
   pExplorerURL: "https://subnets-test.avax.network/p-chain/tx/",
   cExplorerURL: "https://testnet.snowtrace.io/",
+  pandasiaURL: "https://api-test.pandasia.io/",
   chain: {
     name: "fuji",
     chainId: 43113,

@@ -9,6 +9,7 @@ class Pandasia {
   // for querying the blockchain network
   provider;
   ethURL;
+  pandasiaURL;
   chain;
   address; // address of the contract
   abi; // abi of the contract
@@ -18,6 +19,7 @@ class Pandasia {
     this.ethURL = DEPLOYMENT.ethURL;
     this.chain = DEPLOYMENT.chain.chainId;
     this.address = DEPLOYMENT.pandasia;
+    this.pandasiaURL = DEPLOYMENT.pandasiaURL;
     this.abi = DEPLOYMENT.contracts.Pandasia.abi;
     this.provider = new providers.JsonRpcProvider(this.ethURL, this.chain);
     // initialize a new contract instance
@@ -25,7 +27,7 @@ class Pandasia {
   }
 
   async fetchTrees() {
-    const resp = await fetch("https://api.pandasia.io/trees").then((res) => res.json());
+    const resp = await fetch(this.pandasiaURL + "trees").then((res) => res.json());
     this.trees = resp;
     return this.trees;
   }
@@ -105,9 +107,7 @@ class Pandasia {
 
   refreshDataLoop(fn) {
     const poll = async () => {
-      await this.fetchTrees();
-      await this.fetchAirdrops();
-      await this.fetchVerifiedAddresses();
+      await Promise.all([this.fetchTrees(), this.fetchAirdrops(), this.fetchVerifiedAddresses()]);
       fn();
       setTimeout(poll, 30000);
     };

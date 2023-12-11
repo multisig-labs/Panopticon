@@ -4,6 +4,7 @@ const deployment = {
   orcURL: "https://rialto-orc.scorpion-scala.ts.net",
   pExplorerURL: "https://subnets.avax.network/p-chain/tx/",
   cExplorerURL: "https://snowtrace.io/",
+  pandasiaURL: "https://api.pandasia.io/",
   chain: {
     name: "ava-mainnet",
     chainId: 43114,

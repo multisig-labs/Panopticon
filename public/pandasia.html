@@ -46,9 +46,11 @@
 
   async function initData() {
     pandasia = new Pandasia(DEPLOYMENT);
-    await pandasia.fetchTrees();
-    await pandasia.fetchAirdrops();
-    await pandasia.fetchVerifiedAddresses();
+    await Promise.all([
+      pandasia.fetchTrees(),
+      pandasia.fetchAirdrops(),
+      pandasia.fetchVerifiedAddresses()
+    ]);
   }
 
   await initData();
@@ -60,9 +62,17 @@
 
   pandasia.refreshDataLoop(() => {
     try {
+      tablePandasiaTrees.blockRedraw();
+      tablePandasiaAirdrops.blockRedraw();
+      tablePandasiaVerified.blockRedraw();
+
       tablePandasiaTrees.updateOrAddData(pandasia.trees);
       tablePandasiaAirdrops.updateOrAddData(pandasia.airdrops);
       tablePandasiaVerified.updateOrAddData(pandasia.users);
+
+      tablePandasiaTrees.restoreRedraw();
+      tablePandasiaAirdrops.restoreRedraw();
+      tablePandasiaVerified.restoreRedraw();
     } catch (e) {
       console.log(e);
     }

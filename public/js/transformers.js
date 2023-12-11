@@ -1,83 +1,52 @@
-// Etherjs read-only interface to GoGoPool Protocol
+import { pipeAsyncFunctions, formatters, bigToNumber, unfuckEthersObj } from "/js/utils.js";
 
-import { utils as ethersUtils, constants } from "https://esm.sh/ethers@5.7.2";
-import { pipeAsyncFunctions, cb58Encode } from "/js/utils.js";
-
-// transforms look like ["stripNumberKeys", "formatEther"]
-// Fn will take array of objs and send them through the defined transforms
-async function transformer(transforms, objs) {
-  const xfns = {
-    // Etherjs sends a weird obj, so make it a standard one
-    convertToObj: async (obj) => Object.assign({}, obj),
-    stripNumberKeys: async (obj) => {
-      for (const k of Object.keys(obj)) {
-        if (k.match("[0-9]+")) {
-          delete obj[k];
-        }
-      }
-      return obj;
-    },
-    indexToNum: (obj) => {
-      obj.index = obj.index.toNumber();
-      return obj;
-    },
-    encodeNodeID: async (obj) => {
-      obj.nodeAddr = obj.nodeID;
-      const b = ethersUtils.arrayify(ethersUtils.getAddress(obj.nodeAddr));
-      const bec = await cb58Encode(b);
-      obj.nodeID = `NodeID-${bec}`;
-      return obj;
-    },
-    // Stored as 0x123 but its a P-chain tx so we need CB58
-    encodeTxID: async (obj) => {
-      const b = ethersUtils.arrayify(obj.txID);
-      const bec = await cb58Encode(b);
-      obj.txID = bec;
-      return obj;
-    },
-    estimateEndTime: (obj) => {
-      if (obj.endTime.toNumber() === 0 && obj.startTime.toNumber() !== 0) {
-        obj.endTime = obj.startTime.add(obj.duration);
-      }
-      return obj;
-    },
-    estimateCycleEndTime: (obj) => {
-      if (obj.startTime.toNumber() !== 0) {
-        obj.cycleEndTime = obj.startTime.add(15 * 24 * 60 * 60);
-      }
-      return obj;
-    },
-    queueDuration: (obj) => {
-      if (obj.creationTime.toNumber() > 0) {
-        const t =
-          obj.initialStartTime.toNumber() === 0 ? Math.floor(Date.now() / 1000) : obj.initialStartTime.toNumber();
-        obj.queueDuration = t - obj.creationTime.toNumber();
-      }
-      return obj;
-    },
-  };
-
-  const fns = transforms.map((name) => xfns[name]);
+// process each obj through a pipeline of fns
+async function transformer(fns, objs) {
   const pipeline = pipeAsyncFunctions(...fns);
   const promises = objs.map((obj) => pipeline(obj));
   const xobjs = await Promise.all(promises);
   return xobjs;
 }
 
-async function minipoolTransformer(objs) {
-  // indexToNum is necessary because Tabulator.js requires an int key for each row, BigInt doesnt work
-  // the encode* transforms are async in order to use cb58, not sure how to do async in tabulator formatters, so doing it here
-  const pipeline = [
-    "convertToObj",
-    "stripNumberKeys",
-    "indexToNum",
-    "encodeNodeID",
-    "encodeTxID",
-    "estimateEndTime",
-    "estimateCycleEndTime",
-    "queueDuration",
-  ];
+async function fixupMinipool(obj) {
+  obj.nodeAddr = obj.nodeID;
+  obj.nodeID = await formatters.nodeAddrToId(obj.nodeAddr);
+  obj.status = formatters.formatMPStatus(obj.status);
+  obj.txID = await formatters.toCB58(obj.txID);
+
+  obj.errorCode = formatters.formatErrorMsg(obj.errorCode);
+
+  if (obj.endTime === 0 && obj.startTime !== 0) {
+    obj.endTime = obj.startTime + obj.duration;
+  }
+
+  if (obj.startTime !== 0) {
+    obj.cycleEndTime = obj.startTime + 15 * 24 * 60 * 60;
+  }
+
+  if (obj.creationTime > 0) {
+    const t = obj.initialStartTime === 0 ? Math.floor(Date.now() / 1000) : obj.initialStartTime;
+    obj.queueDuration = t - obj.creationTime;
+  }
+
+  return obj;
+}
+
+async function minipoolsTransformer(objs) {
+  const pipeline = [unfuckEthersObj, fixupMinipool];
   return await transformer(pipeline, objs);
 }
 
-export { minipoolTransformer };
+async function stakersTransformerStep1(objs) {
+  return await transformer([unfuckEthersObj], objs);
+}
+
+async function stakersTransformerStep2(objs) {
+  return await transformer([bigToNumber], objs);
+}
+
+async function ggavaxDelegationsTransformer(objs) {
+  const pipeline = ["fixupDelegations"];
+}
+
+export { minipoolsTransformer, stakersTransformerStep1, stakersTransformerStep2 };

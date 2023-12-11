@@ -1,4 +1,5 @@
 import { providers, Contract } from "https://esm.sh/ethers@5.7.2";
+import { unfuckEthersObj } from "/js/utils.js";
 
 class Pandasia {
   trees;
@@ -87,6 +88,8 @@ class Pandasia {
     });
     // wait for all the addresses to resolve
     pChainAddresses = await Promise.all(pChainAddresses);
+    // TODO convert the hex bytes into bech32 addr "P-avax1blahblah..."
+
     // zip them together
     const users = addresses.map((address, i) => {
       return {

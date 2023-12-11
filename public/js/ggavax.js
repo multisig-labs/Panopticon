@@ -11,7 +11,6 @@ class ggAVAX {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "User-Agent": "panopticon.fly.dev",
         },
       }
     ).then((res) => res.json());

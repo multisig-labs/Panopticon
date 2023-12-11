@@ -20,7 +20,11 @@
       { "fn": "getRewardsCycleTotalAmt", "formatter": "formatEther" },
       { "fn": "getInflationIntervalStartTime", "formatter": "unixToISO" },
       { "fn": "getInflationIntervalsElapsed" },
-      { "fn": "getInflationAmt", "formatter": "formatInflationAmt" },
+      {
+        "fn": "getInflationAmt",
+        "formatter": "formatInflationAmt",
+        "desc": "Amount of GGP to be issued in next reward cycle"
+      },
       {
         "fn": "getClaimingContractDistribution",
         "args": ["ClaimNodeOp"],
@@ -128,7 +132,7 @@
         "fn": "getStakerCount",
         "title": "Staker Count",
         "desc": "",
-        "formatter": "bigToNumber"
+        "formatter": "formatNumber"
       }
     ]
   },

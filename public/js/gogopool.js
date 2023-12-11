@@ -2,8 +2,8 @@
 
 import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
-import { MINIPOOL_STATUS_MAP, formatters, stripNumberKeys, bigToNumber } from "/js/utils.js";
-import { minipoolTransformer } from "/js/transformers.js";
+import { MINIPOOL_STATUS_MAP, formatters, transformerFns, unfuckEthersObj } from "/js/utils.js";
+import { minipoolsTransformer } from "/js/transformers.js";
 
 // Hard-code reward cycle amounts
 const REWARDS_TOTAL_NODEOP_POOL_AMT = {
@@ -252,8 +252,9 @@ class GoGoPool {
 
     const promises = this.statusesToFetch.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
     const results = await Promise.all(promises);
-    this.minipoolsData = await minipoolTransformer(results.flat());
-    console.log("Minipools", this.minipoolsData);
+    this.minipoolsData = await minipoolsTransformer(results.flat());
+
+    // console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
 
@@ -265,37 +266,50 @@ class GoGoPool {
     await this.until((_) => this.isLoaded);
 
     let allStakers = await this.contracts.Staking.contract.getStakers(0, 0);
-    // console.log("All Stakers", allStakers);
-    let eligibleStakers = allStakers
-      .filter((s) => s.rewardsStartTime.gt(0) && s.avaxValidatingHighWater.gt(0))
-      .map((s) => Object.assign({}, s)) // ethers gives us weird obj, make it a normal one
-      .map(stripNumberKeys); // ethers obj has redundant keys like "1": ..., "2": ... Get rid of them for God's sake
+    allStakers = allStakers.map(unfuckEthersObj);
+    console.log("allStakers", allStakers);
 
-    // For each ELIGIBLE staker we want to call a couple funcs, so mush them all together for speed into batches
-    const calls = [];
-    const fns = [
-      ["Staking", "getMinimumGGPStake"],
-      ["Staking", "getEffectiveRewardsRatio"],
-      ["Staking", "getCollateralizationRatio"],
-      ["Staking", "getEffectiveGGPStaked"],
-      ["TokenGGP", "balanceOf"],
+    let eligibleStakers = allStakers.filter((s) => s.rewardsStartTime > 0 && s.avaxValidatingHighWater > 0);
+    // console.log("eligibleStakers (pre enrichment)", eligibleStakers);
+
+    // Define similiar structure as used in dashboard.js. Consolidate somehow, someday.
+    const ethAsFloat = (v) => parseFloat(ethersUtils.formatEther(v || 0));
+    const enrichments = [
+      {
+        contract: "Staking",
+        metrics: [
+          { fn: "getMinimumGGPStake", formatter: ethAsFloat },
+          { fn: "getEffectiveRewardsRatio", formatter: ethAsFloat },
+          { fn: "getCollateralizationRatio", formatter: ethAsFloat },
+          { fn: "getEffectiveGGPStaked", formatter: ethAsFloat },
+        ],
+      },
+      {
+        contract: "TokenGGP",
+        metrics: [{ fn: "balanceOf", formatter: ethAsFloat }],
+      },
+      {
+        contract: "ClaimNodeOp",
+        metrics: [{ fn: "isEligible" }],
+      },
     ];
 
+    // For each ELIGIBLE staker we want to call a couple contract funcs, so mush them all together for speed into batches
+    const calls = [];
     for (const s of eligibleStakers) {
-      for (const [contractName, method] of fns) {
-        try {
-          const c = this.contracts[contractName].mccontract;
-          // Un-label the addr argh
-          const addr = s.stakerAddrHex || s.stakerAddr;
-          calls.push(c[method].call(this, addr));
-        } catch (err) {
-          console.error("error calling fn", fn, err);
+      for (const enrichment of enrichments) {
+        const c = this.contracts[enrichment.contract].mccontract;
+        for (const metric of enrichment.metrics) {
+          try {
+            calls.push(c[metric.fn].call(this, s.stakerAddr));
+          } catch (err) {
+            console.log("error calling enrichment:", enrichment, err);
+          }
         }
       }
     }
 
     let results = [];
-
     for (let batch of this.getBatch(calls)) {
       try {
         results = results.concat(await this.multicallProvider.tryAll(batch));
@@ -308,17 +322,31 @@ class GoGoPool {
       }
     }
 
+    console.log("results", results);
+
+    const metrics = enrichments.map((e) => e.metrics).flat();
+    console.log(metrics);
+
     // Now add the results of the batch to each staker
-    const l = fns.length;
+    const idFn = (v) => v;
+    const l = metrics.length;
     for (const [index, s] of eligibleStakers.entries()) {
-      fns.forEach((fnName, i) => {
-        s[fnName[1]] = results[index * l + i];
+      metrics.forEach((metric, i) => {
+        const rawValue = results[index * l + i];
+        s[metric.fn] = (metric.formatter || idFn).call(this, rawValue);
       });
     }
 
-    // Convert BigNums to numbers (taking into account AVAX/GGP which are in Wei)
-    eligibleStakers = eligibleStakers.map(bigToNumber);
     console.log("eligibleStakers", eligibleStakers);
+
+    // So, I still want to show recently created minipool owners in the list, but since they are not yet eligible
+    // we will nerf their rewards to zero
+    eligibleStakers.forEach((s) => {
+      if (!s.isEligible) {
+        s.getEffectiveGGPStaked = 0;
+        s.getEffectiveRewardsRatio = 0;
+      }
+    });
 
     // REWARDS CALCULATIONS
     // Should probably extract this to a generic JS class for reuse

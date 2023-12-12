@@ -5717,6 +5717,11 @@
       },
       {
         "inputs": [],
+        "name": "AirdropStillHasFunding",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "FailedInnerCall",
         "type": "error"
       },
@@ -5936,6 +5941,19 @@
         ],
         "name": "RoleRevoked",
         "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "AIRDROP_ADMIN",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       },
       {
         "inputs": [],
@@ -6195,11 +6213,19 @@
             "internalType": "uint64",
             "name": "airdropId",
             "type": "uint64"
-          },
+          }
+        ],
+        "name": "deleteAirdrop",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
           {
-            "internalType": "uint256",
-            "name": "withdrawAmt",
-            "type": "uint256"
+            "internalType": "uint64",
+            "name": "airdropId",
+            "type": "uint64"
           }
         ],
         "name": "emergencyWithdraw",

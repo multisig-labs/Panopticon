@@ -74,25 +74,26 @@ class Pandasia {
     const addressCount = await this.contract.cChainAddrsCount();
     // convert from a BigNumber to a number
     const count = addressCount.toNumber();
-    // getRegisteredUsers takes an offset and a limit
-    let offset = 0;
-    let limit = 10;
-    let users = [];
-    while (users.length < count) {
-      // make a request to the contract
-      const resp = await this.contract.getRegisteredUsers(offset, limit);
-      // if the response is empty, break out of the loop
-      if (resp.length === 0) {
-        break;
-      }
-      // otherwise, add the response to the local addresses
-      users.push(...resp);
-      if (resp.length < limit) {
-        break;
-      }
-      // increment the offset
-      offset += limit;
+    let addresses = [];
+    // get the entire registered addresses array
+    for (let i = 0; i < count; i++) {
+      addresses.push(this.contract.cChainAddrs(i));
     }
+    // wait for all the addresses to resolve
+    addresses = await Promise.all(addresses);
+
+    let pChainAddresses = addresses.map((address) => {
+      return this.contract.c2p(address);
+    });
+    // wait for all the addresses to resolve
+    pChainAddresses = await Promise.all(pChainAddresses);
+    // zip them together
+    const users = addresses.map((address, i) => {
+      return {
+        cChainAddr: address,
+        pChainAddr: pChainAddresses[i],
+      };
+    });
 
     // users are an object with two keys: cChainAddr and pChainAddr
     this.users = users.map((user, i) => {

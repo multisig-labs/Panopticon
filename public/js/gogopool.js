@@ -6,6 +6,7 @@ import { MINIPOOL_STATUS_MAP, formatters, transformerFns, unfuckEthersObj } from
 import { minipoolsTransformer } from "/js/transformers.js";
 
 // Hard-code reward cycle amounts
+// Note we show the rewards for the *next* cycle amount
 const REWARDS_TOTAL_NODEOP_POOL_AMT = {
   0: BigNumber.from("50629343838906640213406"),
   1: BigNumber.from("50832782764109674639470"),
@@ -356,7 +357,7 @@ class GoGoPool {
       "0x624c4F9E55d2D1158fD5dee555C3bc8110b1E936": true,
     };
     const INVESTOR_REWARDS_SHARE = 0.2;
-    const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount()];
+    const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount() + 1]; // look forward to next cycle
 
     // Make 2 groups, investors and users. (do math in regular numbers)
     const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);

@@ -23,7 +23,7 @@
       {
         "fn": "getInflationAmt",
         "formatter": "formatInflationAmt",
-        "desc": "Amount of GGP to be issued in next reward cycle"
+        "desc": "getInflationIntervalRate * getInflationIntervalsElapsed (until now) "
       },
       {
         "fn": "getClaimingContractDistribution",

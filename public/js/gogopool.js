@@ -355,7 +355,7 @@ class GoGoPool {
       "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true,
       "0x624c4F9E55d2D1158fD5dee555C3bc8110b1E936": true,
     };
-    const INVESTOR_REWARDS_SHARE = 0.1;
+    const INVESTOR_REWARDS_SHARE = 0.2;
     const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount()];
 
     // Make 2 groups, investors and users. (do math in regular numbers)

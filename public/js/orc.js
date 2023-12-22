@@ -63,22 +63,23 @@ class Orc {
     return (this.txLogs || []).map((l) => {
       const body = JSON.parse(l.RialtoBody);
       const result = l.RialtoResult && JSON.parse(l.RialtoResult);
-      const out = pick(l, "SSID", "Nonce", "RialtoEndpoint");
+      const out = {};
       out.CreatedAt = DateTime.fromISO(l.CreatedAt).toRelative();
-      out.TxID = body?.TxID;
+      out.RialtoEndpoint = l.RialtoEndpoint;
+      out.Error = l?.ErrorMsg ? "❌" : "";
+      out.Nonce = l.Nonce;
       out.NodeID = body?.NodeID;
-      // out.SubmittedAt = l?.SubmittedAt?.toLocaleString(DateTime.DATETIME_SHORT);
+      out.TxID = body?.TxID || result?.TxID;
       out.ErrorMsg = l?.ErrorMsg;
       out.RialtoBody = { body: JSON.parse(l.RialtoBody) };
       out.RialtoResult = { result: l.RialtoResult && JSON.parse(l.RialtoResult) };
+      out.SSID = l.SSID;
       return out;
     });
   }
 
   refreshDataLoop(fn) {
     const poll = async () => {
-      // console.log("Polling for orc data");
-      // await this.fetchMinipools();
       await this.fetchTxLogs();
       fn();
       setTimeout(poll, 10000);

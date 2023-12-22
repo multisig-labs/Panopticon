@@ -26,7 +26,8 @@
 <script>
   const params = new URLSearchParams(document.location.search);
   if (params.get("apiToken")) {
-    ORC_AUTH_TOKEN = params.get("apiToken");
+    localStorage.setItem("apiToken", params.get("apiToken"));
   }
+  ORC_AUTH_TOKEN = localStorage.getItem("apiToken");
 </script>
 {{end}}

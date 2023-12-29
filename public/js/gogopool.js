@@ -8,20 +8,21 @@ import { minipoolsTransformer } from "/js/transformers.js";
 // Hard-code reward cycle amounts
 // Note we show the rewards for the *next* cycle amount
 const REWARDS_TOTAL_NODEOP_POOL_AMT = {
-  0: BigNumber.from("50629343838906640213406"),
-  1: BigNumber.from("50832782764109674639470"),
-  2: BigNumber.from("51037039147986861608379"),
-  3: BigNumber.from("51242116275252192212662"),
-  4: BigNumber.from("51448017443818301518451"),
-  5: BigNumber.from("51654745964849503381680"),
-  6: BigNumber.from("51862305162815038368864"),
-  7: BigNumber.from("52070698375542535638786"),
-  8: BigNumber.from("52279928954271689644796"),
-  9: BigNumber.from("52490000263708152520974"),
-  10: BigNumber.from("52700915682077643018745"),
-  11: BigNumber.from("52912678601180272864145"),
+  1: BigNumber.from("50629343838906640213406"),
+  2: BigNumber.from("50832782764109674639470"),
+  3: BigNumber.from("51037039147986861608379"),
+  4: BigNumber.from("51242116275252192212662"),
+  5: BigNumber.from("51448017443818301518451"),
+  6: BigNumber.from("51654745964849503381680"),
+  7: BigNumber.from("51862305162815038368864"),
+  8: BigNumber.from("52070698375542535638786"),
+  9: BigNumber.from("52279928954271689644796"),
+  10: BigNumber.from("52490000263708152520974"),
+  11: BigNumber.from("52700915682077643018745"),
+  12: BigNumber.from("52912678601180272864145"),
 };
 
+const REWARDS_CYCLE_DURATION = 2592000; // 30 days
 // Convert to eth
 for (const k in REWARDS_TOTAL_NODEOP_POOL_AMT) {
   REWARDS_TOTAL_NODEOP_POOL_AMT[k] =
@@ -225,6 +226,12 @@ class GoGoPool {
     return cycle.value.toNumber();
   }
 
+  rewardsCycleStartTime() {
+    const ctrct = this.dashboard.filter((r) => r.contract === "RewardsPool")[0];
+    const cycle = ctrct.metrics.filter((r) => r.fn === "getRewardsCycleStartTime")[0];
+    return cycle.value.toNumber();
+  }
+
   // Reformat data shape to fit Tabulator table
   dashboardAsTabulatorData() {
     this.dashboardData = [];
@@ -266,12 +273,18 @@ class GoGoPool {
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
     await this.until((_) => this.isLoaded);
 
+    const rewardsCycleStartTime = (await this.contracts.RewardsPool.contract.getRewardsCycleStartTime()).toNumber();
+    const rewardsCycleEndTime = rewardsCycleStartTime + REWARDS_CYCLE_DURATION;
+
     let allStakers = await this.contracts.Staking.contract.getStakers(0, 0);
     allStakers = allStakers.map(unfuckEthersObj);
-    console.log("allStakers", allStakers);
+    // console.log("allStakers", allStakers);
 
+    // Filter out people not running minipools at all
     let eligibleStakers = allStakers.filter((s) => s.rewardsStartTime > 0 && s.avaxValidatingHighWater > 0);
-    // console.log("eligibleStakers (pre enrichment)", eligibleStakers);
+    // Calc eligibility based on if they *will* be eligible for the next cycle
+    eligibleStakers.forEach((s) => (s.isEligible = rewardsCycleEndTime - s.rewardsStartTime >= REWARDS_CYCLE_DURATION));
+    console.log("eligibleStakers (pre enrichment)", eligibleStakers);
 
     // Define similiar structure as used in dashboard.js. Consolidate somehow, someday.
     const ethAsFloat = (v) => parseFloat(ethersUtils.formatEther(v || 0));
@@ -288,10 +301,6 @@ class GoGoPool {
       {
         contract: "TokenGGP",
         metrics: [{ fn: "balanceOf", formatter: ethAsFloat }],
-      },
-      {
-        contract: "ClaimNodeOp",
-        metrics: [{ fn: "isEligible" }],
       },
     ];
 
@@ -323,10 +332,7 @@ class GoGoPool {
       }
     }
 
-    console.log("results", results);
-
     const metrics = enrichments.map((e) => e.metrics).flat();
-    console.log(metrics);
 
     // Now add the results of the batch to each staker
     const idFn = (v) => v;
@@ -338,12 +344,13 @@ class GoGoPool {
       });
     }
 
-    console.log("eligibleStakers", eligibleStakers);
-
     // So, I still want to show recently created minipool owners in the list, but since they are not yet eligible
     // we will nerf their rewards to zero
     eligibleStakers.forEach((s) => {
+      // If they were eligible by time but their collat ratio is < 10%, then set them to not eligible
+      if (s.getCollateralizationRatio < 0.1) s.isEligible = false;
       if (!s.isEligible) {
+        console.log("notEligible", s);
         s.getEffectiveGGPStaked = 0;
         s.getEffectiveRewardsRatio = 0;
       }
@@ -363,27 +370,40 @@ class GoGoPool {
     const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);
     const users = eligibleStakers.filter((s) => !INVESTOR_ADDRS[s.stakerAddr]);
 
-    // Investors share 10% of rewards pie
+    // Investors share INVESTOR_REWARDS_SHARE % of rewards pie
     const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     investors.map((s) => {
       s.ggpInvestorRewardsPoolPct = s.getEffectiveGGPStaked / investorTotalGGPStaked;
       s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
       s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
+      s.ggpReqToMax = 0; // N/A to investors
     });
 
-    // Users share 90% of rewards pie
+    // Users share remainder of rewards pie
     const userTotalGGPStaked = users.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     users.map((s) => {
       s.ggpUserRewardsPoolPct = s.getEffectiveGGPStaked / userTotalGGPStaked;
       s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
       s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
+      // Lets calc how much GGP they would need to buy to max out rewards
+      s.ggpReqToMax = 0;
+      if (s.getCollateralizationRatio < 1.5) {
+        s.ggpReqToMax = s.ggpStaked * (1.5 / s.getCollateralizationRatio) - s.ggpStaked - s.balanceOf - s.ggpRewards;
+        if (s.ggpReqToMax < 0) s.ggpReqToMax = 0;
+      }
     });
+
+    console.log("eligibleStakers (post-enrichment)", eligibleStakers);
 
     const totalRewardsCheck = eligibleStakers.reduce((acc, s) => acc + s.ggpRewardsPoolAmt, 0);
     console.log("totalRewardsCheck", totalRewardsCheck);
 
     this.stakersData = eligibleStakers;
     return this.stakersData;
+  }
+
+  buyPressure() {
+    return this.stakersData.reduce((acc, s) => acc + s.ggpReqToMax, 0);
   }
 
   stakersAsTabulatorData() {

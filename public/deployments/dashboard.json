@@ -158,6 +158,7 @@
         "fn": "balanceOf",
         "args": ["MinipoolManager"],
         "title": "MinipoolManager Balance (AVAX)",
+        "desc": "Includes 'withdrawable' and 'pending' minipool funds",
         "formatter": "formatEther"
       },
       {

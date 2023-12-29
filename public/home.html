@@ -34,7 +34,8 @@
   ⚠️ These numbers are all estimates of next cycle's rewards, based on the information in the smart contracts, and may
   not be accurate.
   <br />
-  Not Financial Advice, Do Your Own Research, WAGMI.
+  GGP buys required to get everyone to 150% collateralization ratio: <span id="buy-pressure"></span><br />
+  Not Financial Advice, Do Your Own Research, WAGMI.<br />
 </div>
 
 <div class="container w-95 text-center border border-5 rounded mb-4 pb-4">
@@ -102,6 +103,10 @@
     .addEventListener("click", () => tableMinipools.download("csv", "GoGoPool_Minipools.csv"));
 
   GGP.refreshDataLoop(() => {
+    document.getElementById("buy-pressure").innerHTML = GGP.buyPressure().toLocaleString(undefined, {
+      maximumFractionDigits: 0,
+    });
+
     tableDashboard.blockRedraw();
     tableMinipools.blockRedraw();
     tableStakers.blockRedraw();

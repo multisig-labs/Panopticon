@@ -16,8 +16,8 @@ async function fixupMinipool(obj) {
 
   obj.errorCode = formatters.formatErrorMsg(obj.errorCode);
 
-  if (obj.endTime === 0 && obj.startTime !== 0) {
-    obj.endTime = obj.startTime + obj.duration;
+  if (obj.endTime === 0 && obj.initialStartTime !== 0) {
+    obj.endTime = obj.initialStartTime + obj.duration;
   }
 
   if (obj.startTime !== 0) {

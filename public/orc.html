@@ -10,9 +10,12 @@
 </div>
 
 <div class="container w-95 border border-5 rounded pb-3">
-  <h3 class="text-center">
-    Orchestrator <i class="bi bi-info-square" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
-  </h3>
+  <div class="position-relative">
+    <div class="position-absolute top-0 end-0" id="wallet"></div>
+    <h3 class="text-center">
+      Orchestrator <i class="bi bi-info-square" data-bs-toggle="modal" data-bs-target="#infoModal"></i>
+    </h3>
+  </div>
   <div id="jsoneditor"></div>
   <!-- <div id="orc" class="text-center"><div class="loader">Loading...</div></div> -->
 </div>
@@ -56,6 +59,7 @@
   async function initData() {
     ORC = new Orc(DEPLOYMENT);
     await ORC.fetchInfo();
+    await ORC.fetchWallet();
     // await ORC.fetchMinipools();
   }
 
@@ -85,6 +89,7 @@
   ORC.refreshDataLoop(() => {
     // tableMinipools.updateOrAddData(ORC.minipoolsAsTabulatorData());
     editor.update({ json: ORC.txLogsAsJson() });
+    document.getElementById("wallet").innerHTML = ORC.walletInfoLine();
   });
 </script>
 {{end}}

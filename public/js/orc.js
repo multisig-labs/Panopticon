@@ -7,11 +7,25 @@ class Orc {
   minipools;
   info;
   txLogs;
+  wallet;
 
   constructor({ orcURL = this.required() }) {
     Object.assign(this, {
       orcURL,
     });
+  }
+
+  async fetchWallet() {
+    const response = await fetch(`${this.orcURL}/wallet`, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        Authorization: `Basic ${btoa(`admin:${ORC_AUTH_TOKEN}`)}`,
+        "User-Agent": "Panopticon",
+      },
+    }).then((res) => res.json());
+    this.wallet = response;
+    return this.wallet;
   }
 
   async fetchMinipools() {
@@ -58,6 +72,16 @@ class Orc {
     return this.minipools;
   }
 
+  walletInfoLine() {
+    let cp = "";
+    if (this.wallet.balance.C2P + this.wallet.balance.P2C > 0) {
+      cp = `<br />C2P: ${this.wallet.balance.C2P} P2C: ${this.wallet.balance.P2C}`;
+    }
+    return `C: ${formatters.formatAmount(this.wallet.displayBalance.C)} P: ${formatters.formatAmount(
+      this.wallet.displayBalance.P
+    )} ${cp}`;
+  }
+
   txLogsAsJson() {
     var now = DateTime.now();
     return (this.txLogs || []).map((l) => {
@@ -81,6 +105,7 @@ class Orc {
   refreshDataLoop(fn) {
     const poll = async () => {
       await this.fetchTxLogs();
+      await this.fetchWallet();
       fn();
       setTimeout(poll, 10000);
     };

@@ -130,6 +130,7 @@
         { field: "owner", type: "like", value: valueEl.value },
       ],
     ]);
+    tableStakers.setFilter([[{ field: "stakerAddr", type: "like", value: valueEl.value }]]);
   }
 
   //Update filters on value change

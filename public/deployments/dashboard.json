@@ -106,15 +106,19 @@
   {
     "contract": "TokenggAVAX",
     "metrics": [
-      { "fn": "totalAssets", "desc": "", "formatter": "formatEther" },
-      { "fn": "lastSync", "desc": null, "formatter": "unixToISO" },
-      { "fn": "rewardsCycleEnd", "desc": null, "formatter": "unixToISO" },
-      { "fn": "lastRewardsAmt", "desc": null, "formatter": "formatEther" },
-      { "fn": "totalReleasedAssets", "desc": null, "formatter": "formatEther" },
-      { "fn": "stakingTotalAssets", "desc": null, "formatter": "formatEther" },
+      { "fn": "rewardsCycleEnd", "desc": "", "formatter": "unixToISO" },
+      { "fn": "lastSync", "desc": "", "formatter": "unixToISO" },
+      { "fn": "lastRewardsAmt", "desc": "AVAX yield for last cycle", "formatter": "formatEther" },
+      { "fn": "totalAssets", "desc": "Total AVAX deposited into contract", "formatter": "formatEther" },
+      {
+        "fn": "totalReleasedAssets",
+        "desc": "AVAX available (yield streams over 14 days)",
+        "formatter": "formatEther"
+      },
+      { "fn": "stakingTotalAssets", "desc": "AVAX staked to validators and earning yield", "formatter": "formatEther" },
       {
         "fn": "amountAvailableForStaking",
-        "desc": null,
+        "desc": "AVAX float avail for new minipools or redemption",
         "formatter": "formatEther"
       }
     ]

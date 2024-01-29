@@ -274,16 +274,24 @@ class GoGoPool {
     await this.until((_) => this.isLoaded);
 
     const rewardsCycleStartTime = (await this.contracts.RewardsPool.contract.getRewardsCycleStartTime()).toNumber();
+    const rewardsCutoffTime = rewardsCycleStartTime + REWARDS_CYCLE_DURATION / 2;
     const rewardsCycleEndTime = rewardsCycleStartTime + REWARDS_CYCLE_DURATION;
 
     let allStakers = await this.contracts.Staking.contract.getStakers(0, 0);
     allStakers = allStakers.map(unfuckEthersObj);
-    // console.log("allStakers", allStakers);
 
-    // Filter out people not running minipools at all
-    let eligibleStakers = allStakers.filter((s) => s.rewardsStartTime > 0 && s.avaxValidatingHighWater > 0);
+    // if (stakerStartTime < cutoffDate && highWater > 0n && collatRatio > Tenth) {
+    //   eligibility = "eligible";
+    // } else if (stakerStartTime < cutoffDate && highWater === 0n && collatRatio > Tenth) {
+    //   eligibility = "pending_launch";
+    // } else {
+    //   eligibility = "not_eligible";
+    // }
+
+    // Filter out stakers who have never run a minipool
+    let eligibleStakers = allStakers.filter((s) => s.rewardsStartTime > 0);
     // Calc eligibility based on if they *will* be eligible for the next cycle
-    eligibleStakers.forEach((s) => (s.isEligible = rewardsCycleEndTime - s.rewardsStartTime >= REWARDS_CYCLE_DURATION));
+    eligibleStakers.forEach((s) => (s.isEligible = s.rewardsStartTime <= rewardsCutoffTime));
     console.log("eligibleStakers (pre enrichment)", eligibleStakers);
 
     // Define similiar structure as used in dashboard.js. Consolidate somehow, someday.
@@ -346,6 +354,7 @@ class GoGoPool {
 
     // So, I still want to show recently created minipool owners in the list, but since they are not yet eligible
     // we will nerf their rewards to zero
+    // Also, we are assuming all prelaunch minipools will launch by rewards time
     eligibleStakers.forEach((s) => {
       // If they were eligible by time but their collat ratio is < 10%, then set them to not eligible
       if (s.getCollateralizationRatio < 0.1) s.isEligible = false;
@@ -357,33 +366,14 @@ class GoGoPool {
     });
 
     // REWARDS CALCULATIONS
-    // Should probably extract this to a generic JS class for reuse
 
-    const INVESTOR_ADDRS = {
-      "0xFE5200De605AdCB6306F4CDed77f9A8D9FD47127": true,
-      "0x624c4F9E55d2D1158fD5dee555C3bc8110b1E936": true,
-    };
-    const INVESTOR_REWARDS_SHARE = 0.2;
     const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount() + 1]; // look forward to next cycle
 
-    // Make 2 groups, investors and users. (do math in regular numbers)
-    const investors = eligibleStakers.filter((s) => INVESTOR_ADDRS[s.stakerAddr]);
-    const users = eligibleStakers.filter((s) => !INVESTOR_ADDRS[s.stakerAddr]);
-
-    // Investors share INVESTOR_REWARDS_SHARE % of rewards pie
-    const investorTotalGGPStaked = investors.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
-    investors.map((s) => {
-      s.ggpInvestorRewardsPoolPct = s.getEffectiveGGPStaked / investorTotalGGPStaked;
-      s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * INVESTOR_REWARDS_SHARE * s.ggpInvestorRewardsPoolPct;
-      s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
-      s.ggpReqToMax = 0; // N/A to investors
-    });
-
     // Users share remainder of rewards pie
-    const userTotalGGPStaked = users.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
-    users.map((s) => {
+    const userTotalGGPStaked = eligibleStakers.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
+    eligibleStakers.map((s) => {
       s.ggpUserRewardsPoolPct = s.getEffectiveGGPStaked / userTotalGGPStaked;
-      s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * (1 - INVESTOR_REWARDS_SHARE) * s.ggpUserRewardsPoolPct;
+      s.ggpRewardsPoolAmt = REWARDS_POOL_AMT * s.ggpUserRewardsPoolPct;
       s.ggpRewardsPoolPct = s.ggpRewardsPoolAmt / REWARDS_POOL_AMT;
       // Lets calc how much GGP they would need to buy to max out rewards
       s.ggpReqToMax = 0;

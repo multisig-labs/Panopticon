@@ -429,21 +429,7 @@ const stakersDef = {
       width: 70,
     },
     {
-      title: "GGP Investor Rwrds Pool Pct",
-      field: "ggpInvestorRewardsPoolPct",
-      formatter: formatPct,
-      headerWordWrap: true,
-      width: 80,
-    },
-    {
-      title: "GGP User Rwrds Pool Pct",
-      field: "ggpUserRewardsPoolPct",
-      formatter: formatPct,
-      headerWordWrap: true,
-      width: 80,
-    },
-    {
-      title: "GGP Total Rwrds Pool Pct",
+      title: "GGP Rwrds Pool Pct",
       field: "ggpRewardsPoolPct",
       formatter: formatPct,
       headerWordWrap: true,

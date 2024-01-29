@@ -515,7 +515,7 @@ const stakersDef = {
       formatter: formatUnixTime,
       accessor: accessUnixTime,
       headerWordWrap: true,
-      width: 75,
+      width: 150,
     },
   ],
 };

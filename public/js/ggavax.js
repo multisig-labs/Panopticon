@@ -1,5 +1,6 @@
 class ggAVAX {
   currentDelegations;
+  wavaxBalance;
 
   constructor() {}
 
@@ -18,9 +19,24 @@ class ggAVAX {
     return this.currentDelegations;
   }
 
+  async fetchWavaxBalance() {
+    const response = await fetch(
+      `https://glacier-api.avax.network/v1/chains/43114/addresses/0xA25EaF2906FA1a3a13EdAc9B9657108Af7B703e3/balances:listErc20?pageSize=10&contractAddresses=0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7&currency=usd`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    ).then((res) => res.json());
+    this.wavaxBalance = response.erc20TokenBalances[0].balance;
+    return this.wavaxBalance;
+  }
+
   refreshDataLoop(fn) {
     const poll = async () => {
       await this.fetchCurrentDelegations();
+      await this.fetchWavaxBalance();
       fn();
       setTimeout(poll, 30000);
     };

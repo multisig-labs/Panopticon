@@ -232,6 +232,10 @@ class GoGoPool {
     return cycle.value.toNumber();
   }
 
+  dashboardValue(contract, metric) {
+    return this.dashboard.find((obj) => obj.contract === contract).metrics.find((obj) => obj.fn === metric).rawValue;
+  }
+
   // Reformat data shape to fit Tabulator table
   dashboardAsTabulatorData() {
     this.dashboardData = [];

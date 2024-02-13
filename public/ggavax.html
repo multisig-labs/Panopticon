@@ -17,6 +17,8 @@
 <div class="container w-95 border border-5 rounded pb-3">
   <h3 class="text-center">ggAVAX Stats</h3>
   <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
+  <div>WAVAX Balance: <span id="wavax-balance"></span></div>
+  <div>Next Rewards Amt: <span id="next-rewards-amt"></span></div>
 </div>
 
 <style>
@@ -30,17 +32,21 @@
 </style>
 
 <script type="module">
+  import { utils as ethersUtils, BigNumber } from "https://esm.sh/ethers@5.7.2";
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { GoGoPool } from "/js/gogopool.js";
   import { ggAVAX } from "/js/ggavax.js";
   import { ggAVAXDef, ggAVAXStatsDef } from "/js/tabulator.js";
+  import { formatters } from "/js/utils.js";
+
   let GGAVAX, GGP;
 
   async function initData() {
     GGP = new GoGoPool(DEPLOYMENT);
     GGAVAX = new ggAVAX(DEPLOYMENT);
     await GGP.fetchContracts();
-    await Promise.all([GGP.fetchDashboardData(), GGAVAX.fetchCurrentDelegations()]);
+    await Promise.all([GGP.fetchDashboardData(), GGAVAX.fetchCurrentDelegations(), GGAVAX.fetchWavaxBalance()]);
+    console.log(GGP.dashboard);
   }
 
   await initData();
@@ -49,6 +55,10 @@
 
   GGAVAX.refreshDataLoop(() => {
     tableCurrentDelegations.updateOrAddData(GGAVAX.currentDelegations);
+    const wavaxEl = document.getElementById("wavax-balance");
+    wavaxEl.innerHTML = formatters.formatEther(GGAVAX.wavaxBalance);
+    const nextRewardsAmtEl = document.getElementById("next-rewards-amt");
+    nextRewardsAmtEl.innerHTML = formatters.formatEther(calcNextRewardAmt());
   });
 
   const tableStats = new Tabulator("#ggavax-stats", ggAVAXStatsDef);
@@ -57,6 +67,18 @@
     // Reusing the GGP data, but just grabbing what we want for this page
     const data = GGP.dashboardAsTabulatorData().filter((obj) => obj.contract === "TokenggAVAX");
     tableStats.updateOrAddData(data);
+    const x = calcNextRewardAmt();
+    console.log(x);
   });
+
+  // Ugh lame figure out better way
+  function calcNextRewardAmt() {
+    // 		uint256 nextRewardsAmt = (asset.balanceOf(address(this)) + stakingTotalAssets_) - totalReleasedAssets_ - lastRewardsAmt_;
+    const stakingTotalAssets = GGP.dashboardValue("TokenggAVAX", "stakingTotalAssets");
+    const totalReleasedAssets = GGP.dashboardValue("TokenggAVAX", "totalReleasedAssets");
+    const lastRewardsAmt = GGP.dashboardValue("TokenggAVAX", "lastRewardsAmt");
+
+    return BigNumber.from(GGAVAX.wavaxBalance).add(stakingTotalAssets).sub(totalReleasedAssets).sub(lastRewardsAmt);
+  }
 </script>
 {{end}}

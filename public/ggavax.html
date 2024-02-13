@@ -46,7 +46,6 @@
     GGAVAX = new ggAVAX(DEPLOYMENT);
     await GGP.fetchContracts();
     await Promise.all([GGP.fetchDashboardData(), GGAVAX.fetchCurrentDelegations(), GGAVAX.fetchWavaxBalance()]);
-    console.log(GGP.dashboard);
   }
 
   await initData();

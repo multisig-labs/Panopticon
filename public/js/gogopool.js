@@ -4,6 +4,7 @@ import { utils as ethersUtils, providers, Contract, constants, BigNumber } from 
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
 import { MINIPOOL_STATUS_MAP, formatters, transformerFns, unfuckEthersObj } from "/js/utils.js";
 import { minipoolsTransformer } from "/js/transformers.js";
+import { DateTime } from "https://esm.sh/luxon@3.3.0";
 
 // Hard-code reward cycle amounts
 // Note we show the rewards for the *next* cycle amount
@@ -272,6 +273,43 @@ class GoGoPool {
 
   minipoolsAsTabulatorData() {
     return this.minipoolsData;
+  }
+
+  launchCapacityData() {
+    const ignoreNodes = {
+      "NodeID-2wWroHMggzJvKh6t3tdPtJTTP9DNmdc4K": true,
+      "NodeID-LUhB7mVaTMnkYLQsqf2RV2PUerJfsq2wW": true,
+      "NodeID-LXpULpbU1A4AobEzCSBy6wYLEbogwsMK1": true,
+      "NodeID-GpDhyVHYVaL8qXFB2a1QPBsXyUMZjiXLF": true,
+    };
+    const now = DateTime.now().startOf("day") / 1000;
+    let stakingMPs = this.minipoolsData.filter(
+      (mp) =>
+        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7
+    );
+    stakingMPs = stakingMPs.map((mp) => {
+      return {
+        date: DateTime.fromSeconds(mp.endTime),
+        value: 1,
+      };
+    });
+
+    // Add an element for each mp we could launch right now
+    const amtAvail = parseFloat(
+      this.dashboardAsTabulatorData().filter(
+        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking"
+      )[0].value
+    );
+    const mpAvail = Math.floor(amtAvail / 1000);
+    // console.log(mpAvail);
+    for (let i = 0; i < mpAvail; i++) {
+      stakingMPs.push({
+        date: DateTime.fromSeconds(now),
+        value: 1,
+      });
+    }
+    // console.log(stakingMPs);
+    return stakingMPs;
   }
 
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {

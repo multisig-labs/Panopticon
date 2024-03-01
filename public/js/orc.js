@@ -55,7 +55,7 @@ class Orc {
   }
 
   async fetchTxLogs() {
-    const response = await fetch(`${this.orcURL}/all_tx_logs?limit=100`, {
+    const response = await fetch(`${this.orcURL}/all_tx_logs?limit=300`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

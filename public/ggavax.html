@@ -15,6 +15,11 @@
 </div>
 <br />
 <div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">ggAVAX MEV</h3>
+  <div id="mev" class="text-center"><div class="loader">Loading...</div></div>
+</div>
+<br />
+<div class="container w-95 border border-5 rounded pb-3">
   <h3 class="text-center">ggAVAX Stats</h3>
   <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
   <div>WAVAX Balance: <span id="wavax-balance"></span></div>
@@ -36,7 +41,7 @@
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { GoGoPool } from "/js/gogopool.js";
   import { ggAVAX } from "/js/ggavax.js";
-  import { ggAVAXDef, ggAVAXStatsDef } from "/js/tabulator.js";
+  import { ggAVAXDef, ggAVAXStatsDef, ggAVAXMEVDef } from "/js/tabulator.js";
   import { formatters } from "/js/utils.js";
 
   let GGAVAX, GGP;
@@ -45,15 +50,28 @@
     GGP = new GoGoPool(DEPLOYMENT);
     GGAVAX = new ggAVAX(DEPLOYMENT);
     await GGP.fetchContracts();
-    await Promise.all([GGP.fetchDashboardData(), GGAVAX.fetchCurrentDelegations(), GGAVAX.fetchWavaxBalance()]);
+    await Promise.all([
+      GGP.fetchDashboardData(),
+      GGAVAX.fetchCurrentDelegations(),
+      GGAVAX.fetchCurrentMEV(),
+      GGAVAX.fetchWavaxBalance(),
+    ]);
   }
 
   await initData();
 
   const tableCurrentDelegations = new Tabulator("#ggavax", ggAVAXDef);
+  const tableCurrentMEV = new Tabulator("#mev", ggAVAXMEVDef);
 
   GGAVAX.refreshDataLoop(() => {
-    tableCurrentDelegations.updateOrAddData(GGAVAX.currentDelegations);
+    if (GGAVAX.currentDelegations && GGAVAX.currentDelegations.length > 0) {
+      tableCurrentDelegations.updateOrAddData(GGAVAX.currentDelegations);
+    }
+
+    if (GGAVAX.currentMEV && GGAVAX.currentMEV.length > 0) {
+      tableCurrentMEV.updateOrAddData(GGAVAX.currentMEV);
+    }
+
     const wavaxEl = document.getElementById("wavax-balance");
     wavaxEl.innerHTML = formatters.formatEther(GGAVAX.wavaxBalance);
     const nextRewardsAmtEl = document.getElementById("next-rewards-amt");

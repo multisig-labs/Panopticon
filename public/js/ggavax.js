@@ -1,13 +1,15 @@
 class ggAVAX {
   currentDelegations;
+  currentMEV;
   wavaxBalance;
 
   constructor() {}
 
   async fetchCurrentDelegations() {
-    const timestamp = Math.floor(Date.now() / 1000);
+    const startTimestamp = Math.floor(Date.now() / 1000) - 15 * 24 * 60 * 60;
+    const endTimestamp = Math.floor(Date.now() / 1000);
     const response = await fetch(
-      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddDelegatorTx&startTimestamp=1&endTimestamp=${timestamp}&pageSize=100`,
+      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddDelegatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100`,
       {
         headers: {
           Accept: "application/json",
@@ -17,6 +19,27 @@ class ggAVAX {
     ).then((res) => res.json());
     this.currentDelegations = response.transactions;
     return this.currentDelegations;
+  }
+
+  async fetchCurrentMEV() {
+    const startTimestamp = Math.floor(Date.now() / 1000) - 15 * 24 * 60 * 60;
+    const endTimestamp = Math.floor(Date.now() / 1000);
+    const url = (nextPageParamAndToken) =>
+      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddValidatorTx&txTypes=AddPermissionlessValidatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100${nextPageParamAndToken}`;
+
+    const txs = [];
+    let nextPageParamAndToken = "";
+    let i = 0;
+    do {
+      const response = await fetch(url(nextPageParamAndToken)).then((res) => res.json());
+      txs.push(...response.transactions);
+      nextPageParamAndToken = response.nextPageToken ? `&pageToken=${response.nextPageToken}` : "";
+      i++;
+    } while (nextPageParamAndToken && i < 10);
+
+    // MEV Nodes run 14 days
+    this.currentMEV = txs.filter((t) => t.endTimestamp - t.startTimestamp === 14 * 24 * 60 * 60);
+    return this.currentMEV;
   }
 
   async fetchWavaxBalance() {

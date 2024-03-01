@@ -115,6 +115,28 @@ const ggAVAXStatsDef = {
   ],
 };
 
+const ggAVAXMEVDef = {
+  data: [], // Filled in later by JS
+  index: "startTimestamp",
+  height: 300, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  groupBy: 1,
+  groupHeader: function (value, count, data, group) {
+    return `Validating<span style="color:#00d; margin-left:10px;"">(${count} nodes)</span>`;
+  },
+  initialSort: [{ column: "endTimestamp", dir: "asc" }],
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
+    { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
+  ],
+};
+
 // Definitions for Tabulator tables
 const pandasiaDef = {
   data: [], // Filled in later by JS
@@ -530,6 +552,7 @@ export {
   contractsDef,
   ggAVAXDef,
   ggAVAXStatsDef,
+  ggAVAXMEVDef,
   pandasiaDef,
   pandasiaAirdropsDef,
   pandasiaUsersDef,

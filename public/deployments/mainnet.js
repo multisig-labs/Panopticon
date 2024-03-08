@@ -20,7 +20,7 @@ const deployment = {
 };
 
 async function deploymentFn() {
-  deployment.contracts = await fetch("/deployments/contracts.json").then((res) => res.json());
+  deployment.contracts = await fetch("/deployments/contracts-mainnet.json").then((res) => res.json());
   deployment.dashboard = await fetch("/deployments/dashboard.json").then((res) => res.json());
   return deployment;
 }

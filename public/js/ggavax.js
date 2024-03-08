@@ -37,8 +37,8 @@ class ggAVAX {
       i++;
     } while (nextPageParamAndToken && i < 10);
 
-    // MEV Nodes run 14 days
-    this.currentMEV = txs.filter((t) => t.endTimestamp - t.startTimestamp === 14 * 24 * 60 * 60);
+    // MEV Nodes run 337 hours
+    this.currentMEV = txs.filter((t) => t.endTimestamp - t.startTimestamp <= 337 * 60 * 60);
     return this.currentMEV;
   }
 

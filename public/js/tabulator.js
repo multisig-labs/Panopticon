@@ -266,6 +266,11 @@ const minipoolsDef = {
     if (data.ggpSlashAmt > 0) {
       row.getElement().style.backgroundColor = "#ff0000bf";
     }
+    if (data.blsPubkeyAndSig === "0x") {
+      if (/y|1/.test(window.localStorage.getItem("devmode"))) {
+        row.getElement().style.backgroundColor = "#e0dd06";
+      }
+    }
   },
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
@@ -395,6 +400,18 @@ const minipoolsDef = {
       field: "startTime",
       formatter: formatUnixTime,
       accessor: accessUnixTime,
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "BLSPubkey",
+      field: "blsPubkey",
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "BLSSig",
+      field: "blsSig",
       minWidth: 5000,
       responsive: 9,
     },

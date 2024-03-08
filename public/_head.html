@@ -30,6 +30,9 @@
   if (params.get("apiToken")) {
     localStorage.setItem("apiToken", params.get("apiToken"));
   }
+  if (params.get("devmode")) {
+    localStorage.setItem("devmode", params.get("devmode"));
+  }
   ORC_AUTH_TOKEN = localStorage.getItem("apiToken");
 </script>
 {{end}}

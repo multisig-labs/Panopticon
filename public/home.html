@@ -134,6 +134,8 @@
     tableMinipools.setFilter([
       [
         { field: "nodeID", type: "like", value: valueEl.value },
+        { field: "nodeAddr", type: "like", value: valueEl.value },
+        { field: "BLSPubkey", type: "like", value: valueEl.value },
         { field: "owner", type: "like", value: valueEl.value },
       ],
     ]);

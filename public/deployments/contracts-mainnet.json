@@ -420,8 +420,68 @@
       },
       {
         "inputs": [],
+        "name": "OnlyRole",
+        "type": "error"
+      },
+      {
+        "inputs": [],
         "name": "WithdrawAmountTooLarge",
         "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "WithdrawForDelegationDisabled",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
+          }
+        ],
+        "name": "BLSKeysAdded",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "rewardsAmount",
+            "type": "uint256"
+          }
+        ],
+        "name": "DepositFromDelegation",
+        "type": "event"
       },
       {
         "anonymous": false,
@@ -459,6 +519,25 @@
           }
         ],
         "name": "MinipoolStatusChanged",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "WithdrawForDelegation",
         "type": "event"
       },
       {
@@ -564,9 +643,70 @@
             "internalType": "uint256",
             "name": "avaxAssignmentRequest",
             "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
           }
         ],
         "name": "createMinipool",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "delegationFee",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "avaxAssignmentRequest",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
+          }
+        ],
+        "name": "createMinipoolOnBehalfOf",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "rewards",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          }
+        ],
+        "name": "depositFromDelegation",
         "outputs": [],
         "stateMutability": "payable",
         "type": "function"
@@ -675,6 +815,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
               },
               {
                 "internalType": "bytes32",
@@ -796,6 +941,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
               },
               {
                 "internalType": "bytes32",
@@ -940,6 +1090,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
               },
               {
                 "internalType": "bytes32",
@@ -1121,6 +1276,43 @@
         "type": "function"
       },
       {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          }
+        ],
+        "name": "requireValidMinipool",
+        "outputs": [
+          {
+            "internalType": "int256",
+            "name": "",
+            "type": "int256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
+          }
+        ],
+        "name": "setBLSKeys",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
         "inputs": [],
         "name": "version",
         "outputs": [
@@ -1136,6 +1328,24 @@
       {
         "inputs": [
           {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          }
+        ],
+        "name": "withdrawForDelegation",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
             "internalType": "address",
             "name": "nodeID",
             "type": "address"
@@ -1144,6 +1354,367 @@
         "name": "withdrawMinipoolFunds",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "withdrawRewardsAndRelaunchMinipool",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
+  "MinipoolStreamliner": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "contract Storage",
+            "name": "storageAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "WAVAX",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "TJRouter",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "ContractNotFound",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MismatchedFunds",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardian",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardianOrValidContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeMultisig",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "NotApprovedHardwareProvider",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "OnlyOwner",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "SwapFailed",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "hardwareProviderContract",
+            "type": "address"
+          }
+        ],
+        "name": "MinipoolRelaunched",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "hardwareProviderContract",
+            "type": "address"
+          }
+        ],
+        "name": "NewStreamlinedMinipoolMade",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "nodeID",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "duration",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForMinipool",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForGGP",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minGGPAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForNodeRental",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minUSDCAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "bestRate",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "withdrawalRightWaiver",
+                "type": "bool"
+              },
+              {
+                "internalType": "address",
+                "name": "hardwareProviderContract",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "hardwareProviderInformation",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct MinipoolStreamliner.StreamlinedMinipool",
+            "name": "newMinipool",
+            "type": "tuple"
+          }
+        ],
+        "name": "createOrRelaunchStreamlinedMinipool",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "nodeID",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "duration",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForMinipool",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForGGP",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minGGPAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForNodeRental",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minUSDCAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "bestRate",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "withdrawalRightWaiver",
+                "type": "bool"
+              },
+              {
+                "internalType": "address",
+                "name": "hardwareProviderContract",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "hardwareProviderInformation",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct MinipoolStreamliner.StreamlinedMinipool",
+            "name": "newMinipool",
+            "type": "tuple"
+          }
+        ],
+        "name": "createOrRelaunchStreamlinedMinipoolWithBLSKeys",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "contractAddress",
+            "type": "address"
+          }
+        ],
+        "name": "isApprovedHardwareProvider",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "receiveWithdrawalAVAX",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "avaxForGGP",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minGGPAmountOut",
+            "type": "uint256"
+          }
+        ],
+        "name": "swapAndStakeGGPOnBehalfOf",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "ggpPurchased",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "version",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       }
     ]
@@ -1560,6 +2131,209 @@
           }
         ],
         "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "OonodzHardwareProvider": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "wavax",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "usdc",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "tjRouter",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "ooNodz",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "SwapFailed",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
+          }
+        ],
+        "name": "HardwareRentedFromOonodz",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "receiver",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "name": "USDCRefunded",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes",
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "name": "decodeOonodzData",
+        "outputs": [
+          {
+            "internalType": "uint16",
+            "name": "countryOfResidence",
+            "type": "uint16"
+          },
+          {
+            "internalType": "bool",
+            "name": "withdrawalRightWaiver",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "bestRate",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minUSDCAmountOut",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokenID",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "nodeID",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "duration",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForMinipool",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForGGP",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minGGPAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForNodeRental",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "minUSDCAmountOut",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bool",
+                "name": "bestRate",
+                "type": "bool"
+              },
+              {
+                "internalType": "bool",
+                "name": "withdrawalRightWaiver",
+                "type": "bool"
+              },
+              {
+                "internalType": "address",
+                "name": "hardwareProviderContract",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "hardwareProviderInformation",
+                "type": "bytes"
+              }
+            ],
+            "internalType": "struct MinipoolStreamliner.StreamlinedMinipool",
+            "name": "newMinipool",
+            "type": "tuple"
+          }
+        ],
+        "name": "rentHardware",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "blsPubkeyAndSig",
+            "type": "bytes"
+          }
+        ],
+        "stateMutability": "payable",
         "type": "function"
       }
     ]
@@ -2042,6 +2816,43 @@
       },
       {
         "inputs": [],
+        "name": "getWithdrawForDelegationEnabled",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "roleName",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          }
+        ],
+        "name": "hasRole",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
         "name": "initialize",
         "outputs": [],
         "stateMutability": "nonpayable",
@@ -2118,6 +2929,42 @@
           }
         ],
         "name": "setExpectedAVAXRewardsRate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "roleName",
+            "type": "string"
+          },
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isEnabled",
+            "type": "bool"
+          }
+        ],
+        "name": "setRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bool",
+            "name": "b",
+            "type": "bool"
+          }
+        ],
+        "name": "setWithdrawForDelegationEnabled",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3279,6 +4126,24 @@
             "internalType": "uint256",
             "name": "amount",
             "type": "uint256"
+          }
+        ],
+        "name": "stakeGGPOnBehalfOf",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "stakerAddr",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
           },
           {
             "internalType": "uint256",
@@ -3286,7 +4151,7 @@
             "type": "uint256"
           }
         ],
-        "name": "stakeGGPOnBehalfOf",
+        "name": "stakeGGPOnBehalfOfWithLock",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -3799,6 +4664,458 @@
       }
     ]
   },
+  "Timelock": {
+    "abi": [
+      {
+        "inputs": [],
+        "name": "ExecutionFailed",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "Timelocked",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "TransactionNotFound",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "previousOwner",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          }
+        ],
+        "name": "TransactionAborted",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          }
+        ],
+        "name": "TransactionExecuted",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          }
+        ],
+        "name": "TransactionQueued",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          }
+        ],
+        "name": "abortTransaction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "name": "actions",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "eta",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes",
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "delay",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          }
+        ],
+        "name": "executeTransaction",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "target",
+            "type": "address"
+          },
+          {
+            "internalType": "bytes",
+            "name": "data",
+            "type": "bytes"
+          }
+        ],
+        "name": "queueTransaction",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newOwner",
+            "type": "address"
+          }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
+  "FixedPoint": {
+    "abi": [
+      {
+        "inputs": [],
+        "name": "Q112",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "RESOLUTION",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "TwapGGP": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "_pair",
+            "type": "address"
+          },
+          {
+            "internalType": "uint32",
+            "name": "_timePeriod",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "InsufficientElapsedTime",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "price",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          }
+        ],
+        "name": "GGPPriceUpdated",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "blockTimestampLast",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "currentBlockTimestamp",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "currentCumulativePrices",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "price0Cumulative",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "price1Cumulative",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint32",
+            "name": "blockTimestamp",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "contract IERC20",
+            "name": "srcToken",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "useSrcWrappers",
+            "type": "bool"
+          }
+        ],
+        "name": "getRateToEth",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "weightedRate",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "ggpSpotPriceInAVAX",
+        "outputs": [
+          {
+            "internalType": "uint144",
+            "name": "",
+            "type": "uint144"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "ggpTwapPriceInAVAX",
+        "outputs": [
+          {
+            "internalType": "uint144",
+            "name": "",
+            "type": "uint144"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "pair",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "price0Average",
+        "outputs": [
+          {
+            "internalType": "uint144",
+            "name": "",
+            "type": "uint144"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "price0CumulativeLast",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "timePeriod",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "update",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
   "Vault": {
     "abi": [
       {
@@ -4203,6 +5520,87 @@
         "name": "withdrawToken",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+      }
+    ]
+  },
+  "GGAVAXRateProvider": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "addr",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "getRate",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "ggAVAX",
+        "outputs": [
+          {
+            "internalType": "contract IggAVAX",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "IRateProvider": {
+    "abi": [
+      {
+        "inputs": [],
+        "name": "getRate",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "IggAVAX": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "shares",
+            "type": "uint256"
+          }
+        ],
+        "name": "convertToAssets",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
         "type": "function"
       }
     ]
@@ -5632,1332 +7030,6 @@
       {
         "stateMutability": "payable",
         "type": "receive"
-      }
-    ]
-  },
-  "Pandasia": {
-    "abi": [
-      {
-        "inputs": [],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "inputs": [],
-        "name": "AccessControlBadConfirmation",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "neededRole",
-            "type": "bytes32"
-          }
-        ],
-        "name": "AccessControlUnauthorizedAccount",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AddressAlreadyClaimed",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "target",
-            "type": "address"
-          }
-        ],
-        "name": "AddressEmptyCode",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          }
-        ],
-        "name": "AddressInsufficientBalance",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AddressNotEligible",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AirdropExpired",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AirdropNotStarted",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AirdropOutOfFunds",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AirdropStillActive",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "AirdropStillHasFunding",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "FailedInnerCall",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "InvalidAddress",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "InvalidAmount",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "InvalidInitialization",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "InvalidWithdrawRequest",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "NotInitializing",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "NotOwner",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          }
-        ],
-        "name": "OwnableInvalidOwner",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          }
-        ],
-        "name": "OwnableUnauthorizedAccount",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "PAddrAlreadyRegistered",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "PAddrNotInMerkleTree",
-        "type": "error"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "token",
-            "type": "address"
-          }
-        ],
-        "name": "SafeERC20FailedOperation",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "ZeroAmount",
-        "type": "error"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "uint64",
-            "name": "id",
-            "type": "uint64"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "claimant",
-            "type": "address"
-          }
-        ],
-        "name": "AirdropClaimed",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "uint64",
-            "name": "id",
-            "type": "uint64"
-          }
-        ],
-        "name": "AirdropCreated",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "uint64",
-            "name": "version",
-            "type": "uint64"
-          }
-        ],
-        "name": "Initialized",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "previousOwner",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "newOwner",
-            "type": "address"
-          }
-        ],
-        "name": "OwnershipTransferred",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "indexed": true,
-            "internalType": "bytes32",
-            "name": "previousAdminRole",
-            "type": "bytes32"
-          },
-          {
-            "indexed": true,
-            "internalType": "bytes32",
-            "name": "newAdminRole",
-            "type": "bytes32"
-          }
-        ],
-        "name": "RoleAdminChanged",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          }
-        ],
-        "name": "RoleGranted",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "sender",
-            "type": "address"
-          }
-        ],
-        "name": "RoleRevoked",
-        "type": "event"
-      },
-      {
-        "inputs": [],
-        "name": "AIRDROP_ADMIN",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "DEFAULT_ADMIN_ROLE",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "ROOT_UPDATER",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "airdropCount",
-        "outputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "name": "airdropIds",
-        "outputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          }
-        ],
-        "name": "airdrops",
-        "outputs": [
-          {
-            "internalType": "uint64",
-            "name": "id",
-            "type": "uint64"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "erc20",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "balance",
-            "type": "uint256"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "customRoot",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint256",
-            "name": "claimAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint64",
-            "name": "startsAt",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "expiresAt",
-            "type": "uint64"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "blockHeight",
-        "outputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "c2p",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "name": "cChainAddrs",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "cChainAddrsCount",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "cChainAddr",
-            "type": "address"
-          },
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "name": "canClaimAirdrop",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "name": "claimAirdrop",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          },
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "claimed",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          }
-        ],
-        "name": "deleteAirdrop",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          }
-        ],
-        "name": "emergencyWithdraw",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "feePct",
-        "outputs": [
-          {
-            "internalType": "uint32",
-            "name": "",
-            "type": "uint32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint256",
-            "name": "fundAmount",
-            "type": "uint256"
-          }
-        ],
-        "name": "fundAirdrop",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          }
-        ],
-        "name": "getAirdrop",
-        "outputs": [
-          {
-            "components": [
-              {
-                "internalType": "uint64",
-                "name": "id",
-                "type": "uint64"
-              },
-              {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
-                "name": "erc20",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "balance",
-                "type": "uint256"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "customRoot",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "uint256",
-                "name": "claimAmount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint64",
-                "name": "startsAt",
-                "type": "uint64"
-              },
-              {
-                "internalType": "uint64",
-                "name": "expiresAt",
-                "type": "uint64"
-              }
-            ],
-            "internalType": "struct Pandasia.Airdrop",
-            "name": "",
-            "type": "tuple"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          }
-        ],
-        "name": "getAirdropIds",
-        "outputs": [
-          {
-            "internalType": "uint64[]",
-            "name": "",
-            "type": "uint64[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "offset",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "limit",
-            "type": "uint64"
-          }
-        ],
-        "name": "getAirdrops",
-        "outputs": [
-          {
-            "components": [
-              {
-                "internalType": "uint64",
-                "name": "id",
-                "type": "uint64"
-              },
-              {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
-                "name": "erc20",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "balance",
-                "type": "uint256"
-              },
-              {
-                "internalType": "bytes32",
-                "name": "customRoot",
-                "type": "bytes32"
-              },
-              {
-                "internalType": "uint256",
-                "name": "claimAmount",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint64",
-                "name": "startsAt",
-                "type": "uint64"
-              },
-              {
-                "internalType": "uint64",
-                "name": "expiresAt",
-                "type": "uint64"
-              }
-            ],
-            "internalType": "struct Pandasia.Airdrop[]",
-            "name": "pageOfAirdrops",
-            "type": "tuple[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "offset",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "limit",
-            "type": "uint256"
-          }
-        ],
-        "name": "getRegisteredUsers",
-        "outputs": [
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "cChainAddr",
-                "type": "address"
-              },
-              {
-                "internalType": "address",
-                "name": "pChainAddr",
-                "type": "address"
-              }
-            ],
-            "internalType": "struct Pandasia.User[]",
-            "name": "users",
-            "type": "tuple[]"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          }
-        ],
-        "name": "getRoleAdmin",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          }
-        ],
-        "name": "grantRole",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          },
-          {
-            "internalType": "address",
-            "name": "addr",
-            "type": "address"
-          }
-        ],
-        "name": "hasClaimed",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          }
-        ],
-        "name": "hasRole",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "addr",
-            "type": "address"
-          }
-        ],
-        "name": "hashChecksummedMessage",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "pure",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "initialize",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "addr",
-            "type": "address"
-          }
-        ],
-        "name": "isMinipoolOperator",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "addr",
-            "type": "address"
-          }
-        ],
-        "name": "isRegisteredValidator",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "merkleRoot",
-        "outputs": [
-          {
-            "internalType": "bytes32",
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "customRoot",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "erc20",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "claimAmount",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint64",
-            "name": "startsAt",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint64",
-            "name": "expiresAt",
-            "type": "uint64"
-          }
-        ],
-        "name": "newAirdrop",
-        "outputs": [
-          {
-            "internalType": "uint64",
-            "name": "",
-            "type": "uint64"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "p2c",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "x",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "y",
-            "type": "uint256"
-          }
-        ],
-        "name": "pubKeyBytesToAvaAddressBytes",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "pure",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint8",
-            "name": "v",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "r",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "s",
-            "type": "bytes32"
-          }
-        ],
-        "name": "recoverMessage",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint8",
-            "name": "v",
-            "type": "uint8"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "r",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32",
-            "name": "s",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "name": "registerPChainAddr",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "callerConfirmation",
-            "type": "address"
-          }
-        ],
-        "name": "renounceRole",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "role",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          }
-        ],
-        "name": "revokeRole",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint32",
-            "name": "fee",
-            "type": "uint32"
-          }
-        ],
-        "name": "setFee",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "root",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "uint64",
-            "name": "height",
-            "type": "uint64"
-          }
-        ],
-        "name": "setMerkleRoot",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "addr",
-            "type": "address"
-          }
-        ],
-        "name": "setStorageContract",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "storageContract",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes4",
-            "name": "interfaceId",
-            "type": "bytes4"
-          }
-        ],
-        "name": "supportsInterface",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "newOwner",
-            "type": "address"
-          }
-        ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "unregisterPChainAddr",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes32",
-            "name": "root",
-            "type": "bytes32"
-          },
-          {
-            "internalType": "address",
-            "name": "account",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          }
-        ],
-        "name": "verify",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "pure",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          }
-        ],
-        "name": "withdrawFees",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint64",
-            "name": "airdropId",
-            "type": "uint64"
-          },
-          {
-            "internalType": "uint256",
-            "name": "withdrawAmt",
-            "type": "uint256"
-          }
-        ],
-        "name": "withdrawFunding",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
       }
     ]
   }

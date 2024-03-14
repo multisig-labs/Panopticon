@@ -59,6 +59,8 @@ class GoGoPool {
     storage = this.required(),
     multicall3 = this.required(),
     pandasia = this.required(),
+    OonodzHardwareProvider,
+    MinipoolStreamliner,
     EOALabels = {},
     transforms = [],
     dashboard = [],
@@ -73,6 +75,8 @@ class GoGoPool {
       transforms,
       dashboard,
       pandasia,
+      OonodzHardwareProvider,
+      MinipoolStreamliner,
     });
     this.minipoolsData = [];
     this.dashboardData = [];
@@ -85,7 +89,9 @@ class GoGoPool {
   getContracts() {
     const data = [];
     for (const c in this.contracts) {
-      data.push({ name: c, address: this.contracts[c].address });
+      if (this.contracts[c].address) {
+        data.push({ name: c, address: this.contracts[c].address });
+      }
     }
     data.push({ name: "Multicall3", address: this.multicall3 });
     return data;
@@ -158,6 +164,9 @@ class GoGoPool {
       // if we have a pandasia contract, set the address
       this.contracts["Pandasia"].address = this.pandasia;
     }
+    this.contracts["MinipoolStreamliner"].address = this.MinipoolStreamliner;
+    this.contracts["OonodzHardwareProvider"].address = this.OonodzHardwareProvider;
+
     console.log(this.contracts);
     this.isLoaded = true;
   }

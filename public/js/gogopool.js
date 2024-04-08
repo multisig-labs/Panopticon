@@ -272,11 +272,26 @@ class GoGoPool {
     }
     await this.until((_) => this.isLoaded);
 
-    const promises = this.statusesToFetch.map((s) => this.contracts.MinipoolManager.contract.getMinipools(s, 0, 0));
+    const totalMinipools = (await this.contracts.MinipoolManager.contract.getMinipoolCount()).toNumber();
+    const pageSize = 400; // Number of minipools to fetch per page
+    const maxTotalPages = Math.ceil(totalMinipools / pageSize);
+
+    const promises = [];
+    for (const status of this.statusesToFetch) {
+      // Could get fancier here but we dont really know total count for each status so eh we end up throwing
+      // more requests than we need. But they are parallel so its fast.
+      const totalPagesForStatus = maxTotalPages;
+      for (let pageIndex = 0; pageIndex < maxTotalPages; pageIndex++) {
+        const startIndex = pageIndex * pageSize;
+        promises.push(this.contracts.MinipoolManager.contract.getMinipools(status, startIndex, pageSize));
+        // console.log(`fetch status ${status} start ${startIndex} pageSize ${pageSize}`);
+      }
+    }
+
+    // Execute promises concurrently using Promise.all
     const results = await Promise.all(promises);
     this.minipoolsData = await minipoolsTransformer(results.flat());
 
-    // console.log("Minipools", this.minipoolsData);
     return this.minipoolsData;
   }
 

@@ -273,7 +273,7 @@ class GoGoPool {
     await this.until((_) => this.isLoaded);
 
     const totalMinipools = (await this.contracts.MinipoolManager.contract.getMinipoolCount()).toNumber();
-    const pageSize = 400; // Number of minipools to fetch per page
+    const pageSize = params.get("pageSize") || 300; // Number of minipools to fetch per page
     const maxTotalPages = Math.ceil(totalMinipools / pageSize);
 
     const promises = [];

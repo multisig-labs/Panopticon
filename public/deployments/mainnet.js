@@ -24,6 +24,9 @@ const deployment = {
 async function deploymentFn() {
   deployment.contracts = await fetch("/deployments/contracts-mainnet.json").then((res) => res.json());
   deployment.dashboard = await fetch("/deployments/dashboard.json").then((res) => res.json());
+  // Hack in Pandasia ABIs
+  const pandasiaAbi = await fetch("/deployments/pandasia-abi.json").then((res) => res.json());
+  deployment.contracts.Pandasia = pandasiaAbi;
   return deployment;
 }
 

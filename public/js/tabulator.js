@@ -4,7 +4,13 @@ import { DEPLOYMENT } from "/deployments/selected.js";
 // Formatters specific for use in Tabulator cells, try to reuse
 // utils.formatters as much as possible
 function formatUnixTime(cell, formatterParams, onRendered) {
-  return formatters.unixToISOOnly(cell.getValue());
+  const value = cell.getValue();
+  if (value === undefined || value === null) {
+    return "N/A";
+  } else {
+    return formatters.unixToISOOnly(value);
+  }
+  // return formatters.unixToISOOnly(cell.getValue());
 }
 
 function formatAmount(cell, formatterParams, onRendered) {

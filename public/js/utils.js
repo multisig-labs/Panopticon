@@ -28,10 +28,10 @@ const ORC_STATE_MAP = {
   23: "CancelMPFin",
   24: "MPError",
 };
-
+// 1 is LAUNCHED in the contract. Updated to be consistent with how it is displayed in the dashboard UI.
 const MINIPOOL_STATUS_MAP = {
   0: "Prelaunch",
-  1: "Launched",
+  1: "Launching",
   2: "Staking",
   3: "Withdrawable",
   4: "Finished",

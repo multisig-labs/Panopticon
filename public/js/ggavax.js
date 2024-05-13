@@ -9,7 +9,7 @@ class ggAVAX {
     const startTimestamp = Math.floor(Date.now() / 1000) - 15 * 24 * 60 * 60;
     const endTimestamp = Math.floor(Date.now() / 1000);
     const response = await fetch(
-      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddDelegatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100`,
+      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddPermissionlessDelegatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100`,
       {
         headers: {
           Accept: "application/json",

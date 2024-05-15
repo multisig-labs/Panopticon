@@ -10,8 +10,8 @@
 </div>
 
 <script type="module">
-import { utils as ethersUtils} from "https://esm.sh/ethers@5.7.2";
-import { cb58Encode } from "/js/utils.js"
+import { utils as ethersUtils } from "https://esm.sh/ethers@5.7.2";
+import { cb58Encode, cb58Decode } from "/js/utils.js"
 
 function decodeHex(hex) {
   try {
@@ -25,6 +25,26 @@ function decodeHex(hex) {
     document.querySelector("#cb58output").value = `Invalid hex`;
   }
 }
+
+document.getElementById("cb58ToHex").addEventListener("keyup", (event) => {
+  if (event.key === "Enter") {
+    try {
+      let addr = event.target.value;
+      // if it starts with NodeID-, remove it
+      if (addr.startsWith("NodeID-")) {
+        addr = addr.slice(7);
+      }
+      cb58Decode(addr).then((buffer) => {
+        // outputs a uint8array, convert to hex
+        const hex = ethersUtils.hexlify(buffer);
+        document.querySelector("#hexoutput").value = hex;
+      });
+    } catch (e) {
+      console.error(e)
+      document.querySelector("#hexoutput").value = `Invalid CB58`;
+    }
+  }
+});
 
 document.getElementById("hexToAddr").addEventListener("keyup", (event) => {
   if (event.key === "Enter") {
@@ -73,6 +93,17 @@ document.getElementById("hexToAddr").addEventListener("keyup", (event) => {
     />
     <label for="cb58output" class="form-label">CB58</label>
     <input type="text" class="form-control cursor-copy" id="cb58output" disabled placeholder="CB58" />
+  </div>
+  <div class="mb-3">
+    <label for="cb58ToHex" class="form-label">CB58 to Hex</label>
+    <input
+      type="text"
+      class="form-control"
+      id="cb58ToHex"
+      placeholder="CB58, enter to go"
+      />
+    <label for="hexoutput" class="form-label">Hex</label>
+    <input type="text" class="form-control cursor-copy" id="hexoutput" disabled placeholder="Hex" />
   </div>
 </div>
 

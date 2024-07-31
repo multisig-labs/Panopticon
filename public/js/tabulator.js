@@ -95,11 +95,11 @@ const ggAVAXDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "Started", field: "startTimestamp", formatter: formatUnixTime },
     { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
-    { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount },
-    { title: "Reward", field: "estimatedReward", formatter: formatAvaxAmount },
     { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
+    { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount, width: 50 },
+    { title: "Reward", field: "estimatedReward", formatter: formatAvaxAmount, width: 40 },
+    { title: "Started", field: "startTimestamp", formatter: formatUnixTime, width: 150 },
   ],
 };
 
@@ -138,8 +138,10 @@ const ggAVAXMEVDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
     { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
+    { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
+    { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount, width: 70 },
+    { title: "Reward", field: "estimatedReward", formatter: formatAvaxAmount, width: 60 },
   ],
 };
 

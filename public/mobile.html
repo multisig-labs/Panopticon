@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Panopticon</title>
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css" />
+    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.css" />
+    <script src="https://unpkg.com/onsenui/js/onsenui.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.prod.min.js"></script>
+    <script src="https://unpkg.com/vue-onsenui@latest/dist/vue-onsenui.js"></script>
+    <script lang="javascript">
+      const params = new URLSearchParams(document.location.search);
+      if (params.get("apiToken")) {
+        localStorage.setItem("apiToken", params.get("apiToken"));
+      }
+      ORC_AUTH_TOKEN = localStorage.getItem("apiToken");
+    </script>
+    <style>
+      .pending {
+        background-color: rgb(237, 237, 184);
+      }
+      .error {
+        background-color: rgb(241, 106, 106);
+      }
+      .small {
+        font-size: 0.8em;
+        color: grey;
+      }
+      .amount {
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <template id="main">
+      <v-ons-navigator
+        swipeable
+        v-model:page-stack="pageStack"
+        @push-page="pageStack = [...pageStack, $event]"
+      ></v-ons-navigator>
+    </template>
+
+    <template id="page1">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="center">👁 Panopticon Mobile 👁</div>
+        </v-ons-toolbar>
+
+        <v-ons-list>
+          <v-ons-list-header>Info</v-ons-list-header>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span v-html="state.info.Network"></span>
+              <span class="small">Updated <span v-html="state.secondsAgo"></span> secs ago</span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-header>ggAVAX</v-ons-list-header>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Available WAVAX</span>
+              <span class="amount" v-html="state.wavaxBalance"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-header>Wallet</v-ons-list-header>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Balances</span>
+              <span class="amount" v-html="state.balances"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-header>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Orc Logs</span>
+              <span class="small">Last log <span v-html="state.minsSinceLastLog"></span> mins ago</span>
+            </div>
+          </v-ons-list-header>
+          <v-ons-list-header style="background-color: red" v-if="state.hasErrors">
+            <span>Some Errors Were Logged!</span>
+          </v-ons-list-header>
+          <v-ons-list-item
+            modifier="chevron"
+            tappable
+            @click="push(log)"
+            v-for="log in state.txLogs"
+            :key="log.ID"
+            :class="log.css"
+          >
+            <div style="display: flex; justify-content: space-between; width: 90%">
+              <v-ons-icon :icon="log.Icon"></v-ons-icon>
+              <span v-html="log.RialtoEndpoint"></span>
+              <span style="flex-grow: 1"></span>
+              <span class="small" v-html="log.NodeID"></span>
+            </div>
+          </v-ons-list-item>
+        </v-ons-list>
+        <div>Updated <span v-html="state.secondsAgo"></span> seconds ago</div>
+
+        <v-ons-button @click="push">Details</v-ons-button>
+      </v-ons-page>
+    </template>
+
+    <template id="page2">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="left"><v-ons-back-button>Back</v-ons-back-button></div>
+          <div class="center">Details</div>
+        </v-ons-toolbar>
+        <v-ons-card>
+          <div>TxID: <span v-html="state.currentLog.TxID"></span></div>
+          <div>TS: <span v-html="state.currentLog.CreatedAt"></span></div>
+          <div v-if="state.currentLog.ErrorMsg">Error: <span v-html="state.currentLog.ErrorMsg"></span></div>
+          <div v-if="state.currentLog.RialtoBody">
+            <h4>Rialto Body:</h4>
+            <pre v-html="JSON.stringify(JSON.parse(state.currentLog.RialtoBody), null, 2)"></pre>
+          </div>
+          <div v-if="state.currentLog.RialtoResult">
+            <h4>Rialto Body:</h4>
+            <pre v-html="JSON.stringify(JSON.parse(state.currentLog.RialtoResult), null, 2)"></pre>
+          </div>
+        </v-ons-card>
+      </v-ons-page>
+    </template>
+
+    <div id="app">app</div>
+
+    <script type="module">
+      import { DEPLOYMENT } from "/deployments/selected.js";
+      import { formatters } from "/js/utils.js";
+      import { Orc } from "/js/orc.js";
+      import { ggAVAX } from "/js/ggavax.js";
+
+      // Create reactive Vue state object that can be mutated, and will automatically update the UI
+      const state = Vue.reactive({
+        updatedAt: Math.floor(Date.now() / 1000),
+        secondsAgo: 0,
+        currentLog: {},
+        balances: "",
+        info: {},
+        txLogs: [],
+        currentDelegations: [],
+        currentMEV: [],
+        wavaxBalance: 0,
+        hasErrors: false,
+      });
+
+      function updateSecondsAgo() {
+        state.secondsAgo = Math.floor(Date.now() / 1000 - state.updatedAt);
+      }
+      setInterval(updateSecondsAgo, 1000);
+
+      // Shorter names for Rialto endpoints
+      const endpointMap = {
+        "/record_staking_end_then_maybe_cycle": "/RSETMC",
+        "/withdraw_for_delegation": "/w_f_delegation",
+      };
+
+      function updateStateOrc(orc) {
+        console.log(orc);
+        state.updatedAt = Math.floor(Date.now() / 1000);
+        state.balances = orc.walletInfoLine();
+        state.info = orc.info;
+        state.txLogs = orc.txLogs.slice(0, 300);
+        state.minsSinceLastLog = Math.floor(
+          (Date.now() / 1000 - Math.floor(new Date(state.txLogs[0].CreatedAt).getTime() / 1000)) / 60
+        );
+
+        // Enrich the logs with some additional calculated data
+        state.txLogs.forEach((log) => {
+          if (log.Job === "ProcessOracle") {
+            log.Icon = "fa-atom";
+          }
+          if (log.Job === "ProcessMinipools") {
+            log.Icon = "fa-lightbulb";
+          }
+          if (log.Job === "ProcessDelegations") {
+            log.Icon = "fa-dog";
+          }
+          if (log.RialtoResult.length == 0) log.RialtoResult = "{}";
+          const rr = typeof log.RialtoResult === "string" ? JSON.parse(log.RialtoResult) : log.RialtoResult;
+          log.TxID = rr.EVMTx?.TxID || rr.TxID || "???";
+          if (log.ErrorMsg) {
+            log.css = "error";
+          } else if (log.RialtoResult.length == 0) {
+            log.css = "pending";
+          }
+
+          if (log.RialtoBody.length == 0) log.RialtoBody = "{}";
+          const rb = typeof log.RialtoBody === "string" ? JSON.parse(log.RialtoBody) : log.RialtoBody;
+          log.NodeID = rb.NodeID ? rb.NodeID.substring(0, 15) : "";
+          log.RialtoEndpoint = endpointMap[log.RialtoEndpoint] || log.RialtoEndpoint;
+        });
+
+        // If there are any errors, set a flag
+        state.hasErrors = state.txLogs.some((log) => log.css === "error");
+      }
+
+      function updateStateGgavax(ggavax) {
+        console.log(ggavax);
+        state.currentDelegations = ggavax.currentDelegations;
+        state.currentMEV = ggavax.currentMEV;
+        state.wavaxBalance = formatters.formatEther(ggavax.wavaxBalance);
+      }
+
+      async function initData() {
+        const orc = new Orc(DEPLOYMENT);
+        const ggavax = new ggAVAX(DEPLOYMENT);
+
+        orc.refreshDataLoop((orc) => {
+          updateStateOrc(orc);
+        });
+
+        await Promise.all([
+          orc.fetchInfo(),
+          orc.fetchWallet(),
+          ggavax.fetchCurrentDelegations(),
+          ggavax.fetchCurrentMEV(),
+          ggavax.fetchWavaxBalance(),
+        ]);
+
+        updateStateOrc(orc);
+        updateStateGgavax(ggavax);
+      }
+
+      initData();
+
+      // UI Pages
+      const page2 = {
+        key: "page2",
+        template: "#page2",
+        data() {
+          return { state };
+        },
+      };
+
+      const page1 = {
+        key: "page1",
+        template: "#page1",
+        data() {
+          return { state };
+        },
+        methods: {
+          push(log) {
+            state.currentLog = log;
+            this.$emit("push-page", page2);
+          },
+        },
+      };
+
+      const app = Vue.createApp({
+        template: "#main",
+        data() {
+          return {
+            pageStack: [page1],
+          };
+        },
+      });
+
+      app.use(VueOnsen);
+      app.mount("#app");
+    </script>
+  </body>
+</html>

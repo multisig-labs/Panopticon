@@ -2,7 +2,7 @@
 import { formatters, pick } from "/js/utils.js";
 import { DateTime, Interval } from "https://esm.sh/luxon@3.3.0";
 
-class Orc {
+class Mobile {
   orcURL;
   minipools;
   info;
@@ -28,19 +28,6 @@ class Orc {
     return this.wallet;
   }
 
-  async fetchMinipools() {
-    const response = await fetch(`${this.orcURL}/all_minipools`, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        Authorization: `Basic ${btoa(`admin:${ORC_AUTH_TOKEN}`)}`,
-        "User-Agent": "Panopticon",
-      },
-    }).then((res) => res.json());
-    this.minipools = response.Minipools;
-    return this.minipools;
-  }
-
   async fetchInfo() {
     const response = await fetch(`${this.orcURL}/info`, {
       headers: {
@@ -64,11 +51,8 @@ class Orc {
       },
     }).then((res) => res.json());
     this.txLogs = response.TxLogs;
+    console.log(this);
     return this.txLogs;
-  }
-
-  minipoolsAsTabulatorData() {
-    return this.minipools;
   }
 
   walletInfoLine() {
@@ -116,4 +100,4 @@ class Orc {
   }
 }
 
-export { Orc };
+export { Mobile };

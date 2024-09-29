@@ -38,7 +38,7 @@ copy-contracts:
 	| jq -s add > public/deployments/contracts.json
 
 fly-deploy:
-  fly deploy --config fly.toml --app panopticon
+  fly deploy --local-only --config fly.toml --app panopticon
 
 # Diagnose any obvious setup issues for new folks
 doctor:

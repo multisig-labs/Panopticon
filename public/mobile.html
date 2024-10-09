@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Panopticon</title>
+    <!-- NoBuild Mobile App using https://onsen.io/v2/guide/fundamentals.html -->
+    <title>Panopticon Mobile</title>
     <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css" />
     <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.css" />
     <script src="https://unpkg.com/onsenui/js/onsenui.js"></script>
@@ -57,8 +58,45 @@
           <v-ons-list-header>ggAVAX</v-ons-list-header>
           <v-ons-list-item>
             <div style="display: flex; justify-content: space-between; width: 100%">
-              <span>Available WAVAX</span>
+              <span>WAVAX Balance</span>
               <span class="amount" v-html="state.wavaxBalance"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>AVAX Available</span>
+              <span class="amount" v-html="state.amountAvailableForStaking"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-header>Nodes</v-ons-list-header>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Pending Minipools</span>
+              <span class="amount" v-html="state.pendingMinipoolsCount"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Launching Minipools</span>
+              <span class="amount" v-html="state.launchingMinipoolsCount"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Staking Minipools</span>
+              <span class="amount" v-html="state.stakingMinipoolsCount"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>Delegations</span>
+              <span class="amount" v-html="state.currentDelegations.length"></span>
+            </div>
+          </v-ons-list-item>
+          <v-ons-list-item>
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <span>MEV</span>
+              <span class="amount" v-html="state.currentMEV.length"></span>
             </div>
           </v-ons-list-item>
           <v-ons-list-header>Wallet</v-ons-list-header>
@@ -128,6 +166,10 @@
       import { formatters } from "/js/utils.js";
       import { Orc } from "/js/orc.js";
       import { ggAVAX } from "/js/ggavax.js";
+      import { GoGoPool } from "/js/gogopool.js";
+
+      window.POLL_INTERVAL = 60 * 1000;
+      window.BATCHSIZE = 500;
 
       // Create reactive Vue state object that can be mutated, and will automatically update the UI
       const state = Vue.reactive({
@@ -139,6 +181,12 @@
         txLogs: [],
         currentDelegations: [],
         currentMEV: [],
+        dashboardData: [],
+        minipoolsData: [],
+        pendingMinipoolsCount: 0,
+        launchingMinipoolsCount: 0,
+        stakingMinipoolsCount: 0,
+        amountAvailableForStaking: 0n,
         wavaxBalance: 0,
         hasErrors: false,
       });
@@ -201,15 +249,32 @@
         state.wavaxBalance = formatters.formatEther(ggavax.wavaxBalance);
       }
 
+      function updateStateGgp(ggp) {
+        state.amountAvailableForStaking = ggp.dashboardValue("TokenggAVAX", "amountAvailableForStaking").toBigInt();
+        state.dashboardData = ggp.dashboardData;
+      }
+
+      function updateStateMinipools(ggp) {
+        console.log("GGP",ggp);
+        state.pendingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Prelaunch").length;
+        state.launchingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Launching").length;
+        state.stakingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Staking").length;
+        state.minipoolsData = ggp.minipoolsData;
+      }
+
       async function initData() {
         const orc = new Orc(DEPLOYMENT);
         const ggavax = new ggAVAX(DEPLOYMENT);
+        const ggp = new GoGoPool(DEPLOYMENT);
 
         orc.refreshDataLoop((orc) => {
           updateStateOrc(orc);
         });
 
         await Promise.all([
+          ggp.fetchContracts(),
+          ggp.fetchDashboardData(),
+          ggp.fetchMinipools(),
           orc.fetchInfo(),
           orc.fetchWallet(),
           ggavax.fetchCurrentDelegations(),
@@ -219,6 +284,8 @@
 
         updateStateOrc(orc);
         updateStateGgavax(ggavax);
+        updateStateGgp(ggp);
+        updateStateMinipools(ggp);
       }
 
       initData();

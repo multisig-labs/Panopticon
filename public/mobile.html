@@ -87,14 +87,14 @@
               <span class="amount" v-html="state.stakingMinipoolsCount"></span>
             </div>
           </v-ons-list-item>
-          <v-ons-list-item>
-            <div style="display: flex; justify-content: space-between; width: 100%">
+          <v-ons-list-item modifier="chevron" tappable @click="pushDelegations()">
+            <div style="display: flex; justify-content: space-between; width: 80%">
               <span>Delegations</span>
               <span class="amount" v-html="state.currentDelegations.length"></span>
             </div>
           </v-ons-list-item>
-          <v-ons-list-item>
-            <div style="display: flex; justify-content: space-between; width: 100%">
+          <v-ons-list-item modifier="chevron" tappable @click="pushMEV()">
+            <div style="display: flex; justify-content: space-between; width: 80%">
               <span>MEV</span>
               <span class="amount" v-html="state.currentMEV.length"></span>
             </div>
@@ -159,7 +159,38 @@
       </v-ons-page>
     </template>
 
-    <div id="app">app</div>
+    <template id="pageMEV">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="left"><v-ons-back-button>Back</v-ons-back-button></div>
+          <div class="center">Details</div>
+        </v-ons-toolbar>
+        <v-ons-list>
+          <v-ons-list-header>MEV Nodes</v-ons-list-header>
+          <v-ons-list-item v-for="mev in state.currentMEV" :key="mev.txHash">
+            <div style="display: flex; justify-content: space-between; width: 100%">
+              <div style="font-size: 0.8em" v-html="mev.nodeId"></div>
+              <div class="small" v-html="calculateMinutesUntilEnd(mev.endTimestamp)"></div>
+            </div>
+            <div class="small" v-html="formatAmount(mev.amountStaked[0].amount)"></div>
+          </v-ons-list-item>
+        </v-ons-list>
+      </v-ons-page>
+    </template>
+
+    <template id="pageDelegations">
+      <v-ons-page>
+        <v-ons-toolbar>
+          <div class="left"><v-ons-back-button>Back</v-ons-back-button></div>
+          <div class="center">Details</div>
+        </v-ons-toolbar>
+        <v-ons-card>
+          Delegations
+        </v-ons-card>
+      </v-ons-page>
+    </template>
+
+    <div id="app">Loading...</div>
 
     <script type="module">
       import { DEPLOYMENT } from "/deployments/selected.js";
@@ -244,13 +275,13 @@
 
       function updateStateGgavax(ggavax) {
         console.log(ggavax);
-        state.currentDelegations = ggavax.currentDelegations;
-        state.currentMEV = ggavax.currentMEV;
+        state.currentDelegations = ggavax.currentDelegations.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
+        state.currentMEV = ggavax.currentMEV.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
         state.wavaxBalance = formatters.formatEther(ggavax.wavaxBalance);
       }
 
       function updateStateGgp(ggp) {
-        state.amountAvailableForStaking = ggp.dashboardValue("TokenggAVAX", "amountAvailableForStaking").toBigInt();
+        state.amountAvailableForStaking = formatters.formatEther(ggp.dashboardValue("TokenggAVAX", "amountAvailableForStaking").toBigInt());
         state.dashboardData = ggp.dashboardData;
       }
 
@@ -291,6 +322,33 @@
       initData();
 
       // UI Pages
+      const pageMEV = {
+        key: "pageMEV",
+        template: "#pageMEV",
+        data() {
+          return { state };
+        },
+        methods: {
+          calculateMinutesUntilEnd(timestamp) {
+            const now = Math.floor(Date.now() / 1000);
+            const end = new Date(timestamp);
+            const diffInSeconds = Math.round(end - now);
+            return formatters.formatDurationHumanShort(diffInSeconds > 0 ? diffInSeconds : 0);
+          },
+          formatAmount(amount) {
+            return (amount / 1000000000).toFixed(2) + ' AVAX';
+          }
+        },
+      };
+
+      const pageDelegations = {
+        key: "pageDelegations",
+        template: "#pageDelegations",
+        data() {
+          return { state };
+        },
+      };
+
       const page2 = {
         key: "page2",
         template: "#page2",
@@ -309,6 +367,12 @@
           push(log) {
             state.currentLog = log;
             this.$emit("push-page", page2);
+          },
+          pushMEV() {
+            this.$emit("push-page", pageMEV);
+          },
+          pushDelegations() {
+            this.$emit("push-page", pageDelegations);
           },
         },
       };

@@ -234,7 +234,7 @@
       };
 
       function updateStateOrc(orc) {
-        console.log(orc);
+        // console.log(orc);
         state.updatedAt = Math.floor(Date.now() / 1000);
         state.balances = orc.walletInfoLine();
         state.info = orc.info;
@@ -274,7 +274,7 @@
       }
 
       function updateStateGgavax(ggavax) {
-        console.log(ggavax);
+        // console.log(ggavax);
         state.currentDelegations = ggavax.currentDelegations.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
         state.currentMEV = ggavax.currentMEV.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
         state.wavaxBalance = formatters.formatEther(ggavax.wavaxBalance);
@@ -286,40 +286,49 @@
       }
 
       function updateStateMinipools(ggp) {
-        console.log("GGP",ggp);
+        // console.log("GGP",ggp);
         state.pendingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Prelaunch").length;
         state.launchingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Launching").length;
         state.stakingMinipoolsCount = ggp.minipoolsData.filter((mp) => mp.status == "Staking").length;
         state.minipoolsData = ggp.minipoolsData;
       }
 
-      async function initData() {
+      async function fetchData() {
         const orc = new Orc(DEPLOYMENT);
         const ggavax = new ggAVAX(DEPLOYMENT);
         const ggp = new GoGoPool(DEPLOYMENT);
 
-        orc.refreshDataLoop((orc) => {
+        await ggp.fetchContracts();
+
+        const startTime = Date.now();
+        const maxDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+
+        const poll = async () => {
+          if (Date.now() - startTime > maxDuration) {
+            console.log("Max duration reached, stopping polling.");
+            return;
+          }
+
+          await Promise.all([
+            ggavax.fetchWavaxBalance(),
+            ggavax.fetchCurrentDelegations(),
+            ggavax.fetchCurrentMEV(),
+            ggp.fetchDashboardData(),
+            ggp.fetchMinipools(),
+            orc.fetchInfo(),
+            orc.fetchWallet(),
+            orc.fetchTxLogs(),
+          ]);
           updateStateOrc(orc);
-        });
-
-        await Promise.all([
-          ggp.fetchContracts(),
-          ggp.fetchDashboardData(),
-          ggp.fetchMinipools(),
-          orc.fetchInfo(),
-          orc.fetchWallet(),
-          ggavax.fetchCurrentDelegations(),
-          ggavax.fetchCurrentMEV(),
-          ggavax.fetchWavaxBalance(),
-        ]);
-
-        updateStateOrc(orc);
-        updateStateGgavax(ggavax);
-        updateStateGgp(ggp);
-        updateStateMinipools(ggp);
+          updateStateGgavax(ggavax);
+          updateStateGgp(ggp);
+          updateStateMinipools(ggp);
+          setTimeout(poll, 10000);
+        };
+        poll();
       }
 
-      initData();
+      await fetchData();
 
       // UI Pages
       const pageMEV = {

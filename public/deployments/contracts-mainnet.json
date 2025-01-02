@@ -1,4 +1,566 @@
 {
+  "ArtifactHardwareProvider": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "admin",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "_paymentReceiver",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "_avaxPriceFeed",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "expectedPayment",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "actualPayment",
+            "type": "uint256"
+          }
+        ],
+        "name": "ExcessivePayment",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "expectedPayment",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "actualPayment",
+            "type": "uint256"
+          }
+        ],
+        "name": "InsufficientPayment",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ZeroAddress",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ZeroDuration",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ZeroNodeID",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "bytes32",
+            "name": "hardwareProviderName",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "payment",
+            "type": "uint256"
+          }
+        ],
+        "name": "HardwareRented",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "oldPaymentReceiver",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "newPaymentReceiver",
+            "type": "address"
+          }
+        ],
+        "name": "PaymentReceiverUpdated",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "previousAdminRole",
+            "type": "bytes32"
+          },
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "newAdminRole",
+            "type": "bytes32"
+          }
+        ],
+        "name": "RoleAdminChanged",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          }
+        ],
+        "name": "RoleGranted",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "sender",
+            "type": "address"
+          }
+        ],
+        "name": "RoleRevoked",
+        "type": "event"
+      },
+      {
+        "inputs": [],
+        "name": "DEFAULT_ADMIN_ROLE",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "RENTER_ROLE",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "avaxPriceFeed",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAvaxUsdPrice",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "getExpectedPayment",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "getExpectedPaymentAvax",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getHardwareProviderName",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "pure",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          }
+        ],
+        "name": "getRoleAdmin",
+        "outputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "grantRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "hasRole",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "payIncrementUsd",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "payMargin",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "payPeriod",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "paymentReceiver",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "renounceRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "rentHardware",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "role",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "revokeRole",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newAvaxPriceFeed",
+            "type": "address"
+          }
+        ],
+        "name": "setAvaxPriceFeed",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "newPayIncrementUsd",
+            "type": "uint256"
+          }
+        ],
+        "name": "setPayIncrementUsd",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "newPayMargin",
+            "type": "uint256"
+          }
+        ],
+        "name": "setPayMargin",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "newPayPeriod",
+            "type": "uint256"
+          }
+        ],
+        "name": "setPayPeriod",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "newPaymentReceiver",
+            "type": "address"
+          }
+        ],
+        "name": "setPaymentReceiver",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes4",
+            "name": "interfaceId",
+            "type": "bytes4"
+          }
+        ],
+        "name": "supportsInterface",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
   "ClaimNodeOp": {
     "abi": [
       {
@@ -506,6 +1068,31 @@
             "type": "address"
           },
           {
+            "indexed": false,
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "MinipoolLaunched",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
             "indexed": true,
             "internalType": "enum MinipoolStatus",
             "name": "status",
@@ -642,6 +1229,11 @@
             "internalType": "bytes",
             "name": "blsPubkeyAndSig",
             "type": "bytes"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
           }
         ],
         "name": "createMinipool",
@@ -680,6 +1272,11 @@
             "internalType": "bytes",
             "name": "blsPubkeyAndSig",
             "type": "bytes"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
           }
         ],
         "name": "createMinipoolOnBehalfOf",
@@ -864,6 +1461,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerRewardAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "hardwareProvider",
+                "type": "bytes32"
               }
             ],
             "internalType": "struct MinipoolManager.Minipool",
@@ -990,6 +1592,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerRewardAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "hardwareProvider",
+                "type": "bytes32"
               }
             ],
             "internalType": "struct MinipoolManager.Minipool",
@@ -1139,6 +1746,11 @@
                 "internalType": "uint256",
                 "name": "avaxLiquidStakerRewardAmt",
                 "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "hardwareProvider",
+                "type": "bytes32"
               }
             ],
             "internalType": "struct MinipoolManager.Minipool[]",
@@ -1361,6 +1973,11 @@
             "internalType": "uint256",
             "name": "duration",
             "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
           }
         ],
         "name": "withdrawRewardsAndRelaunchMinipool",
@@ -1373,23 +1990,7 @@
   "MinipoolStreamliner": {
     "abi": [
       {
-        "inputs": [
-          {
-            "internalType": "contract Storage",
-            "name": "storageAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "WAVAX",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "TJRouter",
-            "type": "address"
-          }
-        ],
+        "inputs": [],
         "stateMutability": "nonpayable",
         "type": "constructor"
       },
@@ -1401,6 +2002,17 @@
       {
         "inputs": [],
         "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          }
+        ],
+        "name": "InvalidHardwareProvider",
         "type": "error"
       },
       {
@@ -1430,11 +2042,6 @@
       },
       {
         "inputs": [],
-        "name": "NotApprovedHardwareProvider",
-        "type": "error"
-      },
-      {
-        "inputs": [],
         "name": "OnlyOwner",
         "type": "error"
       },
@@ -1442,6 +2049,19 @@
         "inputs": [],
         "name": "SwapFailed",
         "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "version",
+            "type": "uint8"
+          }
+        ],
+        "name": "Initialized",
+        "type": "event"
       },
       {
         "anonymous": false,
@@ -1460,9 +2080,21 @@
           },
           {
             "indexed": false,
-            "internalType": "address",
-            "name": "hardwareProviderContract",
-            "type": "address"
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "avaxForNodeRental",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
           }
         ],
         "name": "MinipoolRelaunched",
@@ -1485,13 +2117,62 @@
           },
           {
             "indexed": false,
-            "internalType": "address",
-            "name": "hardwareProviderContract",
-            "type": "address"
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "avaxForNodeRental",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
           }
         ],
         "name": "NewStreamlinedMinipoolMade",
         "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "providerContract",
+            "type": "address"
+          }
+        ],
+        "name": "addHardwareProvider",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "name": "approvedHardwareProviders",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
       },
       {
         "inputs": [
@@ -1533,14 +2214,14 @@
                 "type": "uint256"
               },
               {
-                "internalType": "address",
-                "name": "hardwareProviderContract",
-                "type": "address"
+                "internalType": "uint256",
+                "name": "ggpStakeAmount",
+                "type": "uint256"
               },
               {
-                "internalType": "bytes",
-                "name": "hardwareProviderInformation",
-                "type": "bytes"
+                "internalType": "bytes32",
+                "name": "hardwareProvider",
+                "type": "bytes32"
               }
             ],
             "internalType": "struct MinipoolStreamliner.StreamlinedMinipool",
@@ -1556,20 +2237,24 @@
       {
         "inputs": [
           {
+            "internalType": "contract Storage",
+            "name": "storageAddress",
+            "type": "address"
+          },
+          {
             "internalType": "address",
-            "name": "contractAddress",
+            "name": "wavax",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "tjRouter",
             "type": "address"
           }
         ],
-        "name": "isApprovedHardwareProvider",
-        "outputs": [
-          {
-            "internalType": "bool",
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "stateMutability": "view",
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -1577,6 +2262,374 @@
         "name": "receiveWithdrawalAVAX",
         "outputs": [],
         "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          }
+        ],
+        "name": "removeHardwareProvider",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "avaxForGGP",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minGGPAmountOut",
+            "type": "uint256"
+          }
+        ],
+        "name": "swapAndStakeGGPOnBehalfOf",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "ggpPurchased",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "version",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "MinipoolStreamlinerV2": {
+    "abi": [
+      {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+      },
+      {
+        "inputs": [],
+        "name": "ContractNotFound",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "ContractPaused",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          }
+        ],
+        "name": "InvalidHardwareProvider",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InvalidOrOutdatedContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MismatchedFunds",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardian",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeGuardianOrValidContract",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "MustBeMultisig",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "OnlyOwner",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "SwapFailed",
+        "type": "error"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "actualCount",
+            "type": "uint256"
+          }
+        ],
+        "name": "TooManyMinipools",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "version",
+            "type": "uint8"
+          }
+        ],
+        "name": "Initialized",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "avaxForNodeRental",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "MinipoolRelaunched",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "nodeID",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "owner",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "bytes32",
+            "name": "hardwareProvider",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "avaxForNodeRental",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "duration",
+            "type": "uint256"
+          }
+        ],
+        "name": "NewStreamlinedMinipoolMade",
+        "type": "event"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "address",
+            "name": "providerContract",
+            "type": "address"
+          }
+        ],
+        "name": "addHardwareProvider",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
+        "name": "approvedHardwareProviders",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "batchLimit",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "avaxForGGP",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "minGGPAmountOut",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ggpStakeAmount",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "nodeID",
+                "type": "address"
+              },
+              {
+                "internalType": "bytes",
+                "name": "blsPubkeyAndSig",
+                "type": "bytes"
+              },
+              {
+                "internalType": "uint256",
+                "name": "duration",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForMinipool",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "avaxForNodeRental",
+                "type": "uint256"
+              },
+              {
+                "internalType": "bytes32",
+                "name": "hardwareProvider",
+                "type": "bytes32"
+              }
+            ],
+            "internalType": "struct MinipoolStreamlinerV2.StreamlinedMinipool[]",
+            "name": "newMinipools",
+            "type": "tuple[]"
+          }
+        ],
+        "name": "createOrRelaunchStreamlinedMinipool",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "receiveWithdrawalAVAX",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "bytes32",
+            "name": "providerName",
+            "type": "bytes32"
+          }
+        ],
+        "name": "removeHardwareProvider",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "newBatchLimit",
+            "type": "uint256"
+          }
+        ],
+        "name": "setBatchLimit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -2035,204 +3088,6 @@
           }
         ],
         "stateMutability": "view",
-        "type": "function"
-      }
-    ]
-  },
-  "OonodzHardwareProvider": {
-    "abi": [
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "wavax",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "usdc",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "tjRouter",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "ooNodz",
-            "type": "address"
-          },
-          {
-            "internalType": "address",
-            "name": "minipoolStreamliner",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
-        "inputs": [],
-        "name": "InvalidSender",
-        "type": "error"
-      },
-      {
-        "inputs": [],
-        "name": "SwapFailed",
-        "type": "error"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "address",
-            "name": "nodeID",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "internalType": "bytes",
-            "name": "blsPubkeyAndSig",
-            "type": "bytes"
-          }
-        ],
-        "name": "HardwareRentedFromOonodz",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "internalType": "address",
-            "name": "receiver",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "amount",
-            "type": "uint256"
-          }
-        ],
-        "name": "USDCRefunded",
-        "type": "event"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "bytes",
-            "name": "data",
-            "type": "bytes"
-          }
-        ],
-        "name": "decodeOonodzData",
-        "outputs": [
-          {
-            "internalType": "uint16",
-            "name": "countryOfResidence",
-            "type": "uint16"
-          },
-          {
-            "internalType": "bool",
-            "name": "withdrawalRightWaiver",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "bestRate",
-            "type": "bool"
-          },
-          {
-            "internalType": "uint256",
-            "name": "minUSDCAmountOut",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "tokenID",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "pure",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "address",
-            "name": "user",
-            "type": "address"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "nodeID",
-                "type": "address"
-              },
-              {
-                "internalType": "bytes",
-                "name": "blsPubkeyAndSig",
-                "type": "bytes"
-              },
-              {
-                "internalType": "uint256",
-                "name": "duration",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "avaxForMinipool",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "avaxForGGP",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "minGGPAmountOut",
-                "type": "uint256"
-              },
-              {
-                "internalType": "uint256",
-                "name": "avaxForNodeRental",
-                "type": "uint256"
-              },
-              {
-                "internalType": "address",
-                "name": "hardwareProviderContract",
-                "type": "address"
-              },
-              {
-                "internalType": "bytes",
-                "name": "hardwareProviderInformation",
-                "type": "bytes"
-              }
-            ],
-            "internalType": "struct MinipoolStreamliner.StreamlinedMinipool",
-            "name": "newMinipool",
-            "type": "tuple"
-          }
-        ],
-        "name": "rentHardware",
-        "outputs": [
-          {
-            "internalType": "address",
-            "name": "nodeID",
-            "type": "address"
-          },
-          {
-            "internalType": "bytes",
-            "name": "blsPubkeyAndSig",
-            "type": "bytes"
-          }
-        ],
-        "stateMutability": "payable",
         "type": "function"
       }
     ]
@@ -5423,327 +6278,6 @@
       }
     ]
   },
-  "AggregatorV2V3Interface": {
-    "abi": [
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "int256",
-            "name": "current",
-            "type": "int256"
-          },
-          {
-            "indexed": true,
-            "internalType": "uint256",
-            "name": "roundId",
-            "type": "uint256"
-          },
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "timestamp",
-            "type": "uint256"
-          }
-        ],
-        "name": "AnswerUpdated",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": true,
-            "internalType": "uint256",
-            "name": "roundId",
-            "type": "uint256"
-          },
-          {
-            "indexed": true,
-            "internalType": "address",
-            "name": "startedBy",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "internalType": "uint256",
-            "name": "startedAt",
-            "type": "uint256"
-          }
-        ],
-        "name": "NewRound",
-        "type": "event"
-      },
-      {
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [
-          {
-            "internalType": "uint8",
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "description",
-        "outputs": [
-          {
-            "internalType": "string",
-            "name": "",
-            "type": "string"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "roundId",
-            "type": "uint256"
-          }
-        ],
-        "name": "getAnswer",
-        "outputs": [
-          {
-            "internalType": "int256",
-            "name": "",
-            "type": "int256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint80",
-            "name": "_roundId",
-            "type": "uint80"
-          }
-        ],
-        "name": "getRoundData",
-        "outputs": [
-          {
-            "internalType": "uint80",
-            "name": "roundId",
-            "type": "uint80"
-          },
-          {
-            "internalType": "int256",
-            "name": "answer",
-            "type": "int256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startedAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "updatedAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint80",
-            "name": "answeredInRound",
-            "type": "uint80"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "roundId",
-            "type": "uint256"
-          }
-        ],
-        "name": "getTimestamp",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "latestAnswer",
-        "outputs": [
-          {
-            "internalType": "int256",
-            "name": "",
-            "type": "int256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "latestRound",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "latestRoundData",
-        "outputs": [
-          {
-            "internalType": "uint80",
-            "name": "roundId",
-            "type": "uint80"
-          },
-          {
-            "internalType": "int256",
-            "name": "answer",
-            "type": "int256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "startedAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "updatedAt",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint80",
-            "name": "answeredInRound",
-            "type": "uint80"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "latestTimestamp",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ]
-  },
-  "IggAVAX": {
-    "abi": [
-      {
-        "inputs": [
-          {
-            "internalType": "uint256",
-            "name": "shares",
-            "type": "uint256"
-          }
-        ],
-        "name": "convertToAssets",
-        "outputs": [
-          {
-            "internalType": "uint256",
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ]
-  },
-  "StakedAvaxPriceFeed": {
-    "abi": [
-      {
-        "inputs": [],
-        "name": "avaxPriceFeed",
-        "outputs": [
-          {
-            "internalType": "contract AggregatorV2V3Interface",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "decimals",
-        "outputs": [
-          {
-            "internalType": "uint8",
-            "name": "",
-            "type": "uint8"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "latestAnswer",
-        "outputs": [
-          {
-            "internalType": "int256",
-            "name": "",
-            "type": "int256"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "name": "sAVAX",
-        "outputs": [
-          {
-            "internalType": "contract IggAVAX",
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-      }
-    ]
-  },
   "GGAVAXRateProvider": {
     "abi": [
       {
@@ -5790,6 +6324,29 @@
       {
         "inputs": [],
         "name": "getRate",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      }
+    ]
+  },
+  "IggAVAX": {
+    "abi": [
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "shares",
+            "type": "uint256"
+          }
+        ],
+        "name": "convertToAssets",
         "outputs": [
           {
             "internalType": "uint256",

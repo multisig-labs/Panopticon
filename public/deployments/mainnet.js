@@ -18,7 +18,7 @@ const deployment = {
   dashboard: [], // will merge in dashboard.json
   pandasia: "0x5746c7210f668e2aFc7D572C39Ff2f61a1FA593B",
   MinipoolStreamliner: "0x8C05D78066431C3b11bBFB6f3546fD3F1396115C",
-  OonodzHardwareProvider: "0xfE6ca6cD383d1e213f5d1015dD0BB35275E8Fe3E",
+  ArtifactHardwareProvider: "0xC095ece2C0f315381b4BF6De169FbC219B24194C",
 };
 
 async function deploymentFn() {

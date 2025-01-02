@@ -19,6 +19,7 @@ const deployment = {
   contracts: {}, // will merge in contracts.json
   dashboard: [], // will merge in dashboard.json,
   pandasia: "0x930BfF0eaa8B6056ade39C94bf8082187FA0B991",
+  ArtifactHardwareProvider: "0xd68922cB57Ff95F705405553A92aaD8746A55F88",
 };
 
 async function deploymentFn() {

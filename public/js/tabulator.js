@@ -223,7 +223,7 @@ const dashboardDef = {
   groupHeader: function (value, count, data, group) {
     return `${value} ${data[0].address.substring(
       0,
-      6
+      6,
     )} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
   },
   selectable: true,
@@ -420,6 +420,12 @@ const minipoolsDef = {
     {
       title: "BLSSig",
       field: "blsSig",
+      minWidth: 5000,
+      responsive: 9,
+    },
+    {
+      title: "HardwareProvider",
+      field: "hardwareProvider",
       minWidth: 5000,
       responsive: 9,
     },

@@ -80,7 +80,7 @@ class GoGoPool {
     storage = this.required(),
     multicall3 = this.required(),
     pandasia = this.required(),
-    OonodzHardwareProvider,
+    ArtifactHardwareProvider,
     MinipoolStreamliner,
     EOALabels = {},
     transforms = [],
@@ -96,7 +96,7 @@ class GoGoPool {
       transforms,
       dashboard,
       pandasia,
-      OonodzHardwareProvider,
+      ArtifactHardwareProvider,
       MinipoolStreamliner,
     });
     this.minipoolsData = [];
@@ -150,7 +150,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }
@@ -177,7 +177,7 @@ class GoGoPool {
       } catch (e) {
         console.log(
           `error in getAddress, ensure that storage addr ${this.storage} points to a Storage contract. [${name}]`,
-          e
+          e,
         );
       }
     }
@@ -186,9 +186,7 @@ class GoGoPool {
       this.contracts["Pandasia"].address = this.pandasia;
     }
     this.contracts["MinipoolStreamliner"].address = this.MinipoolStreamliner;
-    this.contracts["OonodzHardwareProvider"].address = this.OonodzHardwareProvider;
-
-    console.log(this.contracts);
+    this.contracts["ArtifactHardwareProvider"].address = this.ArtifactHardwareProvider;
     this.isLoaded = true;
   }
 
@@ -217,7 +215,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }
@@ -330,7 +328,7 @@ class GoGoPool {
     const now = DateTime.now().startOf("day") / 1000;
     let stakingMPs = this.minipoolsData.filter(
       (mp) =>
-        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7
+        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7,
     );
     stakingMPs = stakingMPs.map((mp) => {
       return {
@@ -342,8 +340,8 @@ class GoGoPool {
     // Add an element for each mp we could launch right now
     const amtAvail = parseFloat(
       this.dashboardAsTabulatorData().filter(
-        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking"
-      )[0].value
+        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking",
+      )[0].value,
     );
     const mpAvail = Math.floor(amtAvail / 1000);
     // console.log(mpAvail);
@@ -421,7 +419,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }

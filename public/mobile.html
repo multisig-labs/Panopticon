@@ -1,11 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <!-- NoBuild Mobile App using https://onsen.io/v2/guide/fundamentals.html -->
     <title>Panopticon Mobile</title>
-    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsenui.css" />
-    <link rel="stylesheet" href="https://unpkg.com/onsenui/css/onsen-css-components.css" />
-    <script src="https://unpkg.com/onsenui/js/onsenui.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.12.8/css/onsenui.min.css"
+      integrity="sha512-MF9klD2Y0WddBdC5jnOWdS9AuH9WMDxntqal3CICn5isNNlp0Nsc8q3/VCyTryiATc4qTwGw4OKzf+Z8sB8Csg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.12.8/css/onsen-css-components.min.css"
+      integrity="sha512-jvoxSMcFCHzycwZ/0cLrEu6ZquNvsgVMiUJI2NaSFGxNQZz3T8sc8DvDhm0BiH9bHUreYtJFT147rJdzchZd7g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.12.8/js/onsenui.min.js"
+      integrity="sha512-gTBYvF3IPbzY0LLzGILVeSPCbNEGdttGGwFmU/It7aX3UXZzfyn9TaQO9vegWAV24ChabN/YsjZoYrJkdJrOTA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.37/vue.global.prod.min.js"></script>
     <script src="https://unpkg.com/vue-onsenui@latest/dist/vue-onsenui.js"></script>
     <script lang="javascript">
@@ -184,9 +201,7 @@
           <div class="left"><v-ons-back-button>Back</v-ons-back-button></div>
           <div class="center">Details</div>
         </v-ons-toolbar>
-        <v-ons-card>
-          Delegations
-        </v-ons-card>
+        <v-ons-card> Delegations </v-ons-card>
       </v-ons-page>
     </template>
 
@@ -240,7 +255,7 @@
         state.info = orc.info;
         state.txLogs = orc.txLogs.slice(0, 300);
         state.minsSinceLastLog = Math.floor(
-          (Date.now() / 1000 - Math.floor(new Date(state.txLogs[0].CreatedAt).getTime() / 1000)) / 60
+          (Date.now() / 1000 - Math.floor(new Date(state.txLogs[0].CreatedAt).getTime() / 1000)) / 60,
         );
 
         // Enrich the logs with some additional calculated data
@@ -275,13 +290,17 @@
 
       function updateStateGgavax(ggavax) {
         // console.log(ggavax);
-        state.currentDelegations = ggavax.currentDelegations.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
+        state.currentDelegations = ggavax.currentDelegations.sort(
+          (a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp),
+        );
         state.currentMEV = ggavax.currentMEV.sort((a, b) => new Date(a.endTimestamp) - new Date(b.endTimestamp));
         state.wavaxBalance = formatters.formatEther(ggavax.wavaxBalance);
       }
 
       function updateStateGgp(ggp) {
-        state.amountAvailableForStaking = formatters.formatEther(ggp.dashboardValue("TokenggAVAX", "amountAvailableForStaking").toBigInt());
+        state.amountAvailableForStaking = formatters.formatEther(
+          ggp.dashboardValue("TokenggAVAX", "amountAvailableForStaking").toBigInt(),
+        );
         state.dashboardData = ggp.dashboardData;
       }
 
@@ -345,8 +364,8 @@
             return formatters.formatDurationHumanShort(diffInSeconds > 0 ? diffInSeconds : 0);
           },
           formatAmount(amount) {
-            return (amount / 1000000000).toFixed(2) + ' AVAX';
-          }
+            return (amount / 1000000000).toFixed(2) + " AVAX";
+          },
         },
       };
 

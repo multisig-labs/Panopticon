@@ -1,62 +1,8 @@
 import { utils as ethersUtils, constants as ethersConstants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { DateTime, Duration } from "https://esm.sh/luxon@3.3.0";
 
-const ORC_STATE_MAP = {
-  0: "Prelaunch",
-  1: "ClaimMPStrt",
-  2: "ClaimMPFin",
-  3: "ExportC2PStrt",
-  4: "ExportC2PFin",
-  5: "ImportC2PStrt",
-  6: "ImportC2PFin",
-  7: "StakeMPStrt",
-  8: "StakeMPFin",
-  9: "RecStkStartStrt",
-  10: "RecStkStartFin",
-  11: "Validating",
-  12: "ExportP2CStrt",
-  13: "ExportP2CFin",
-  14: "ImportP2CStrt",
-  15: "ImportP2CFin",
-  16: "RecStkEndStrt",
-  17: "RecreateMPStrt",
-  18: "RecStkErrStrt",
-  19: "CancelMPStrt",
-  20: "RecStkEndFin",
-  21: "RecreateMPFin",
-  22: "RecStkErrorFin",
-  23: "CancelMPFin",
-  24: "MPError",
-};
-// 1 is LAUNCHED in the contract. Updated to be consistent with how it is displayed in the dashboard UI.
-const MINIPOOL_STATUS_MAP = {
-  0: "Prelaunch",
-  1: "Launching",
-  2: "Staking",
-  3: "Withdrawable",
-  4: "Finished",
-  5: "Canceled",
-  6: "Error",
-};
-
 function pick(o, ...props) {
   return Object.assign({}, ...props.map((prop) => ({ [prop]: o[prop] })));
-}
-
-function checkNetworkStatus(eth_rpc_url) {
-  eth_rpc_url ||= localStorage.getItem("eth_rpc_url");
-  return fetch(`${eth_rpc_url}/ext/bc/P`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: {
-      jsonrpc: "2.0",
-      id: 1,
-      method: "platform.getHeight",
-      params: {},
-    },
-  });
 }
 
 function makeRpc(method, params = {}) {
@@ -258,51 +204,4 @@ const transformerFns = {
   },
 };
 
-// Ethers gives back an extremely ugly obj, I must be doing something wrong
-function unfuckEthersObj(ugly) {
-  // Make it a POJO
-  let obj = Object.assign({}, ugly);
-
-  // Strip out (stupid) number keys
-  for (const k of Object.keys(obj)) {
-    if (k.match("[0-9]+")) {
-      delete obj[k];
-    }
-  }
-
-  // Convert any bigNumbers to numbers or eth
-  return bigToNumber(obj);
-}
-
-// This is dumb. Havent found the right abstraction for converting numbers yet :(
-// A naming convention would have been a good idea, eh?
-function bigToNumber(obj) {
-  const weiKeys = /avax|Amt|balance|GGP|ggpRewards|ggpStaked/;
-  const bigKeys = Object.keys(obj).filter((k) => BigNumber.isBigNumber(obj[k]));
-  for (const k of bigKeys) {
-    if (obj[k].toHexString() === "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff") {
-      obj[k] = Infinity;
-    } else if (weiKeys.test(k)) {
-      obj[k] = obj[k].mul(100).div(ethersConstants.WeiPerEther).toNumber() / 100;
-    } else {
-      obj[k] = obj[k].toNumber();
-    }
-  }
-  return obj;
-}
-
-export {
-  MINIPOOL_STATUS_MAP,
-  ORC_STATE_MAP,
-  formatters,
-  transformerFns,
-  pipeAsyncFunctions,
-  pipe,
-  pick,
-  sha256,
-  cb58Encode,
-  cb58Decode,
-  makeRpc,
-  bigToNumber,
-  unfuckEthersObj,
-};
+export { formatters, transformerFns, pipeAsyncFunctions, pipe, pick, sha256, cb58Encode, cb58Decode, makeRpc };

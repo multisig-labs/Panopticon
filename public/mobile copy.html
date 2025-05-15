@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Panopticon</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.12.8/css/onsenui-core.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/onsen/2.12.8/css/onsen-css-components.min.css"
+    />
+    <script lang="javascript">
+      const params = new URLSearchParams(document.location.search);
+      if (params.get("apiToken")) {
+        localStorage.setItem("apiToken", params.get("apiToken"));
+      }
+      ORC_AUTH_TOKEN = localStorage.getItem("apiToken");
+    </script>
+  </head>
+  <body>
+    <ons-navigator swipeable id="myNavigator" page="page1.html"></ons-navigator>
+
+    <template id="page1.html">
+      <ons-page id="page1" x-data="wallet">
+        <ons-toolbar>
+          <div class="center">Panopticon Mobile</div>
+        </ons-toolbar>
+
+        <ons-list>
+          <ons-list-header>Wallet</ons-list-header>
+          <ons-list-item>P: <span x-bind="ORC.wallet.p"></span></ons-list-item>
+          <ons-list-item>Item B</ons-list-item>
+        </ons-list>
+
+        <ons-button id="push-button">Push page</ons-button>
+        <script>
+          ons.getScriptPage().onInit = function () {
+            // Set up page's content or anything else
+            this.querySelector("ons-toolbar .center").innerHTML = "Title";
+
+            this.onShow = function () {
+              console.log("show");
+            };
+            this.onHide = function () {
+              console.log("hide");
+            };
+            this.onDestroy = function () {
+              console.log("destroy");
+            };
+          };
+        </script>
+      </ons-page>
+    </template>
+
+    <template id="page2.html">
+      <ons-page id="page2">
+        <ons-toolbar>
+          <div class="left"><ons-back-button>Back</ons-back-button></div>
+          <div class="center"></div>
+        </ons-toolbar>
+
+        <p>This is the second page.</p>
+      </ons-page>
+    </template>
+
+    <script type="module">
+      console.log("module");
+      import { DEPLOYMENT } from "/deployments/selected.js";
+      import { Orc } from "/js/orc.js";
+      import Alpine from "https://esm.sh/alpinejs";
+      import ons from "https://esm.sh/onsenui";
+      console.log(ons);
+      ons.ready(function () {
+        console.log("ons.ready");
+      });
+      let ORC = {};
+
+      document.addEventListener("alpine:init", () => {
+        console.log("alpine:init");
+        Alpine.data("wallet", () => ({
+          init() {
+            console.log("wallet.init");
+          },
+          ORC: ORC,
+        }));
+      });
+
+      Alpine.start();
+
+      document.addEventListener("init", function (event) {
+        console.log("init", event);
+        var page = event.target;
+
+        if (page.id === "page1") {
+          page.querySelector("#push-button").onclick = function () {
+            document.querySelector("#myNavigator").pushPage("page2.html", { data: { title: "Page 2" } });
+          };
+        } else if (page.id === "page2") {
+          page.querySelector("ons-toolbar .center").innerHTML = page.data.title;
+        }
+      });
+
+      async function initData() {
+        ORC = new Orc(DEPLOYMENT);
+        await ORC.fetchInfo();
+        await ORC.fetchWallet();
+      }
+
+      await initData();
+
+      ORC.refreshDataLoop(() => {
+        // document.getElementById("wallet").innerHTML = ORC.walletInfoLine();
+      });
+    </script>
+  </body>
+</html>

@@ -54,6 +54,60 @@ function formatNodeIdLink(cell, formatterParams, onRendered) {
   return `<a target="_blank" href='https://avascan.info/staking/validator/${cell.getValue()}'>${cell.getValue()}</a>`;
 }
 
+function formatObject(cell, formatterParams, onRendered) {
+  const value = cell.getValue();
+  if (typeof value === "object") {
+    return objectToHtmlTable(value);
+  }
+  return value;
+}
+
+function objectToHtmlTable(obj) {
+  if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
+    // For non-objects, or arrays, return a pre-formatted JSON string or direct value
+    if (typeof obj === "bigint") return obj.toString();
+    if (obj === null || typeof obj !== "object") {
+      let simpleValue = obj;
+      if (typeof simpleValue === "string") {
+        simpleValue = simpleValue.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+      return simpleValue;
+    }
+    // For arrays, pretty print JSON
+    return `<ul>${obj.map((v) => `<li>${v}</li>`).join("")}</ul>`;
+  }
+
+  let tableHtml =
+    '<table class="nested-object-table" style="width: 100%; border-collapse: collapse; border: 1px solid #eee;">';
+  tableHtml +=
+    '<thead><tr><th style="border: 1px solid #ddd; padding: 4px; text-align: center; background-color: #f9f9f9;">Key</th><th style="border: 1px solid #ddd; padding: 4px; text-align: center; background-color: #f9f9f9;">Value</th></tr></thead>';
+  tableHtml += "<tbody>";
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      let displayValue;
+
+      if (typeof value === "bigint") {
+        displayValue = value.toString();
+      } else if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+        displayValue = objectToHtmlTable(value); // Recursive call for nested objects
+      } else if (Array.isArray(value)) {
+        displayValue = `<pre>${JSON.stringify(value, (k, v) => (typeof v === "bigint" ? v.toString() : v), 2)}</pre>`;
+      } else {
+        displayValue = value;
+        if (typeof displayValue === "string") {
+          displayValue = displayValue.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+      }
+      tableHtml += `<tr><td style="border: 1px solid #ddd; padding: 4px; vertical-align: top; word-break: break-all;text-align:left;">${key}</td><td style="border: 1px solid #ddd; padding: 4px; word-break: break-all;">${displayValue}</td></tr>`;
+    }
+  }
+
+  tableHtml += "</tbody></table>";
+  return tableHtml;
+}
+
 // Convert a bool to yes/no
 function formatYesNo(cell, formatterParams, onRendered) {
   return cell.getValue() ? "Yes" : "No";
@@ -83,6 +137,31 @@ function accessUnixTime(value, data, accessorParams) {
 }
 
 // Definitions for Tabulator tables
+const dashboardDef = {
+  data: [], // Filled in later by JS
+  index: "title",
+  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  groupBy: "contract", // contract name
+  groupHeader: function (value, count, data, group) {
+    return `${value} ${data[0].address.substring(
+      0,
+      6,
+    )} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
+  },
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Variable", field: "title", width: 300 },
+    { title: "Value", field: "value", formatter: formatObject },
+    { title: "Desc", field: "desc" },
+  ],
+};
+
 const ggAVAXDef = {
   data: [], // Filled in later by JS
   index: "startTimestamp",
@@ -209,31 +288,6 @@ const pandasiaUsersDef = {
     { title: "ID", field: "idx", width: 50, formatter: formatNumber },
     { title: "C Chain Address", field: "cChainAddr", width: 300 },
     { title: "P Chain Address", field: "pChainAddr", width: 300 },
-  ],
-};
-
-const dashboardDef = {
-  data: [], // Filled in later by JS
-  index: "title",
-  // height: 600, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
-  layout: "fitColumns", //fit columns to width of table (optional)
-  responsiveLayout: "collapse",
-  responsiveLayoutCollapseStartOpen: false,
-  groupBy: "contract", // contract name
-  groupHeader: function (value, count, data, group) {
-    return `${value} ${data[0].address.substring(
-      0,
-      6
-    )} <span style="color:#00d; margin-left:10px;"">(${count} items)</span>`;
-  },
-  selectable: true,
-  clipboard: "copy",
-  clipboardCopyRowRange: "selected",
-  columns: [
-    { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "Variable", field: "title", width: 300 },
-    { title: "Value", field: "value" },
-    { title: "Desc", field: "desc" },
   ],
 };
 

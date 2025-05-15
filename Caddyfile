@@ -1,0 +1,45 @@
+{
+    order cache before rewrite
+    debug
+    log {
+        level debug
+    }
+    cache {
+        allowed_http_verbs GET POST
+        timeout {
+            backend 5s
+            cache 100ms
+        }
+        default_cache_control public
+    }
+}
+
+(cors) {
+	respond @options 204	
+	header ?Access-Control-Allow-Origin "*"
+	header ?Access-Control-Allow-Methods "OPTIONS,HEAD,GET,POST,PUT,PATCH,DELETE"
+	header ?Access-Control-Allow-Headers "authorization,origin,content-type,accept"
+	header Vary "Origin,Accept-Encoding,Access-Control-Request-Method,Access-Control-Request-Headers"
+	header Cache-Control no-store
+}
+
+:8080 {
+respond "Hello World!"
+	@options {
+		method OPTIONS
+	}
+
+	@notoptions {
+		not method OPTIONS
+	}
+
+	@avalanche path /ext*
+	cache @avalanche {
+		ttl 10s
+	}
+
+	handle /ext/* {
+		import cors
+		reverse_proxy @notoptions https://api.avax.network 
+	}
+}

@@ -1,0 +1,15 @@
+{{template "layout" .}} {{define "content"}}
+
+<script type="module">
+  import { utils as ethersUtils, providers, Contract, constants } from "https://esm.sh/ethers@5.7.2";
+
+  // const url = "wss://localhost:9650/ext/bc/FsZshki1omgMrYADHoWdf6jVDGf5aS9CAbT43Qf4n55NBVsYa/ws";
+  const url = "wss://localhost:9650/ext/bc/MyChainName/ws";
+  // const url = "wss://localhost:9650/ext/bc/C/ws";
+
+  const wsProvider = new providers.WebSocketProvider(url);
+  wsProvider.on("block", (blockNumber) => {
+    console.log("New Block: " + blockNumber);
+  });
+</script>
+{{end}}

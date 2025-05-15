@@ -1,0 +1,60 @@
+{{template "layout" .}} {{define "content"}}
+<div class="masthead mb-3">
+  <div class="container-xxl bd-gutter">
+    <div class="col-md-8 mx-auto text-center mt-5">
+      <h1 class="mb-3 fw-semibold">
+        <span class="d-inline-block blinking"></span> NFTStakingManager <span class="d-inline-block blinking"></span>
+      </h1>
+    </div>
+  </div>
+</div>
+
+<div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">Settings</h3>
+  <div id="settings" class="text-center"><div class="loader">Loading...</div></div>
+</div>
+<br />
+<div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">Validations</h3>
+  <div id="validations" class="text-center">
+    <div class="loader">Loading...</div>
+  </div>
+</div>
+<br />
+
+<style>
+  .container,
+  .container-lg,
+  .container-md,
+  .container-sm,
+  .container-xl {
+    max-width: 9140px;
+  }
+</style>
+
+<script type="module">
+  import { DEPLOYMENT } from "/deployments/selected.js";
+  import { NFTStakingManagerClient } from "/js/nftstaking.js";
+  import { dashboardDef } from "/js/tabulator.js";
+
+  let nftStakingManager;
+  const tableDashboard = new Tabulator("#settings", dashboardDef);
+
+  window.POLL_INTERVAL = 60 * 1000;
+  window.BATCHSIZE = 500;
+
+  async function initData() {
+    console.log(DEPLOYMENT);
+    nftStakingManager = new NFTStakingManagerClient(DEPLOYMENT);
+
+    await Promise.all([nftStakingManager.fetchDashboardData()]);
+    console.log("Data Loaded", nftStakingManager);
+  }
+  await initData();
+  console.log(nftStakingManager.dashboardAsTabulatorData());
+  tableDashboard.updateOrAddData(nftStakingManager.dashboardAsTabulatorData());
+
+  // const tablePandasiaTrees = new Tabulator("#settings", pandasiaDef);
+  // const tablePandasiaAirdrops = new Tabulator("#validations", pandasiaAirdropsDef);
+</script>
+{{end}}

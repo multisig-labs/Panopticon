@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blockchain Log Viewer</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+      }
+      #logsContainer {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        padding: 15px;
+        min-height: 300px;
+        overflow-y: auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .log-entry {
+        border-bottom: 1px solid #eee;
+        padding: 8px 0;
+        margin-bottom: 5px;
+        font-size: 0.9em;
+      }
+      .log-entry:last-child {
+        border-bottom: none;
+      }
+      .log-event-name {
+        font-weight: bold;
+        color: #007bff;
+      }
+      .log-args {
+        margin-left: 15px;
+      }
+      pre {
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        background-color: #e9e9e9;
+        padding: 5px;
+        border-radius: 3px;
+      }
+      h1 {
+        color: #333;
+      }
+      p {
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Decoded Logs</h1>
+    <div id="logsContainer">
+      <p>Waiting for logs...</p>
+    </div>
+
+    <!-- ESM Shims for browser compatibility with import maps and modules -->
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "viem": "https://esm.sh/viem@2.29.1",
+          "base58-js": "https://esm.sh/base58-js@3.0.2"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import { createPublicClient, http, formatLog } from "viem";
+      import { DecodeLogs } from "/js/decodeLogs.js";
+      import { DEPLOYMENT } from "/deployments/selected.js";
+
+      // --- Viem Public Client Setup ---
+      let publicClient;
+      try {
+        publicClient = createPublicClient({
+          chain: DEPLOYMENT.chain,
+          transport: http(DEPLOYMENT.ethURL),
+        });
+      } catch (error) {
+        console.error("Failed to create Viem public client:", error);
+      }
+      console.log(publicClient);
+
+      const eventABIs = Object.values(DEPLOYMENT.abis).flatMap((abi) => abi.filter((abi) => abi.type === "event"));
+      console.log(eventABIs);
+
+      const logsContainer = document.getElementById("logsContainer");
+      let isFirstLog = true;
+
+      function displayLog(decodedLogEntry) {
+        if (isFirstLog) {
+          logsContainer.innerHTML = ""; // Clear "Waiting for logs..."
+          isFirstLog = false;
+        }
+
+        const entryDiv = document.createElement("div");
+        entryDiv.classList.add("log-entry");
+
+        const eventNameSpan = document.createElement("span");
+        eventNameSpan.classList.add("log-event-name");
+        eventNameSpan.textContent = decodedLogEntry.eventName;
+        entryDiv.appendChild(eventNameSpan);
+
+        if (decodedLogEntry.args) {
+          const argsPre = document.createElement("pre");
+          // Using a replacer to handle BigInts for JSON.stringify
+          const replacer = (key, value) => (typeof value === "bigint" ? value.toString() : value);
+          argsPre.textContent = JSON.stringify(decodedLogEntry.args, replacer, 2);
+          entryDiv.appendChild(argsPre);
+        }
+
+        // Also display raw log details if needed
+        // const rawLogPre = document.createElement('pre');
+        // rawLogPre.textContent = `Raw: ${JSON.stringify(decodedLogEntry, replacer, 2)}`;
+        // entryDiv.appendChild(rawLogPre);
+
+        logsContainer.prepend(entryDiv); // Add new logs to the top
+        // logsContainer.scrollTop = logsContainer.scrollHeight; // Removed auto-scroll to bottom
+      }
+
+      async function main() {
+        try {
+          const logDecoder = new DecodeLogs(publicClient, eventABIs);
+
+          console.log("Starting to scan and watch for logs...");
+          const unwatch = await logDecoder.scanAndWatchChainLogs(displayLog);
+
+          // To stop watching (e.g., if the page is closed or user navigates away)
+          window.addEventListener("beforeunload", () => {
+            console.log("Unwatching logs before page unloads.");
+            unwatch();
+          });
+
+          console.log("Log scanning and watching initialized. Waiting for events...");
+        } catch (error) {
+          console.error("Initialization error:", error);
+          logsContainer.innerHTML = `<p style="color: red;">Error initializing log viewer: ${error.message}. Check console.</p>`;
+        }
+      }
+
+      main();
+    </script>
+  </body>
+</html>

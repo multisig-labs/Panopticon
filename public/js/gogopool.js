@@ -32,16 +32,39 @@ const REWARDS_TOTAL_NODEOP_POOL_AMT = {
   21: BigNumber.from("54857248843014749830911"),
   22: BigNumber.from("55077676344104389294521"),
   23: BigNumber.from("55298989567395950847377"),
-  24: BigNumber.from("55521192071900062018602"),
   24: BigNumber.from("55744287430928173574424"),
   25: BigNumber.from("55968279232150023113155"),
-  26: BigNumber.from("56193171077651329560521"),
-  27: BigNumber.from("56418966583991719493095"),
-  28: BigNumber.from("56645669382262886221402"),
-  30: BigNumber.from("56873283118146982567973"),
-  31: BigNumber.from("57101811451975248279354"),
-  32: BigNumber.from("57331258058786873014903"),
-  33: BigNumber.from("57561626628388095858956"),
+  26: BigNumber.from("55968000000000000000000"),
+  27: BigNumber.from("56193000000000000000000"),
+  28: BigNumber.from("56418000000000000000000"),
+  29: BigNumber.from("56645000000000000000000"),
+  30: BigNumber.from("56873000000000000000000"),
+  31: BigNumber.from("57101000000000000000000"),
+  32: BigNumber.from("57331000000000000000000"),
+  33: BigNumber.from("57561000000000000000000"),
+  34: BigNumber.from("57792910850766284000000"),
+  35: BigNumber.from("58025115431414020000000"),
+  36: BigNumber.from("58258244099698500000000"),
+  37: BigNumber.from("58492299599911000000000"),
+  38: BigNumber.from("58727284691227000000000"),
+  39: BigNumber.from("58963202147765000000000"),
+  40: BigNumber.from("59200054758545000000000"),
+  41: BigNumber.from("59438000000000000000000"),
+  42: BigNumber.from("59677000000000000000000"),
+  43: BigNumber.from("59916000000000000000000"),
+  44: BigNumber.from("60157000000000000000000"),
+  45: BigNumber.from("60399000000000000000000"),
+  46: BigNumber.from("60642000000000000000000"),
+  47: BigNumber.from("60885000000000000000000"),
+  48: BigNumber.from("61130000000000000000000"),
+  49: BigNumber.from("61375000000000000000000"),
+  50: BigNumber.from("61622000000000000000000"),
+  51: BigNumber.from("61870000000000000000000"),
+  52: BigNumber.from("62118000000000000000000"),
+  53: BigNumber.from("62368000000000000000000"),
+  54: BigNumber.from("62619000000000000000000"),
+  55: BigNumber.from("62870000000000000000000"),
+  56: BigNumber.from("40665000000000000000000"),
 };
 
 const REWARDS_CYCLE_DURATION = 2592000; // 30 days
@@ -150,7 +173,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }
@@ -177,7 +200,7 @@ class GoGoPool {
       } catch (e) {
         console.log(
           `error in getAddress, ensure that storage addr ${this.storage} points to a Storage contract. [${name}]`,
-          e
+          e,
         );
       }
     }
@@ -217,7 +240,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }
@@ -330,7 +353,7 @@ class GoGoPool {
     const now = DateTime.now().startOf("day") / 1000;
     let stakingMPs = this.minipoolsData.filter(
       (mp) =>
-        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7
+        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7,
     );
     stakingMPs = stakingMPs.map((mp) => {
       return {
@@ -342,8 +365,8 @@ class GoGoPool {
     // Add an element for each mp we could launch right now
     const amtAvail = parseFloat(
       this.dashboardAsTabulatorData().filter(
-        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking"
-      )[0].value
+        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking",
+      )[0].value,
     );
     const mpAvail = Math.floor(amtAvail / 1000);
     // console.log(mpAvail);
@@ -421,7 +444,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err
+          err,
         );
         console.error(batch);
       }
@@ -455,7 +478,7 @@ class GoGoPool {
     // REWARDS CALCULATIONS
 
     const REWARDS_POOL_AMT = REWARDS_TOTAL_NODEOP_POOL_AMT[this.rewardsCycleCount() + 1]; // look forward to next cycle
-
+    console.log(this.rewardsCycleCount());
     // Users share remainder of rewards pie
     const userTotalGGPStaked = eligibleStakers.reduce((acc, s) => acc + s.getEffectiveGGPStaked, 0);
     eligibleStakers.map((s) => {

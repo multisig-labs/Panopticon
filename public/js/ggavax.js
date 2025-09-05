@@ -9,7 +9,7 @@ class ggAVAX {
     const startTimestamp = Math.floor(Date.now() / 1000) - 15 * 24 * 60 * 60;
     const endTimestamp = Math.floor(Date.now() / 1000);
     const response = await fetch(
-      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddPermissionlessDelegatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100`,
+      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q%2Cavax1ukya4342ewusq0hptaxqpm28fs9cc3kgqm70ld&txTypes=AddPermissionlessDelegatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100`,
       {
         headers: {
           Accept: "application/json",
@@ -25,7 +25,7 @@ class ggAVAX {
     const startTimestamp = Math.floor(Date.now() / 1000) - 45 * 24 * 60 * 60;
     const endTimestamp = Math.floor(Date.now() / 1000);
     const url = (nextPageParamAndToken) =>
-      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q&txTypes=AddValidatorTx&txTypes=AddPermissionlessValidatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100${nextPageParamAndToken}`;
+      `https://glacier-api.avax.network/v1/networks/mainnet/blockchains/p-chain/transactions:listStaking?addresses=avax10f8305248c0wsfsdempdtpx7lpkc30vwzl9y9q%2Cavax1ukya4342ewusq0hptaxqpm28fs9cc3kgqm70ld&txTypes=AddValidatorTx&txTypes=AddPermissionlessValidatorTx&startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}&pageSize=100${nextPageParamAndToken}`;
 
     const txs = [];
     let nextPageParamAndToken = "";

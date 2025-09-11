@@ -24,6 +24,7 @@
   <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
   <div>WAVAX Balance: <span id="wavax-balance"></span></div>
   <div>Next Rewards Amt: <span id="next-rewards-amt"></span></div>
+  <div>Deposit Queue Balance: <span id="deposit-queue-balance"></span></div>
 </div>
 
 <style>
@@ -76,6 +77,8 @@
     wavaxEl.innerHTML = formatters.formatEther(GGAVAX.wavaxBalance);
     const nextRewardsAmtEl = document.getElementById("next-rewards-amt");
     nextRewardsAmtEl.innerHTML = formatters.formatEther(calcNextRewardAmt());
+    const depositQueueBalanceEl = document.getElementById("deposit-queue-balance");
+    depositQueueBalanceEl.innerHTML = formatters.formatEther(GGAVAX.depositQueueBalance);
   });
 
   const tableStats = new Tabulator("#ggavax-stats", ggAVAXStatsDef);

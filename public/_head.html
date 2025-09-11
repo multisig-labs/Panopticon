@@ -27,12 +27,19 @@
 
 <script>
   const params = new URLSearchParams(document.location.search);
-  if (params.get("apiToken")) {
-    localStorage.setItem("apiToken", params.get("apiToken"));
+
+  // Save all URL parameters to localStorage
+  if (params.size > 0) {
+    params.forEach((value, key) => {
+      localStorage.setItem(key, value);
+    });
+
+    // Redirect to clean URL without parameters
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.location.replace(cleanUrl);
   }
-  if (params.get("devmode")) {
-    localStorage.setItem("devmode", params.get("devmode"));
-  }
+
+  // Initialize global variables from localStorage
   ORC_AUTH_TOKEN = localStorage.getItem("apiToken");
 </script>
 {{end}}

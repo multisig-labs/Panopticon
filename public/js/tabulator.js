@@ -54,6 +54,10 @@ function formatNodeIdLink(cell, formatterParams, onRendered) {
   return `<a target="_blank" href='https://avascan.info/staking/validator/${cell.getValue()}'>${cell.getValue()}</a>`;
 }
 
+function formatPAddrLink(cell, formatterParams, onRendered) {
+  return `<a target="_blank" href='https://subnets.avax.network/p-chain/address/P-${cell.getValue()}'>${cell.getValue()}</a>`;
+}
+
 // Convert a bool to yes/no
 function formatYesNo(cell, formatterParams, onRendered) {
   return cell.getValue() ? "Yes" : "No";
@@ -95,6 +99,7 @@ const ggAVAXDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Address", field: "address", formatter: formatPAddrLink },
     { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
     { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
     { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount, width: 50 },
@@ -138,6 +143,7 @@ const ggAVAXMEVDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "Address", field: "address", formatter: formatPAddrLink },
     { title: "Node", field: "nodeId", formatter: formatNodeIdLink },
     { title: "Period Ends", field: "endTimestamp", formatter: formatDurationHumanUntil },
     { title: "Amount", field: "amountStaked", formatter: formatGlacierAmount, width: 70 },

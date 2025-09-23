@@ -2,7 +2,7 @@
 
 import { utils as ethersUtils, providers, Contract, constants, BigNumber } from "https://esm.sh/ethers@5.7.2";
 import { Contract as MCContract, Provider as MCProvider } from "https://esm.sh/ethcall@4.8.13";
-import { MINIPOOL_STATUS_MAP, formatters, transformerFns, unfuckEthersObj } from "/js/utils.js";
+import { MINIPOOL_STATUS_MAP, formatters, transformerFns, unfuckEthersObj, unfuckObj } from "/js/utils.js";
 import { minipoolsTransformer } from "/js/transformers.js";
 import { DateTime } from "https://esm.sh/luxon@3.3.0";
 
@@ -92,6 +92,7 @@ class GoGoPool {
   minipoolsData;
   dashboardData;
   stakersData;
+  withdrawQueueData;
   isLoaded;
   statusesToFetch;
 
@@ -102,9 +103,7 @@ class GoGoPool {
     contracts = this.required(),
     storage = this.required(),
     multicall3 = this.required(),
-    pandasia = this.required(),
-    OonodzHardwareProvider,
-    MinipoolStreamliner,
+    addresses = {},
     EOALabels = {},
     transforms = [],
     dashboard = [],
@@ -118,13 +117,12 @@ class GoGoPool {
       EOALabels,
       transforms,
       dashboard,
-      pandasia,
-      OonodzHardwareProvider,
-      MinipoolStreamliner,
+      addresses,
     });
     this.minipoolsData = [];
     this.dashboardData = [];
     this.stakersData = [];
+    this.withdrawQueueData = [];
     this.isLoaded = false;
     this.statusesToFetch = undefined;
   }
@@ -173,45 +171,39 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err,
+          err
         );
         console.error(batch);
       }
     }
 
-    // Loop through all other contract names we have abis for
+    // Loop through all contract names we have abis for and get their addresses
     for (let i = 0; i < contractNames.length; i++) {
       try {
         const name = contractNames[i];
-        const addr = results[i];
+        let addr = results[i];
 
         if (addr == constants.AddressZero) {
-          console.log(`${name} not found in Storage`);
-        } else {
-          this.contracts[name].address = addr;
-          // Make a standard ethers contract
-          const contract = await new Contract(this.contracts[name].address, this.contracts[name].abi, this.provider);
-          this.contracts[name].contract = contract;
-
-          // Also make a MultiCall contract for use with 'ethcall'
-          const mccontract = await new MCContract(this.contracts[name].address, this.contracts[name].abi);
-          this.contracts[name].mccontract = mccontract;
+          if (this.addresses[name]) {
+            addr = this.addresses[name];
+          } else {
+            console.log(`${name} not found in Storage or addresses key`);
+            continue;
+          }
         }
+        this.contracts[name].address = addr;
+        // Make a standard ethers contract
+        const contract = await new Contract(this.contracts[name].address, this.contracts[name].abi, this.provider);
+        this.contracts[name].contract = contract;
+
+        // Also make a MultiCall contract for use with 'ethcall'
+        const mccontract = await new MCContract(this.contracts[name].address, this.contracts[name].abi);
+        this.contracts[name].mccontract = mccontract;
       } catch (e) {
-        console.log(
-          `error in getAddress, ensure that storage addr ${this.storage} points to a Storage contract. [${name}]`,
-          e,
-        );
+        console.log(`error in getAddress, ensure that storage addr ${this.storage} points to a Storage contract.`, e);
       }
     }
-    if (this.contracts["Pandasia"]) {
-      // if we have a pandasia contract, set the address
-      this.contracts["Pandasia"].address = this.pandasia;
-    }
-    this.contracts["MinipoolStreamliner"].address = this.MinipoolStreamliner;
-    this.contracts["OonodzHardwareProvider"].address = this.OonodzHardwareProvider;
 
-    console.log(this.contracts);
     this.isLoaded = true;
   }
 
@@ -240,7 +232,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err,
+          err
         );
         console.error(batch);
       }
@@ -277,13 +269,13 @@ class GoGoPool {
   rewardsCycleCount() {
     const ctrct = this.dashboard.filter((r) => r.contract === "RewardsPool")[0];
     const cycle = ctrct.metrics.filter((r) => r.fn === "getRewardsCycleCount")[0];
-    return cycle.value.toNumber();
+    return cycle.value?.toNumber();
   }
 
   rewardsCycleStartTime() {
     const ctrct = this.dashboard.filter((r) => r.contract === "RewardsPool")[0];
     const cycle = ctrct.metrics.filter((r) => r.fn === "getRewardsCycleStartTime")[0];
-    return cycle.value.toNumber();
+    return cycle.value?.toNumber();
   }
 
   dashboardValue(contract, metric) {
@@ -353,7 +345,7 @@ class GoGoPool {
     const now = DateTime.now().startOf("day") / 1000;
     let stakingMPs = this.minipoolsData.filter(
       (mp) =>
-        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7,
+        !ignoreNodes[mp.nodeID] && mp.status === "Staking" && mp.endTime > now && mp.endTime < now + 60 * 60 * 24 * 7
     );
     stakingMPs = stakingMPs.map((mp) => {
       return {
@@ -365,8 +357,8 @@ class GoGoPool {
     // Add an element for each mp we could launch right now
     const amtAvail = parseFloat(
       this.dashboardAsTabulatorData().filter(
-        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking",
-      )[0].value,
+        (obj) => obj.contract === "TokenggAVAX" && obj.title === "amountAvailableForStaking"
+      )[0].value
     );
     const mpAvail = Math.floor(amtAvail / 1000);
     // console.log(mpAvail);
@@ -378,6 +370,76 @@ class GoGoPool {
     }
     // console.log(stakingMPs);
     return stakingMPs;
+  }
+
+  async fetchWithdrawQueue() {
+    await this.until((_) => this.isLoaded);
+
+    const allPendingRequests = await this.contracts.WithdrawQueue.contract.getAllPendingRequests();
+    let calls = [];
+    for (const pr of allPendingRequests) {
+      const c = this.contracts.WithdrawQueue.mccontract;
+      try {
+        calls.push(c["getRequestInfo"].call(this, pr));
+      } catch (err) {
+        console.log("error calling getRequestInfo:", pr, err);
+      }
+    }
+
+    let results = [];
+    for (let batch of this.getBatch(calls)) {
+      try {
+        results = results.concat(await this.multicallProvider.tryAll(batch));
+      } catch (err) {
+        console.error(
+          "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
+          err
+        );
+        console.error(batch);
+      }
+    }
+    // Loop through results, and add the index of allPendingRequests to each object with the key requestID
+    results = results.map(unfuckObj);
+    results.forEach((obj, idx) => {
+      obj.requestID = formatters.formatNumber(allPendingRequests[idx]);
+      obj.status = "pending";
+    });
+    console.log("pendingWithdrawQueueData", results);
+
+    const allFulfilledRequests = await this.contracts.WithdrawQueue.contract.getAllFulfilledRequests();
+    console.log("allFulfilledRequests", allFulfilledRequests);
+    calls = [];
+    for (const pr of allFulfilledRequests) {
+      const c = this.contracts.WithdrawQueue.mccontract;
+      try {
+        calls.push(c["getRequestInfo"].call(this, pr));
+      } catch (err) {
+        console.log("error calling getRequestInfo:", pr, err);
+      }
+    }
+
+    let results2 = [];
+    for (let batch of this.getBatch(calls)) {
+      try {
+        results2 = results2.concat(await this.multicallProvider.tryAll(batch));
+      } catch (err) {
+        console.error(
+          "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
+          err
+        );
+        console.error(batch);
+      }
+    }
+    // Loop through results, and add the index of allPendingRequests to each object with the key requestID
+    results2 = results2.map(unfuckObj);
+    results2.forEach((obj, idx) => {
+      obj.requestID = formatters.formatNumber(allFulfilledRequests[idx]);
+      obj.status = "fulfilled";
+    });
+    console.log("fulfilledWithdrawQueueData", results2);
+
+    this.withdrawQueueData = results.concat(results2);
+    return this.withdrawQueueData;
   }
 
   async fetchStakers({ status } = { status: Object.keys(MINIPOOL_STATUS_MAP) }) {
@@ -444,7 +506,7 @@ class GoGoPool {
       } catch (err) {
         console.error(
           "ERROR in Multicall, so we dont know which call failed. Make sure Multicall3 addr is correct and check the /deployments descriptor.",
-          err,
+          err
         );
         console.error(batch);
       }
@@ -510,10 +572,19 @@ class GoGoPool {
     return this.stakersData;
   }
 
+  withdrawQueueAsTabulatorData() {
+    return this.withdrawQueueData;
+  }
+
   // Helpers
   refreshDataLoop(fn) {
     const poll = async () => {
-      await Promise.all([this.fetchDashboardData(), this.fetchMinipools(), this.fetchStakers()]);
+      await Promise.all([
+        this.fetchDashboardData(),
+        this.fetchMinipools(),
+        this.fetchStakers(),
+        this.fetchWithdrawQueue(),
+      ]);
       fn();
       setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
     };

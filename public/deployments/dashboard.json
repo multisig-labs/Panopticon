@@ -64,6 +64,7 @@
         "desc": "Seconds",
         "formatter": "formatDuration"
       },
+      { "fn": "getFeeBips", "desc": "stAVAX fee in basis points" },
       { "fn": "getInflationIntervalRate", "desc": "" },
       { "fn": "getInflationIntervalSeconds", "desc": "Seconds", "formatter": "formatDuration" },
       { "fn": "getMinipoolMinAVAXStakingAmt", "formatter": "formatEther" },
@@ -120,6 +121,23 @@
         "fn": "amountAvailableForStaking",
         "desc": "AVAX float avail for new minipools or redemption",
         "formatter": "formatEther"
+      }
+    ]
+  },
+  {
+    "contract": "WithdrawQueue",
+    "metrics": [
+      {
+        "fn": "getPendingRequestsCount",
+        "desc": "Number of requests waiting for AVAX to become available"
+      },
+      {
+        "fn": "getFulfilledRequestsCount",
+        "desc": "Number of requests ready to be claimed by users"
+      },
+      {
+        "fn": "getExpiredRequestsCount",
+        "desc": "Number of requests that have expired and are no longer valid"
       }
     ]
   },

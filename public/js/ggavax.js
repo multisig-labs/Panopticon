@@ -2,7 +2,7 @@ class ggAVAX {
   currentDelegations;
   currentMEV;
   wavaxBalance;
-  depositQueueBalance;
+  WithdrawQueueBalance;
 
   constructor() {}
 
@@ -68,7 +68,7 @@ class ggAVAX {
     return this.wavaxBalance;
   }
 
-  async fetchDepositQueueBalance() {
+  async fetchWithdrawQueueBalance() {
     const response = await fetch(
       `https://glacier-api.avax.network/v1/chains/43114/addresses/0x61f908D4992a790A2792D3C36850B4b9eB5849A3/balances:getNative?currency=usd`,
       {
@@ -78,13 +78,13 @@ class ggAVAX {
         },
       }
     ).then((res) => res.json());
-    this.depositQueueBalance = response.nativeTokenBalance.balance;
-    return this.depositQueueBalance;
+    this.WithdrawQueueBalance = response.nativeTokenBalance.balance;
+    return this.WithdrawQueueBalance;
   }
 
   refreshDataLoop(fn) {
     const poll = async () => {
-      await Promise.all([this.fetchCurrentDelegations(), this.fetchWavaxBalance(), this.fetchDepositQueueBalance()]);
+      await Promise.all([this.fetchCurrentDelegations(), this.fetchWavaxBalance(), this.fetchWithdrawQueueBalance()]);
       fn();
       setTimeout(poll, 30000);
     };

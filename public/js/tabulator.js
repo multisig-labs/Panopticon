@@ -58,6 +58,10 @@ function formatPAddrLink(cell, formatterParams, onRendered) {
   return `<a target="_blank" href='https://subnets.avax.network/p-chain/address/P-${cell.getValue()}'>${cell.getValue()}</a>`;
 }
 
+function formatCAddrLink(cell, formatterParams, onRendered) {
+  return `<a target="_blank" href="${DEPLOYMENT.cExplorerURL}/address/${cell.getValue()}">${cell.getValue()}</a>`;
+}
+
 // Convert a bool to yes/no
 function formatYesNo(cell, formatterParams, onRendered) {
   return cell.getValue() ? "Yes" : "No";
@@ -576,11 +580,80 @@ const stakersDef = {
 // Force all columns to be in the CSV download
 stakersDef.columns.forEach((c) => (c.download = true));
 
+const withdrawQueueDef = {
+  data: [], // Filled in later by JS
+  index: "requestID",
+  height: 700, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+  // rowHeight: 30,
+  layout: "fitColumns", //fit columns to width of table (optional)
+  responsiveLayout: "collapse",
+  responsiveLayoutCollapseStartOpen: false,
+  selectable: true,
+  clipboard: "copy",
+  clipboardCopyRowRange: "selected",
+  groupBy: function (data) {
+    return data.status;
+  },
+  groupHeader: function (value, count, data, group) {
+    //value - the value all members of this group share
+    //count - the number of rows in this group
+    //data - an array of all the row data objects in this group
+    //group - the group component for the group
+    const stAVAXAmt = data.reduce((acc, curr) => {
+      if (!curr.shares) return acc;
+
+      // Convert ethers BigNumber to native BigInt
+      const sharesBigInt = BigInt(curr.shares.toString());
+
+      return acc + sharesBigInt;
+    }, 0n); // Start with BigInt 0
+
+    // Convert final result to ether
+    const stAVAXAmtInEther = Number(stAVAXAmt) / 1e18;
+    const formattedAmount = stAVAXAmtInEther.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    });
+    return (
+      value +
+      "<span style='color:#d00; margin-left:10px;'>(" +
+      count +
+      " items, " +
+      formattedAmount +
+      " total stAVAX)</span>"
+    );
+  },
+  // rowFormatter: function (row) {
+  //   let data = row.getData();
+  //   if (data.ggpSlashAmt > 0) {
+  //     row.getElement().style.backgroundColor = "#ff0000bf";
+  //   }
+  // },
+  columns: [
+    { width: 20, formatter: "responsiveCollapse", headerSort: false },
+    { title: "requestID", field: "requestID", width: 25 },
+    { title: "requester", field: "requester", sorter: "alphanum", formatter: formatCAddrLink },
+    { title: "shares", field: "shares", sorter: "alphanum", formatter: formatEther, width: 150 },
+    { title: "expectedAssets", field: "expectedAssets", sorter: "alphanum", formatter: formatEther, width: 150 },
+    { title: "allocatedFunds", field: "allocatedFunds", sorter: "alphanum", formatter: formatEther, width: 150 },
+    {
+      title: "claimableTime",
+      field: "claimableTime",
+      sorter: "alphanum",
+      formatter: formatDurationHumanUntil,
+      width: 200,
+    },
+    { title: "expirationTime", field: "expirationTime", sorter: "alphanum" },
+    { title: "requestTime", field: "requestTime", sorter: "alphanum" },
+  ],
+};
+
 export {
   minipoolsDef,
   stakersDef,
   dashboardDef,
   contractsDef,
+  withdrawQueueDef,
   ggAVAXDef,
   ggAVAXStatsDef,
   ggAVAXMEVDef,

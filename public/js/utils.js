@@ -274,6 +274,20 @@ function unfuckEthersObj(ugly) {
   return bigToNumber(obj);
 }
 
+function unfuckObj(ugly) {
+  // Make it a POJO
+  let obj = Object.assign({}, ugly);
+
+  // Strip out (stupid) number keys
+  for (const k of Object.keys(obj)) {
+    if (k.match("[0-9]+")) {
+      delete obj[k];
+    }
+  }
+
+  return obj;
+}
+
 // This is dumb. Havent found the right abstraction for converting numbers yet :(
 // A naming convention would have been a good idea, eh?
 function bigToNumber(obj) {
@@ -305,4 +319,5 @@ export {
   makeRpc,
   bigToNumber,
   unfuckEthersObj,
+  unfuckObj,
 };

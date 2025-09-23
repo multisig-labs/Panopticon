@@ -1,6 +1,6 @@
 module github.com/multisig-labs/panopticon
 
-go 1.20
+go 1.24
 
 require (
 	github.com/AbsaOSS/env-binder v1.0.1

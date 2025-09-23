@@ -16,9 +16,13 @@ const deployment = {
   },
   contracts: {}, // will merge in contracts.json
   dashboard: [], // will merge in dashboard.json
-  pandasia: "0x5746c7210f668e2aFc7D572C39Ff2f61a1FA593B",
-  MinipoolStreamliner: "0x8C05D78066431C3b11bBFB6f3546fD3F1396115C",
-  OonodzHardwareProvider: "0xfE6ca6cD383d1e213f5d1015dD0BB35275E8Fe3E",
+  addresses: {
+    // of contracts not in storage
+    pandasia: "0x5746c7210f668e2aFc7D572C39Ff2f61a1FA593B",
+    MinipoolStreamliner: "0x8C05D78066431C3b11bBFB6f3546fD3F1396115C",
+    OonodzHardwareProvider: "0xfE6ca6cD383d1e213f5d1015dD0BB35275E8Fe3E",
+    WithdrawQueue: "0x61f908D4992a790A2792D3C36850B4b9eB5849A3",
+  },
 };
 
 async function deploymentFn() {

@@ -20,11 +20,16 @@
 </div>
 <br />
 <div class="container w-95 border border-5 rounded pb-3">
+  <h3 class="text-center">Withdraw Queue</h3>
+  <div id="withdraw-queue" class="text-center"><div class="loader">Loading...</div></div>
+</div>
+<br />
+<div class="container w-95 border border-5 rounded pb-3">
   <h3 class="text-center">ggAVAX Stats</h3>
   <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
   <div>WAVAX Balance: <span id="wavax-balance"></span></div>
   <div>Next Rewards Amt: <span id="next-rewards-amt"></span></div>
-  <div>Deposit Queue Balance: <span id="deposit-queue-balance"></span></div>
+  <div>WithdrawQueue Contract Balance: <span id="withdraw-queue-balance"></span></div>
 </div>
 
 <style>
@@ -42,7 +47,7 @@
   import { DEPLOYMENT } from "/deployments/selected.js";
   import { GoGoPool } from "/js/gogopool.js";
   import { ggAVAX } from "/js/ggavax.js";
-  import { ggAVAXDef, ggAVAXStatsDef, ggAVAXMEVDef } from "/js/tabulator.js";
+  import { ggAVAXDef, ggAVAXStatsDef, ggAVAXMEVDef, withdrawQueueDef } from "/js/tabulator.js";
   import { formatters } from "/js/utils.js";
 
   let GGAVAX, GGP;
@@ -56,6 +61,7 @@
       GGAVAX.fetchCurrentDelegations(),
       GGAVAX.fetchCurrentMEV(),
       GGAVAX.fetchWavaxBalance(),
+      GGP.fetchWithdrawQueue(),
     ]);
   }
 
@@ -63,6 +69,7 @@
 
   const tableCurrentDelegations = new Tabulator("#ggavax", ggAVAXDef);
   const tableCurrentMEV = new Tabulator("#mev", ggAVAXMEVDef);
+  const tableWithdrawQueue = new Tabulator("#withdraw-queue", withdrawQueueDef);
 
   GGAVAX.refreshDataLoop(() => {
     if (GGAVAX.currentDelegations && GGAVAX.currentDelegations.length > 0) {
@@ -77,13 +84,17 @@
     wavaxEl.innerHTML = formatters.formatEther(GGAVAX.wavaxBalance);
     const nextRewardsAmtEl = document.getElementById("next-rewards-amt");
     nextRewardsAmtEl.innerHTML = formatters.formatEther(calcNextRewardAmt());
-    const depositQueueBalanceEl = document.getElementById("deposit-queue-balance");
-    depositQueueBalanceEl.innerHTML = formatters.formatEther(GGAVAX.depositQueueBalance);
+    const WithdrawQueueBalanceEl = document.getElementById("withdraw-queue-balance");
+    WithdrawQueueBalanceEl.innerHTML = formatters.formatEther(GGAVAX.WithdrawQueueBalance);
   });
 
   const tableStats = new Tabulator("#ggavax-stats", ggAVAXStatsDef);
 
   GGP.refreshDataLoop(() => {
+    if (GGP.withdrawQueueData && GGP.withdrawQueueData.length > 0) {
+      tableWithdrawQueue.updateOrAddData(GGP.withdrawQueueAsTabulatorData());
+    }
+
     // Reusing the GGP data, but just grabbing what we want for this page
     const data = GGP.dashboardAsTabulatorData().filter((obj) => obj.contract === "TokenggAVAX");
     tableStats.updateOrAddData(data);

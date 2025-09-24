@@ -585,17 +585,53 @@ class GoGoPool {
 
   // Helpers
   refreshDataLoop(fn) {
+    const pageLoadTime = Date.now();
+    const ONE_HOUR_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+    let timeoutId = null;
+    let isPollingActive = true;
+
     const poll = async () => {
-      await Promise.all([
-        this.fetchDashboardData(),
-        this.fetchMinipools(),
-        this.fetchStakers(),
-        this.fetchWithdrawQueue(),
-      ]);
-      fn();
-      setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
+      // Check if 1 hour has passed since page load
+      if (Date.now() - pageLoadTime >= ONE_HOUR_MS) {
+        console.log("Polling stopped after 1 hour of page load");
+        isPollingActive = false;
+        return;
+      }
+
+      // Only continue polling if still active
+      if (!isPollingActive) {
+        return;
+      }
+
+      try {
+        await Promise.all([
+          this.fetchDashboardData(),
+          this.fetchMinipools(),
+          this.fetchStakers(),
+          this.fetchWithdrawQueue(),
+        ]);
+        fn();
+      } catch (error) {
+        console.error("Error in refreshDataLoop:", error);
+      }
+
+      // Schedule next poll only if still active
+      if (isPollingActive) {
+        timeoutId = setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
+      }
     };
+
+    // Start polling
     poll();
+
+    // Return cleanup function
+    return () => {
+      isPollingActive = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
   }
 
   async isLoaded() {

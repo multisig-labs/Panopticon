@@ -27,9 +27,9 @@
 <div class="container w-95 border border-5 rounded pb-3">
   <h3 class="text-center">ggAVAX Stats</h3>
   <div id="ggavax-stats" class="text-center"><div class="loader">Loading...</div></div>
-  <div>WAVAX Balance: <span id="wavax-balance"></span></div>
   <div>Next Rewards Amt: <span id="next-rewards-amt"></span></div>
-  <div>WithdrawQueue Contract Balance: <span id="withdraw-queue-balance"></span></div>
+  <div>ggAVAX Contract WAVAX Balance: <span id="wavax-balance"></span></div>
+  <div>WithdrawQueue Contract AVAX Balance: <span id="withdraw-queue-balance"></span></div>
 </div>
 
 <style>
@@ -39,6 +39,10 @@
   .container-sm,
   .container-xl {
     max-width: 9140px;
+  }
+  #ggavax-stats [tabulator-field="title"],
+  #ggavax-stats [tabulator-field="desc"] {
+    text-align: left;
   }
 </style>
 

@@ -124,9 +124,9 @@ const ggAVAXStatsDef = {
   clipboardCopyRowRange: "selected",
   columns: [
     { width: 20, formatter: "responsiveCollapse", headerSort: false },
-    { title: "Variable", field: "title", width: 300 },
+    { title: "Variable", field: "title", width: 200 },
     { title: "Value", field: "value" },
-    { title: "Desc", field: "desc" },
+    { title: "Desc", field: "desc", align: "left" },
   ],
 };
 

@@ -86,7 +86,7 @@ class ggAVAX {
     const poll = async () => {
       await Promise.all([this.fetchCurrentDelegations(), this.fetchWavaxBalance(), this.fetchWithdrawQueueBalance()]);
       fn();
-      setTimeout(poll, 30000);
+      setTimeout(poll, window.POLL_INTERVAL || 60 * 1000);
     };
     poll();
   }

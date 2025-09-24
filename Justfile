@@ -16,15 +16,15 @@ LDFLAGS := "-s -w " + "-X " + VERSION_PATH + ".BuildDate=" + BUILD_DATE + " -X "
 default:
 	@just --list --unsorted
 
-compile:
+build:
 	go build -ldflags "{{LDFLAGS}}" -o bin/panopticon main.go
 
 # Run server using embedded files
-server: compile
+server: build
 	bin/panopticon server
 
 # Run server and serve files from disk, not embedded files
-dev: compile
+dev: build
 	OPEN_BROWSER=false VERBOSE=true bin/panopticon server
 
 # Copy ABIs from ../gogopool-contracts (excluding Base*)

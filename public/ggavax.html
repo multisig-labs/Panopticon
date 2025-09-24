@@ -50,6 +50,9 @@
   import { ggAVAXDef, ggAVAXStatsDef, ggAVAXMEVDef, withdrawQueueDef } from "/js/tabulator.js";
   import { formatters } from "/js/utils.js";
 
+  window.POLL_INTERVAL = 60 * 1000;
+  window.BATCHSIZE = 500;
+
   let GGAVAX, GGP;
 
   async function initData() {
@@ -96,10 +99,10 @@
     }
 
     // Reusing the GGP data, but just grabbing what we want for this page
-    const data = GGP.dashboardAsTabulatorData().filter((obj) => obj.contract === "TokenggAVAX");
+    const data = GGP.dashboardAsTabulatorData().filter(
+      (obj) => obj.contract === "TokenggAVAX" || obj.contract === "WithdrawQueue"
+    );
     tableStats.updateOrAddData(data);
-    const x = calcNextRewardAmt();
-    console.log(x);
   });
 
   // Ugh lame figure out better way

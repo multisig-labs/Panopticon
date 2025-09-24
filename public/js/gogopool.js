@@ -216,10 +216,16 @@ class GoGoPool {
     for (const obj of this.dashboard) {
       const c = this.contracts[obj.contract].mccontract;
       for (const metric of obj.metrics) {
-        try {
-          calls.push(c[metric.fn].call(this, ...(metric.args || [])));
-        } catch (err) {
-          console.log("cant find fn in contract for metric:", metric);
+        if (metric.fn === "NATIVE_BALANCE") {
+          // Get the contract address for the native balance
+          const contractAddress = this.contracts[obj.contract].address;
+          calls.push(this.multicallProvider.getEthBalance(contractAddress));
+        } else {
+          try {
+            calls.push(c[metric.fn].call(this, ...(metric.args || [])));
+          } catch (err) {
+            console.log("cant find fn in contract for metric:", metric);
+          }
         }
       }
     }
@@ -263,6 +269,7 @@ class GoGoPool {
         }
       }
     }
+    console.log("dashboard", this.dashboard);
     return this.dashboard;
   }
 

@@ -8,9 +8,10 @@ primary_region = "lax"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
 
-[build]
-  builder = "paketobuildpacks/builder:base"
-  # buildpacks = ["gcr.io/paketo-buildpacks/go"]
+# use Dockerfile instead of buildpacks
+# [build]
+#   builder = "paketobuildpacks/builder:base"
+#   buildpacks = ["docker.io/paketobuildpacks/go"]
 
 [env]
   PORT = "8000"

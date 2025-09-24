@@ -22,6 +22,7 @@ const deployment = {
     MinipoolStreamliner: "0x8C05D78066431C3b11bBFB6f3546fD3F1396115C",
     OonodzHardwareProvider: "0xfE6ca6cD383d1e213f5d1015dD0BB35275E8Fe3E",
     WithdrawQueue: "0x61f908D4992a790A2792D3C36850B4b9eB5849A3",
+    WAVAX: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
   },
 };
 

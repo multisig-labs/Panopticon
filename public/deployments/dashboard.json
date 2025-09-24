@@ -138,6 +138,11 @@
       {
         "fn": "getExpiredRequestsCount",
         "desc": "Number of requests that have expired and are no longer valid"
+      },
+      {
+        "fn": "NATIVE_BALANCE",
+        "desc": "Balance of the WithdrawQueue contract",
+        "formatter": "formatEther"
       }
     ]
   },

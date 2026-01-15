@@ -307,10 +307,10 @@ class GoGoPool {
   }
 
   async fetchMinipools() {
-    const params = new URLSearchParams(document.location.search);
-    if (params.get("status")) {
-      this.statusesToFetch = params.get("status").split(",");
-    } else {
+    try {
+      this.statusesToFetch = localStorage.getItem("status").split(",");
+    } catch (e) {
+      console.warn("using default statusesToFetch");
       this.statusesToFetch = [0, 1, 2];
     }
     await this.until((_) => this.isLoaded);

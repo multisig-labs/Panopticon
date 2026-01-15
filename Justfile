@@ -51,3 +51,8 @@ doctor:
 	fi
 	echo "gogopool-contracts repo ok"
 
+rpc-cache:
+	docker run --name rpc-cache-proxy -p 3000:3000 \
+		-e UPSTREAM_RPC_URL=$UPSTREAM_ETH_RPC_URL \
+		-e REDIS_URL=memory \
+		ghcr.io/powerloom/ethereum-rpc-cache-proxy:latest
